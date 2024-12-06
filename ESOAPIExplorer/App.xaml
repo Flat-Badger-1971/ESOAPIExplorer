@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="ESOAPIExplorer.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:ESOAPIExplorer.ValueConverters"
+    xmlns:models="using:ESOAPIExplorer.Models"
+    xmlns:local="using:ESOAPIExplorer">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <!-- Other merged dictionaries here -->
+                <!-- Styles -->
+                <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- ValueConverters -->
+            <converters:BoolToValueConverter x:Key="BoolToVisibilityConverter" ReturnType="Visibility">
+                <converters:BoolToValueConverter.TrueValue>
+                    <Visibility>Visible</Visibility>
+                </converters:BoolToValueConverter.TrueValue>
+                <converters:BoolToValueConverter.FalseValue>
+                    <Visibility>Collapsed</Visibility>
+                </converters:BoolToValueConverter.FalseValue>
+                <converters:BoolToValueConverter.NullValue>
+                    <Visibility>Collapsed</Visibility>
+                </converters:BoolToValueConverter.NullValue>
+            </converters:BoolToValueConverter>
+            <converters:BoolToValueConverter x:Key="NullableBoolToBoolConverter" ReturnType="x:Boolean"  TrueValue="true" FalseValue="false" NullValue="false"/>
+            <converters:BoolToValueConverter x:Key="InvertedBoolToVisibilityConverter" ReturnType="Visibility">
+                <converters:BoolToValueConverter.FalseValue>
+                    <Visibility>Visible</Visibility>
+                </converters:BoolToValueConverter.FalseValue>
+                <converters:BoolToValueConverter.TrueValue>
+                    <Visibility>Collapsed</Visibility>
+                </converters:BoolToValueConverter.TrueValue>
+                <converters:BoolToValueConverter.NullValue>
+                    <Visibility>Visible</Visibility>
+                </converters:BoolToValueConverter.NullValue>
+            </converters:BoolToValueConverter>
+            <converters:BoolToValueConverter x:Key="BoolInverter" ReturnType="x:Boolean"  TrueValue="false" FalseValue="true" NullValue="true"/>
+            <converters:BoolToValueConverter x:Key="BoolToPercentageConverter" ReturnType="x:Int32" TrueValue="100" FalseValue="0" NullValue="0"/>
+            <converters:NullToValueConverter x:Key="NotNullToVisibilityConverter" ReturnType="Visibility">
+                <converters:NullToValueConverter.NullValue>
+                    <Visibility>Collapsed</Visibility>
+                </converters:NullToValueConverter.NullValue>
+                <converters:NullToValueConverter.NotNullValue>
+                    <Visibility>Visible</Visibility>
+                </converters:NullToValueConverter.NotNullValue>
+            </converters:NullToValueConverter>
+            <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
+                <converters:OddEvenToValueConverter.EvenValue>
+                    <SolidColorBrush Color="DarkGray"/>
+                </converters:OddEvenToValueConverter.EvenValue>
+                <converters:OddEvenToValueConverter.OddValue>
+                    <SolidColorBrush Color="DimGray"/>
+                </converters:OddEvenToValueConverter.OddValue>
+            </converters:OddEvenToValueConverter>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

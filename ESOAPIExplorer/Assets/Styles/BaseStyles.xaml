@@ -1,0 +1,24 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Style TargetType="ListView">
+	</Style>
+
+	<Style TargetType="ListViewItem">
+		<Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
+		<Setter Property="Height" Value="20"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="Padding" Value="10,0,10,0"/>
+	</Style>
+	
+	<Style TargetType="ListViewItem" x:Key="NoPaddingListViewStyle">
+		<Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
+		<Setter Property="Height" Value="20"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+	</Style>
+	
+</ResourceDictionary>

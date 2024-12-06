@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ESOAPIExplorer.Views.HomeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ESOAPIExplorer.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ESOAPIExplorer.ViewModels"    
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
+    <Page.Resources>
+        <DataTemplate x:Key="ArgumentHeaderTemplate">
+            <Grid Margin="0" Height="20" Padding="10,0,10,0" Background="DarkGray">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Id" FontWeight="Bold" Margin="0" Grid.Column="0"/>
+                <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"/>
+                <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ArgumentItemTemplate">
+            <Grid Height="20" Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">
+                <Grid Margin="10,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"/>
+                    <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"/>
+                    <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="2"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+    
+    
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Top: Radio Buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <StackPanel Orientation="Horizontal"  Margin="5" HorizontalAlignment="Center">
+                <TextBlock Text="Events" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ToggleSwitch IsOn="{Binding ShowEvents, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="50"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"  Margin="5" HorizontalAlignment="Center">
+                <TextBlock Text="Functions" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ToggleSwitch IsOn="{Binding ShowFunctions, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="50"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"  Margin="5" HorizontalAlignment="Center">
+                <TextBlock Text="Globals" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ToggleSwitch IsOn="{Binding ShowGlobals, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="50"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Left: TextBox and ListBox -->
+        <Grid Grid.Column="0" Grid.Row="1" Width="500" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!-- Filter TextBox -->
+            <AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" PlaceholderText="Filter items..." Margin="5" Grid.Row="0"/>
+            <!-- TextChanged="FilterTextBox_TextChanged"/> -->
+            <!-- Full Height ListBox -->
+            <ListView x:Name="ListBox" ItemsSource="{Binding FilteredItems}" Grid.Row="1" SelectedItem="{Binding SelectedElement, Mode=TwoWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0" Height="20">
+                            <!-- Hidden ID Column -->
+                            <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
+                            <!-- Visible Text Column -->
+                            <TextBlock Text="{Binding Name}"  Margin="0"/>
+                            <Frame CornerRadius="5" Background="Salmon" Margin="5,0,0,0" Height="15">
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" />
+                            </Frame>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!-- Right: Split Horizontally -->
+        <Grid Grid.Column="1" Grid.Row="1" Background="LightGray" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Name -->
+                <TextBlock Grid.Row="0" 
+                           Text="{Binding SelectedElement.Name}" 
+                           Margin="5" 
+                           FontSize="32" 
+                           FontWeight="Bold" 
+                           TextAlignment="Left"/>
+            
+            <!-- Details -->
+            <Grid  Grid.Row="1" Margin="10">
+                <Grid Background="Black" Opacity="0.4"/>
+                <TextBlock Text="TBC"/>
+            </Grid>
+
+            <!-- access -->
+            <StackPanel Grid.Row="2" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <TextBlock Text="{Binding SelectedFunctionDetails.Access}" />
+            </StackPanel>
+
+            <!-- arguments -->
+            <StackPanel Grid.Row="3">
+                <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <!-- Function Arguments -->
+                <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
+                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                          Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+
+                <!-- Event Arguments -->
+                <ListView ItemsSource="{Binding SelectedEventDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
+                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                          Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="4" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Search Github" Command="{Binding SearchGithubCommand}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
