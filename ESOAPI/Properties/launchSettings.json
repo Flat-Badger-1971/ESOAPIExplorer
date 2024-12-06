@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ESOAPI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ESOAPI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

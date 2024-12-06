@@ -1,0 +1,14 @@
+﻿namespace ESOAPI.Parser;
+
+public enum ReaderState
+{
+    UNDETERMINED,
+    READ_API_VERSION,
+    READ_VM_FUNCTIONS,
+    READ_GLOBALS,
+    READ_GAME_API,
+    READ_OBJECT_API,
+    READ_EVENTS,
+    READ_XML_LAYOUT,
+    READ_XML_ATTRIBUTES
+}
