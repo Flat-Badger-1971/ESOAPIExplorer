@@ -74,8 +74,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- Top: Radio Buttons -->
@@ -95,7 +95,7 @@
         </StackPanel>
 
         <!-- Left: TextBox and ListBox -->
-        <Grid Grid.Column="0" Grid.Row="1" Width="500" >
+        <Grid Grid.Column="0" Grid.Row="1" MinWidth="500" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
@@ -113,7 +113,7 @@
                             <!-- Visible Text Column -->
                             <TextBlock Text="{Binding Name}"  Margin="0"/>
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
-                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" />
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
                             </Frame>
                         </StackPanel>
                     </DataTemplate>
