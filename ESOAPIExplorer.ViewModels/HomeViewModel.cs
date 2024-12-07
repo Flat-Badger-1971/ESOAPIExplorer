@@ -25,7 +25,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedElement, value);
 
             SelectedFunctionDetails = null;
-            SelectedFunctionDetails = null;
+            SelectedEventDetails = null;
             SelectedGlobalDetails = null;
             if (value != null)
             {
