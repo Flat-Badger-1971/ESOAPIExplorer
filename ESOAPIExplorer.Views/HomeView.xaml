@@ -13,13 +13,13 @@
     d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
     <Page.Resources>
         <DataTemplate x:Key="ArgumentHeaderTemplate">
-            <Grid Margin="0" Height="20" Padding="10,0,10,0" Background="DarkGray">
+            <Grid Margin="0" Height="20" Padding="10,0,10,0" Background="#FF1A2B40">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Id" FontWeight="Bold" Margin="0" Grid.Column="0"/>
+                <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"/>
                 <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"/>
                 <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"/>
             </Grid>
@@ -34,13 +34,40 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"/>
                     <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"/>
-                    <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="2"/>
+                    <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}"  Margin="0" Grid.Column="2"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ValueHeaderTemplate">
+            <Grid Margin="0" Height="20" Padding="10,0,10,0" Background="#FF1A2B40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Name" FontWeight="Bold" Margin="0" Grid.Column="0"/>
+                <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="1"/>
+                <TextBlock Text="Value" FontWeight="Bold"  Margin="0" Grid.Column="2"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ValueItemTemplate">
+            <Grid Height="20" >
+                <!--Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">-->
+                <Grid Margin="10,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="0"/>
+                    <TextBlock Text="integer"  Margin="0" Grid.Column="1"/>
+                    <TextBlock Text="{Binding Name, Converter={StaticResource ConstantToValueConverter}}"  Margin="0" Grid.Column="2"/>
                 </Grid>
             </Grid>
         </DataTemplate>
     </Page.Resources>
-    
-    
+
+
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -95,7 +122,7 @@
         </Grid>
 
         <!-- Right: Split Horizontally -->
-        <Grid Grid.Column="1" Grid.Row="1" Background="LightGray" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
+        <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -106,47 +133,69 @@
             </Grid.RowDefinitions>
 
             <!-- Name -->
-                <TextBlock Grid.Row="0" 
-                           Text="{Binding SelectedElement.Name}" 
+            <TextBlock Grid.Row="0" 
+                           Text="{Binding SelectedElement.Name}"
+                           Foreground ="Goldenrod"
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
                            TextAlignment="Left"/>
-            
-            <!-- Details -->
-            <Grid  Grid.Row="1" Margin="10">
-                <Grid Background="Black" Opacity="0.4"/>
-                <TextBlock Text="TBC"/>
-            </Grid>
 
-            <!-- access -->
-            <StackPanel Grid.Row="2" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10"/>
-                <TextBlock Text="{Binding SelectedFunctionDetails.Access}" />
-            </StackPanel>
-
-            <!-- arguments -->
-            <StackPanel Grid.Row="3">
-                <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10"/>
-                <!-- Function Arguments -->
-                <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
-                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                          Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-
-                <!-- Event Arguments -->
-                <ListView ItemsSource="{Binding SelectedEventDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
-                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                          Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-            </StackPanel>
-
-            <Grid Grid.Row="4" Margin="10">
+            <!-- github -->
+            <Grid Grid.Row="1" Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Content="Search Github" Command="{Binding SearchGithubCommand}" />
             </Grid>
+
+            <!-- access -->
+            <StackPanel Grid.Row="2" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" />
+                <TextBlock Text="{Binding SelectedFunctionDetails.Access, Converter={StaticResource LowercaseConverter}}" Foreground="{Binding SelectedFunctionDetails.Access, Converter={StaticResource AccessLevelToColourConverter}}" Margin="10" />
+            </StackPanel>
+
+            <!-- value -->
+            <StackPanel Grid.Row="3" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <!-- Event Values -->
+                <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                    ItemTemplate="{StaticResource ValueItemTemplate}"
+                    HeaderTemplate="{StaticResource ValueHeaderTemplate}" />
+            </StackPanel>
+
+            <!-- arguments -->
+            <StackPanel Grid.Row="4">
+                <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <!-- Function Arguments -->
+                <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
+                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                          Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                    <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                </Grid>
+
+                <!-- Event Arguments -->
+                <Grid Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    <ListView ItemsSource="{Binding SelectedEventDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
+                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                          Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                    <TextBlock Text="none" Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- results -->
+            <StackPanel Grid.Row="5" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <!-- Function Return Values -->
+                <ListView ItemsSource="{Binding SelectedFunctionDetails.Returns}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                    ItemTemplate="{StaticResource ArgumentItemTemplate}"
+                    HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                    Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                <TextBlock Text="nothing" Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

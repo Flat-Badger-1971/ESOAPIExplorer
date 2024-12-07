@@ -1,17 +1,9 @@
-using ESOAPIExplorer.Models;
-using System;
+namespace ESOAPIExplorer.Models;
 
-namespace ESOAPIExplorer.Models
+public class APIElement
 {
-    public class APIElement
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public APIElementType ElementType { get; set; }
-
-        //public int CompareTo(APIElement other)
-        //{
-        //    return Name.CompareTo(other.Name);
-        //}
-    }
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public APIElementType ElementType { get; set; }
+    public string Parent { get; set; }
 }

@@ -50,12 +50,32 @@
             </converters:NullToValueConverter>
             <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
                 <converters:OddEvenToValueConverter.EvenValue>
-                    <SolidColorBrush Color="DarkGray"/>
+                    <SolidColorBrush Color="#FF0E0E0E"/>
                 </converters:OddEvenToValueConverter.EvenValue>
                 <converters:OddEvenToValueConverter.OddValue>
-                    <SolidColorBrush Color="DimGray"/>
+                    <SolidColorBrush Color="#FF1A1A1A"/>
                 </converters:OddEvenToValueConverter.OddValue>
             </converters:OddEvenToValueConverter>
+            <converters:LowercaseConverter x:Key="LowercaseConverter" />
+            <converters:AccessLevelToColourConverter x:Key="AccessLevelToColourConverter" ReturnType="SolidColorBrush">
+                <converters:AccessLevelToColourConverter.PrivateValue>
+                    <SolidColorBrush Color="#FFFF3B30"/>
+                </converters:AccessLevelToColourConverter.PrivateValue>
+                <converters:AccessLevelToColourConverter.ProtectedAttributeValue>
+                    <SolidColorBrush Color="#FFB10DC9"/>
+                </converters:AccessLevelToColourConverter.ProtectedAttributeValue>
+                <converters:AccessLevelToColourConverter.ProtectedValue>
+                    <SolidColorBrush Color="#FFB10DC9"/>
+                </converters:AccessLevelToColourConverter.ProtectedValue>
+                <converters:AccessLevelToColourConverter.PublicValue>
+                    <SolidColorBrush Color="#FF2ECC40"/>
+                </converters:AccessLevelToColourConverter.PublicValue>
+            </converters:AccessLevelToColourConverter>
+            <converters:TypeToNameConverter x:Key="TypeToNameConverter"/>
+            <converters:EmptyListToVisibilityConverter x:Key="EmptyListToVisibilityConverter"/>
+            <converters:EmptyListToTextConverter x:Key="EmptyListToTextConverter"/>
+            <converters:SingleValueToListConverter x:Key="SingleValueToListConverter"/>
+            <converters:ConstantToNumberConverter x:Key="ConstantToValueConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,9 +1,8 @@
 using System;
 
-namespace ESOAPIExplorer.EventArguments
+namespace ESOAPIExplorer.EventArguments;
+
+public class AppBusyEventArgs : EventArgs
 {
-    public class AppBusyEventArgs : EventArgs
-    {
-        public bool IsBusy { get; set; }
-    }
+    public bool IsBusy { get; set; }
 }

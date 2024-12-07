@@ -1,9 +1,8 @@
 using System;
 
-namespace ESOAPIExplorer.EventArguments
+namespace ESOAPIExplorer.EventArguments;
+
+public class NavigationEventArgs:EventArgs
 {
-    public class NavigationEventArgs:EventArgs
-    {
-        public Type ViewModelType { get; set; }
-    }
+    public Type ViewModelType { get; set; }
 }

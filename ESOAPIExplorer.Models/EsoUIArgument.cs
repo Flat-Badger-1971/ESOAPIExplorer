@@ -1,5 +1,3 @@
-using System.Data.Common;
-
 namespace ESOAPIExplorer.Models;
 
 public class EsoUIArgument

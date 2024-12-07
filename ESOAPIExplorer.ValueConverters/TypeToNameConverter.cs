@@ -1,24 +1,19 @@
 using System;
+using ESOAPIExplorer.Models;
 using Microsoft.UI.Xaml.Data;
 
 namespace ESOAPIExplorer.ValueConverters;
 
-public class OddEvenToValueConverter : IValueConverter
+public class TypeToNameConverter : IValueConverter
 {
-    public object EvenValue { get; set; }
-    public object OddValue { get; set; }
-    public Type ReturnType { get; set; }
-
     public object Convert(object value, Type targetType, object parameter, string culture)
     {
-        if (value is int num)
+        if (value is EsoUIType arg)
         {
-            if (num % 2 == 0) //is even
-                return EvenValue;
-            else
-                return OddValue;
+            return arg.Name;
         }
-        else return 0;
+
+        return value;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string culture)

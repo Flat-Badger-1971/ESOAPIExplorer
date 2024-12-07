@@ -1,4 +1,3 @@
-using ESOAPIExplorer.Models;
 using System.Collections.Generic;
 
 namespace ESOAPIExplorer.Models;
