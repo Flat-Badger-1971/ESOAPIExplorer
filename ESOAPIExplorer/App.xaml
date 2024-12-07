@@ -57,25 +57,25 @@
                 </converters:OddEvenToValueConverter.OddValue>
             </converters:OddEvenToValueConverter>
             <converters:LowercaseConverter x:Key="LowercaseConverter" />
-            <converters:AccessLevelToColourConverter x:Key="AccessLevelToColourConverter" ReturnType="SolidColorBrush">
-                <converters:AccessLevelToColourConverter.PrivateValue>
-                    <SolidColorBrush Color="#FFFF3B30"/>
-                </converters:AccessLevelToColourConverter.PrivateValue>
-                <converters:AccessLevelToColourConverter.ProtectedAttributeValue>
-                    <SolidColorBrush Color="#FFB10DC9"/>
-                </converters:AccessLevelToColourConverter.ProtectedAttributeValue>
-                <converters:AccessLevelToColourConverter.ProtectedValue>
-                    <SolidColorBrush Color="#FFB10DC9"/>
-                </converters:AccessLevelToColourConverter.ProtectedValue>
-                <converters:AccessLevelToColourConverter.PublicValue>
-                    <SolidColorBrush Color="#FF2ECC40"/>
-                </converters:AccessLevelToColourConverter.PublicValue>
-            </converters:AccessLevelToColourConverter>
+            <converters:StringToValueConverter x:Key="AccessLevelToColourConverter" ReturnType="SolidColorBrush">
+                <converters:StringToValueConverter.Values>
+                    <SolidColorBrush Color="#FFFF3B30" x:Key="PRIVATE"/>
+                    <SolidColorBrush Color="#FFB10DC9" x:Key="PROTECTED"/>
+                    <SolidColorBrush Color="#FF2ECC40" x:Key="PUBLIC"/>
+                </converters:StringToValueConverter.Values>
+            </converters:StringToValueConverter>
             <converters:TypeToNameConverter x:Key="TypeToNameConverter"/>
             <converters:EmptyListToVisibilityConverter x:Key="EmptyListToVisibilityConverter"/>
             <converters:EmptyListToTextConverter x:Key="EmptyListToTextConverter"/>
             <converters:SingleValueToListConverter x:Key="SingleValueToListConverter"/>
             <converters:ConstantToNumberConverter x:Key="ConstantToValueConverter"/>
+            <converters:StringToValueConverter x:Key="APITypeToColourConverter" ReturnType="SolidColorBrush">
+                <converters:StringToValueConverter.Values>
+                    <SolidColorBrush Color="#FF2ECC40" x:Key="Event"/>
+                    <SolidColorBrush Color="#FFFF3B30" x:Key="Global"/>
+                    <SolidColorBrush Color="#FFB10DC9" x:Key="Function"/>
+                </converters:StringToValueConverter.Values>
+            </converters:StringToValueConverter>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

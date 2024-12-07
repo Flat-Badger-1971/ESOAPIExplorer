@@ -112,7 +112,7 @@
                             <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
                             <!-- Visible Text Column -->
                             <TextBlock Text="{Binding Name}"  Margin="0"/>
-                            <Frame CornerRadius="5" Background="Salmon" Margin="5,0,0,0" Height="15">
+                            <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
                                 <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" />
                             </Frame>
                         </StackPanel>
