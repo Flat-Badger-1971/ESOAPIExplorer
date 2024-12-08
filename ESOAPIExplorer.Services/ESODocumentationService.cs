@@ -13,17 +13,18 @@ namespace ESOAPIExplorer.Services;
 
 public class ESODocumentationService : IESODocumentationService
 {
-    public EsoUIDocumentation Data { get; set; }
-    public string FileName { get; set; }
-    public string CurrentLine { get; set; }
-    public List<string> CurrentEnum { get; set; }
-    public EsoUIFunction CurrentFunction { get; set; }
-    public EsoUIObject CurrentObject { get; set; }
-    public EsoUIXMLElement CurrentElement { get; set; }
-    public ReaderState State { get; set; }
+    private string FileName { get; set; }
+    private string CurrentLine { get; set; }
+    private List<string> CurrentEnum { get; set; }
+    private EsoUIFunction CurrentFunction { get; set; }
+    private EsoUIObject CurrentObject { get; set; }
+    private EsoUIXMLElement CurrentElement { get; set; }
+    private ReaderState State { get; set; }
     private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
     private readonly FileOpenPicker _filePicker;
+
     public EsoUIDocumentation Documentation { get; set; }
+    public EsoUIDocumentation Data { get; set; }
 
     public ESODocumentationService()
     {
@@ -76,17 +77,17 @@ public class ESODocumentationService : IESODocumentationService
         return path;
     }
 
-    public bool LineStartsWith(string prefix)
+    private bool LineStartsWith(string prefix)
     {
         return CurrentLine.StartsWith(prefix);
     }
 
-    public bool LineEndsWith(string suffix)
+    private bool LineEndsWith(string suffix)
     {
         return CurrentLine.EndsWith(suffix);
     }
 
-    public string GetFirstMatch(Regex pattern)
+    private string GetFirstMatch(Regex pattern)
     {
         MatchCollection matches = pattern.Matches(CurrentLine);
 
@@ -100,7 +101,7 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    public List<string> GetMatches(Regex pattern)
+    private List<string> GetMatches(Regex pattern)
     {
         MatchCollection matches = pattern.Matches(CurrentLine);
         List<string> result = [];
@@ -113,7 +114,7 @@ public class ESODocumentationService : IESODocumentationService
         return result;
     }
 
-    public ReaderState FindNextState()
+    private ReaderState FindNextState()
     {
         switch (true)
         {
@@ -140,7 +141,7 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    public bool ReadApiVersion()
+    private bool ReadApiVersion()
     {
         if (LineStartsWith("h1. "))
         {
@@ -152,7 +153,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    public List<string> GetOrCreateGlobal(string name)
+    private List<string> GetOrCreateGlobal(string name)
     {
         if (!Data.Globals.TryGetValue(name, out List<string> value))
         {
@@ -163,7 +164,7 @@ public class ESODocumentationService : IESODocumentationService
         return value;
     }
 
-    public bool ReadGlobals()
+    private bool ReadGlobals()
     {
         switch (true)
         {
@@ -184,7 +185,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    public static List<EsoUIArgument> ParseArgs(string args)
+    private static List<EsoUIArgument> ParseArgs(string args)
     {
         List<EsoUIArgument> data = [];
         string[] argsArray = args.Split(',');
@@ -200,7 +201,7 @@ public class ESODocumentationService : IESODocumentationService
         return data;
     }
 
-    public bool ReadGameApi()
+    private bool ReadGameApi()
     {
         if (LineStartsWith("h2. "))
         {
@@ -212,7 +213,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    public void ReadFunction(Dictionary<string, EsoUIFunction> functions)
+    private void ReadFunction(Dictionary<string, EsoUIFunction> functions)
     {
         switch (true)
         {
@@ -242,7 +243,7 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    public EsoUIObject GetOrCreateObject(string name)
+    private EsoUIObject GetOrCreateObject(string name)
     {
         if (!Data.Objects.TryGetValue(name, out EsoUIObject value))
         {
@@ -253,7 +254,7 @@ public class ESODocumentationService : IESODocumentationService
         return value;
     }
 
-    public bool ReadObjectApi()
+    private bool ReadObjectApi()
     {
         if (LineStartsWith("h2. "))
         {
@@ -263,7 +264,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    public bool ReadEvents()
+    private bool ReadEvents()
     {
         switch (true)
         {
@@ -293,7 +294,7 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    public bool ReadXmlAttributes()
+    private bool ReadXmlAttributes()
     {
         if (LineStartsWith("h4. Attributes"))
         {
@@ -314,7 +315,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    public EsoUIXMLElement GetOrCreateElement(string name)
+    private EsoUIXMLElement GetOrCreateElement(string name)
     {
         if (!Data.XmlLayout.TryGetValue(name, out EsoUIXMLElement value))
         {
@@ -325,7 +326,7 @@ public class ESODocumentationService : IESODocumentationService
         return value;
     }
 
-    public bool ReadXmlLayout()
+    private bool ReadXmlLayout()
     {
         switch (true)
         {
@@ -378,7 +379,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    public void InjectCustomData()
+    private void InjectCustomData()
     {
         EsoUIFunction registerForEvent = new EsoUIFunction("RegisterForEvent");
         registerForEvent.AddArgument("namespace", "string");
@@ -440,7 +441,7 @@ public class ESODocumentationService : IESODocumentationService
         Data.Functions["GetAddOnManager"] = getAddOnManager;
     }
 
-    public Task<EsoUIDocumentation> ParseFileAsync()
+    private Task<EsoUIDocumentation> ParseFileAsync()
     {
         return Task.Run(() =>
         {
@@ -469,7 +470,7 @@ public class ESODocumentationService : IESODocumentationService
         });
     }
 
-    public Task<EsoUIDocumentation> ParseAsync(string fileName)
+    private Task<EsoUIDocumentation> ParseAsync(string fileName)
     {
         FileName = fileName;
 
