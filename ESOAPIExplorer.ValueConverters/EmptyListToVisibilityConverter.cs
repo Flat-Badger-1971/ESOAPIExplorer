@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
@@ -10,6 +11,11 @@ public class EmptyListToVisibilityConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is IList list && list.Count == 0)
+        {
+            return Visibility.Collapsed;
+        }
+
+        if (value is IOrderedEnumerable<string> ienum && !ienum.Any())
         {
             return Visibility.Collapsed;
         }

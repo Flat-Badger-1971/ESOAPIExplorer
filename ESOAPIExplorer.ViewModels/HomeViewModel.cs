@@ -45,7 +45,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             Name = value.Name,
                             ParentName = value.Parent
                         };
-                        SelectedGlobalEnum = _ESODocumentationService.Data.Globals[value.Parent];
+
+                        SelectedGlobalEnum = new EsoUIEnum
+                        {
+                            ValueNames = _ESODocumentationService.Data.Globals[value.Parent],
+                            Name = value.Name,
+                            UsedBy = GetUsedBy(value.Parent)
+                        };
+
                         break;
                 }
                 // }
@@ -81,7 +88,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
-    public List<string> SelectedGlobalEnum
+    public EsoUIEnum SelectedGlobalEnum
     {
         get => selectedGlobalEnum;
         set => SetProperty(ref selectedGlobalEnum, value);
@@ -182,7 +189,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     private ObservableCollection<APIElement> _FilteredItems;
-    private List<string> selectedGlobalEnum;
+    private EsoUIEnum selectedGlobalEnum;
 
     public ObservableCollection<APIElement> FilteredItems
     {
@@ -233,19 +240,117 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         FilterItems();
     }
 
+    private static bool ContainsInOrder(string source, string filter)
+    {
+        if (string.IsNullOrEmpty(filter)) return true;
+        int index = 0;
+        foreach (char c in source)
+        {
+            if (char.ToLowerInvariant(c) == char.ToLowerInvariant(filter[index]))
+            {
+                index++;
+                if (index == filter.Length) return true;
+            }
+        }
+        return false;
+    }
+
+    private IEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
+    {
+        if (string.IsNullOrWhiteSpace(filter))
+        {
+            return keywordList;
+        }
+
+        IEnumerable<APIElement> scoredKeywords =
+            keywordList
+            .Select(keyword => new
+            {
+                Keyword = keyword.Name,
+                Score = CalculateScore(keyword.Name, filter),
+                Element = keyword
+            })
+            .Where(item => item.Score > 0)
+            .OrderByDescending(item => item.Score)
+            .ThenBy(item => item.Keyword)
+            .Select(item => item.Element);
+
+        return scoredKeywords;
+    }
+
+    private int CalculateScore(string keyword, string filter)
+    {
+        int score = 0; 
+        
+        for (int i = 0; i < filter.Length && i < keyword.Length; i++)
+        {
+            if (keyword[i] == filter[i])
+            {
+                score += 2; // Higher score for exact position match
+            }
+            else if (keyword.Contains(filter[i], StringComparison.OrdinalIgnoreCase))
+            {
+                score += 1; // Lower score for presence of character
+            }
+        }
+
+        return score;
+    }
+
     private void FilterItems()
     {
-        FilteredItems = new ObservableCollection<APIElement>(AllItems.Where(i =>
+        IEnumerable<APIElement> items = AllItems
+                .Where(i =>
+                    ((ShowEvents && i.Value.ElementType == APIElementType.Event)
+                    || (ShowFunctions && i.Value.ElementType == APIElementType.Function)
+                    || (ShowGlobals && i.Value.ElementType == APIElementType.Global))
+                )
+                .Select(d => d.Value);
 
-            (string.IsNullOrEmpty(FilterText) || i.Value.Name.Contains(FilterText, StringComparison.OrdinalIgnoreCase))
-            && ((ShowEvents && i.Value.ElementType == APIElementType.Event)
-            || (ShowFunctions && i.Value.ElementType == APIElementType.Function)
-            || (ShowGlobals && i.Value.ElementType == APIElementType.Global))
-        ).Select(d => d.Value));
+        IEnumerable<APIElement> filtered = FilterKeywords(items, FilterText);
+
+        FilteredItems = new ObservableCollection<APIElement>(filtered);
     }
 
     public ICommand SearchGithubCommand => new RelayCommand(() =>
     {
         _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type="));
     });
+
+    private IEnumerable<string> GetUsedBy(string enumName)
+    {
+        List<string> usedBy = [];
+
+        foreach (KeyValuePair<string, EsoUIEvent> item in _ESODocumentationService.Data.Events)
+        {
+            foreach (EsoUIArgument arg in item.Value.Args)
+            {
+                if (arg.Type.Name == enumName)
+                {
+                    usedBy.Add(item.Key);
+                }
+            }
+        }
+
+        foreach (KeyValuePair<string, EsoUIFunction> item in _ESODocumentationService.Data.Functions)
+        {
+            foreach (EsoUIArgument arg in item.Value.Args)
+            {
+                if (arg.Type.Name == enumName)
+                {
+                    usedBy.Add(item.Key);
+                }
+            }
+
+            foreach (EsoUIArgument retval in item.Value.Returns)
+            {
+                if (retval.Type.Name == enumName)
+                {
+                    usedBy.Add(item.Key);
+                }
+            }
+        }
+
+        return usedBy.Order();
+    }
 }

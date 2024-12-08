@@ -80,6 +80,16 @@
                 </Grid>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="UsedByItemTemplate">
+            <Grid Height="20" Padding="0">
+                <Grid Margin="10,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding}"  Margin="0" Grid.Column="0"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
 
@@ -139,6 +149,8 @@
         <!-- Right: Split Horizontally -->
         <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -220,16 +232,26 @@
             </StackPanel>
 
             <!-- enum -->
-            <StackPanel Grid.Row="5" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="6" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <!-- enum Values -->
-                <ListView ItemsSource="{Binding SelectedGlobalEnum, Converter={StaticResource EnumToSortedEnumConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                <Border BorderBrush="DimGray" BorderThickness="1" Margin="10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                <ListView ItemsSource="{Binding SelectedGlobalEnum.ValueNames, Converter={StaticResource EnumToSortedEnumConverter}}" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource EnumItemTemplate}"
                     Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                </ScrollViewer>
+                </Border>
                 <TextBlock Text="nothing" Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
             </StackPanel>
-            
+
+            <!-- used by -->
+            <StackPanel Grid.Row="7" Visibility="{Binding SelectedGlobalEnum.UsedBy, Converter={StaticResource EmptyListToVisibilityConverter}}">
+                <TextBlock Text="used by" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <ListView ItemsSource="{Binding SelectedGlobalEnum.UsedBy}" Margin="10" BorderThickness="0" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                    ItemTemplate="{StaticResource UsedByItemTemplate}"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>
