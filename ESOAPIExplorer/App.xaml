@@ -48,6 +48,14 @@
                     <Visibility>Visible</Visibility>
                 </converters:NullToValueConverter.NotNullValue>
             </converters:NullToValueConverter>
+            <converters:NullToValueConverter x:Key="NullToVisibilityConverter" ReturnType="Visibility">
+                <converters:NullToValueConverter.NullValue>
+                    <Visibility>Visible</Visibility>
+                </converters:NullToValueConverter.NullValue>
+                <converters:NullToValueConverter.NotNullValue>
+                    <Visibility>Collapsed</Visibility>
+                </converters:NullToValueConverter.NotNullValue>
+            </converters:NullToValueConverter>
             <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
                 <converters:OddEvenToValueConverter.EvenValue>
                     <SolidColorBrush Color="#FF0E0E0E"/>
@@ -76,6 +84,7 @@
                     <SolidColorBrush Color="#FFB10DC9" x:Key="Function"/>
                 </converters:StringToValueConverter.Values>
             </converters:StringToValueConverter>
+            <converters:EnumToSortedEnumConverter x:Key="EnumToSortedEnumConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

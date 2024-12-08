@@ -65,6 +65,21 @@
                 </Grid>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="EnumItemTemplate">
+            <Grid Height="20" >
+                <!--Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">-->
+                <Grid Margin="10,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="0"/>
+                    <TextBlock Text="integer"  Margin="0" Grid.Column="1"/>
+                    <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
 
@@ -156,22 +171,29 @@
             </StackPanel>
 
             <!-- value -->
-            <StackPanel Grid.Row="3" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="3" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NullToVisibilityConverter}}">
                 <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <!-- Event Values -->
                 <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource ValueItemTemplate}"
-                    HeaderTemplate="{StaticResource ValueHeaderTemplate}" />
+                    Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+
+                <!-- Global Values -->
+                <ListView ItemsSource="{Binding SelectedGlobalDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
+                    ItemTemplate="{StaticResource ValueItemTemplate}"
+                    Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
             </StackPanel>
 
             <!-- arguments -->
-            <StackPanel Grid.Row="4">
+            <StackPanel Grid.Row="4" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NullToVisibilityConverter}}">
                 <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <!-- Function Arguments -->
                 <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                     <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
-                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                          ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
                     <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
                 </Grid>
@@ -191,11 +213,23 @@
                 <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <!-- Function Return Values -->
                 <ListView ItemsSource="{Binding SelectedFunctionDetails.Returns}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
-                    ItemTemplate="{StaticResource ArgumentItemTemplate}"
                     HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                    ItemTemplate="{StaticResource ArgumentItemTemplate}"
                     Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
                 <TextBlock Text="nothing" Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
             </StackPanel>
+
+            <!-- enum -->
+            <StackPanel Grid.Row="5" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <!-- enum Values -->
+                <ListView ItemsSource="{Binding SelectedGlobalEnum, Converter={StaticResource EnumToSortedEnumConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewStyle}" 
+                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
+                    ItemTemplate="{StaticResource EnumItemTemplate}"
+                    Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                <TextBlock Text="nothing" Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+            </StackPanel>
+            
         </Grid>
     </Grid>
 </Page>

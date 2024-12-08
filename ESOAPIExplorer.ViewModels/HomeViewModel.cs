@@ -1,7 +1,6 @@
 using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Services;
-using Microsoft.UI.Xaml.Documents;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,6 +26,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SelectedFunctionDetails = null;
             SelectedEventDetails = null;
             SelectedGlobalDetails = null;
+
             if (value != null)
             {
                 // try
@@ -40,9 +40,13 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         SelectedFunctionDetails = _ESODocumentationService.Data.Functions[value.Id];
                         break;
                     case APIElementType.Global:
-                        SelectedGlobalDetails = _ESODocumentationService.Data.Globals[value.Parent];
+                        SelectedGlobalDetails = new EsoUIGlobal
+                        {
+                            Name = value.Name,
+                            ParentName = value.Parent
+                        };
+                        SelectedGlobalEnum = _ESODocumentationService.Data.Globals[value.Parent];
                         break;
-
                 }
                 // }
                 // catch
@@ -77,8 +81,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
-    private List<string> _SelectedGlobalDetails;
-    public List<string> SelectedGlobalDetails
+    public List<string> SelectedGlobalEnum
+    {
+        get => selectedGlobalEnum;
+        set => SetProperty(ref selectedGlobalEnum, value);
+    }
+
+    private EsoUIGlobal _SelectedGlobalDetails;
+    public EsoUIGlobal SelectedGlobalDetails
     {
         get => _SelectedGlobalDetails;
         set
@@ -172,6 +182,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     private ObservableCollection<APIElement> _FilteredItems;
+    private List<string> selectedGlobalEnum;
+
     public ObservableCollection<APIElement> FilteredItems
     {
         get => _FilteredItems;
