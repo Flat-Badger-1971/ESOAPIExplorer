@@ -1,5 +1,6 @@
 using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
+using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
 using System;
 using System.Collections.Generic;
@@ -278,39 +279,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             return keywordList;
         }
 
-        IEnumerable<APIElement> scoredKeywords =
-            keywordList
-            .Select(keyword => new
-            {
-                Keyword = keyword.Name,
-                Score = CalculateScore(keyword.Name, filter),
-                Element = keyword
-            })
-            .Where(item => item.Score > 0)
-            .OrderByDescending(item => item.Score)
-            .ThenBy(item => item.Keyword)
-            .Select(item => item.Element);
-
-        return scoredKeywords;
-    }
-
-    private int CalculateScore(string keyword, string filter)
-    {
-        int score = 0; 
-        
-        for (int i = 0; i < filter.Length && i < keyword.Length; i++)
-        {
-            if (keyword[i] == filter[i])
-            {
-                score += 2; // Higher score for exact position match
-            }
-            else if (keyword.Contains(filter[i], StringComparison.OrdinalIgnoreCase))
-            {
-                score += 1; // Lower score for presence of character
-            }
-        }
-
-        return score;
+        return FastFuzzy.Search(filter, keywordList);
     }
 
     CancellationTokenSource token;

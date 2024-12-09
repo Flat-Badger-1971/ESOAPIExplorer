@@ -155,6 +155,7 @@
             <!-- enum -->
             <StackPanel Grid.Row="6" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <TextBlock Text="{Binding SelectedGlobalDetails.ParentName}" Margin="10"/>
                 <!-- enum Values -->
                 <Border BorderBrush="DimGray" BorderThickness="1" Margin="10">
                     <Grid Style="{StaticResource ListHeaderGridStyle}">
