@@ -5,9 +5,29 @@
     <SolidColorBrush x:Key="ESOSelectedBackground">#999999</SolidColorBrush>
     <SolidColorBrush x:Key="ESOHoverBackground">#787878</SolidColorBrush>
     <SolidColorBrush x:Key="ESOStripedListForeground">LightGray</SolidColorBrush>
-    
-    <Style TargetType="ListView">
+
+    <!-- Default Styles -->
+    <Style TargetType="ListView" x:Key="DefaultListViewStyle">
         <Setter Property="MinWidth" Value="900"/>
+    </Style>
+    <Style TargetType="ListView" BasedOn="{StaticResource DefaultListViewStyle}"/>
+    <!-- -->
+
+
+    <Style TargetType="ListView" x:Key="InvisibleListViewStyle" BasedOn="{StaticResource DefaultListViewStyle}">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style TargetType="ListViewItem" x:Key="InvisibleListViewItemStyle">
+        <Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
     </Style>
 
     <Style TargetType="Grid" x:Key="ListHeaderGridStyle">
@@ -99,7 +119,7 @@
         </Setter>
     </Style>
 	
-	<Style TargetType="ListViewItem" x:Key="NoPaddingListViewStyle">
+	<Style TargetType="ListViewItem" x:Key="NoPaddingListViewItemStyle">
 		<Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
 		<Setter Property="Height" Value="20"/>
 		<Setter Property="MinHeight" Value="0"/>
