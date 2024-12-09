@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -29,6 +30,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
             if (value != null)
             {
+                SelectedUsedByItem = null;
                 // try
                 // {
                 switch (value.ElementType)
@@ -92,6 +94,20 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         get => selectedGlobalEnum;
         set => SetProperty(ref selectedGlobalEnum, value);
+    }
+
+    private string _SelectedUsedByItem;
+    public string SelectedUsedByItem
+    {
+        get => _SelectedUsedByItem;
+        set
+        {
+            SetProperty(ref _SelectedUsedByItem, value);
+            if (value != null)
+            {
+                SelectedElement = _AllItems.FirstOrDefault(i => i.Value.Name == value)?.Value;
+            }
+        }
     }
 
     private EsoUIGlobal _SelectedGlobalDetails;
@@ -297,19 +313,33 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         return score;
     }
 
-    private void FilterItems()
+    CancellationTokenSource token;
+    private async void FilterItems()
     {
-        IEnumerable<APIElement> items = AllItems
-                .Where(i =>
-                    ((ShowEvents && i.Value.ElementType == APIElementType.Event)
-                    || (ShowFunctions && i.Value.ElementType == APIElementType.Function)
-                    || (ShowGlobals && i.Value.ElementType == APIElementType.Global))
-                )
-                .Select(d => d.Value);
+        if (token != null && !token.IsCancellationRequested)
+        {
+            token.Cancel();
+        }
+        token = new CancellationTokenSource();
+        await Task.Run(async () =>
+        {
+            string searchQuery = _FilterText;
+            await Task.Delay(300);
+            if (searchQuery == _FilterText)
+            {
+                IEnumerable<APIElement> items = AllItems
+                        .Where(i =>
+                            ((ShowEvents && i.Value.ElementType == APIElementType.Event)
+                            || (ShowFunctions && i.Value.ElementType == APIElementType.Function)
+                            || (ShowGlobals && i.Value.ElementType == APIElementType.Global))
+                        )
+                        .Select(d => d.Value);
 
-        IEnumerable<APIElement> filtered = FilterKeywords(items, FilterText);
+                IEnumerable<APIElement> filtered = FilterKeywords(items, FilterText);
 
-        FilteredItems = new ObservableCollection<APIElement>(filtered);
+                _DialogService.RunOnMainThread(() => { FilteredItems = new ObservableCollection<APIElement>(filtered); });
+            }
+        }, token.Token);
     }
 
     public ICommand SearchGithubCommand => new RelayCommand(() =>

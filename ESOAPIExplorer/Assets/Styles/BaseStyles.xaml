@@ -4,12 +4,19 @@
 
     <SolidColorBrush x:Key="ESOSelectedBackground">#999999</SolidColorBrush>
     <SolidColorBrush x:Key="ESOHoverBackground">#787878</SolidColorBrush>
+    <SolidColorBrush x:Key="ESOStripedListForeground">LightGray</SolidColorBrush>
     
     <Style TargetType="ListView">
+        <Setter Property="MinWidth" Value="900"/>
     </Style>
 
-	<Style TargetType="ListViewItem">
-		<Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
+    <Style TargetType="Grid" x:Key="ListHeaderGridStyle">
+        <Setter Property="MinWidth" Value="900"/>
+    </Style>
+    
+    <Style TargetType="ListViewItem">
+        <Setter Property="MinWidth" Value="900"/>
+        <Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
 		<Setter Property="Height" Value="20"/>
 		<Setter Property="MinHeight" Value="0"/>
 		<Setter Property="Margin" Value="0"/>
