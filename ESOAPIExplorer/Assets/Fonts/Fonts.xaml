@@ -1,0 +1,5 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<FontFamily x:Key="SegoeUI" >ms-appx:///Assets/Fonts/segoeui.ttf#Segoe UI</FontFamily>
+</ResourceDictionary>

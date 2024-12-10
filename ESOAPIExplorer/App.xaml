@@ -13,6 +13,8 @@
                 <!-- Other merged dictionaries here -->
                 <!-- Styles -->
                 <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
+                <!-- Fonts -->
+                <ResourceDictionary Source="Assets/Fonts/Fonts.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <!-- ValueConverters -->
             <converters:BoolToValueConverter x:Key="BoolToVisibilityConverter" ReturnType="Visibility">

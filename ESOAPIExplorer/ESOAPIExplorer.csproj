@@ -15,9 +15,11 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
+    <None Remove="Assets\Fonts\Fonts.xaml" />
     <None Remove="Assets\Styles\BaseStyles.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <Page Remove="Assets\Fonts\Fonts.xaml" />
     <Page Remove="Assets\Styles\BaseStyles.xaml" />
   </ItemGroup>
 
@@ -70,6 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\Styles\BaseStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Assets\Fonts\Fonts.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
   </ItemGroup>

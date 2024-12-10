@@ -7,12 +7,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ESOAPIExplorer.ViewModels"    
+    xmlns:converters="using:ESOAPIExplorer.ValueConverters"    
+    xmlns:c="using:ESOAPIExplorer.Controls"    
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
 
-
+    <Page.Resources>
+        <converters:StringToHighlightedStringConverter x:Key="StringToHighlightedStringConverter" Parameter="{Binding FilterText}"/>
+    </Page.Resources>
 
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
@@ -57,7 +61,19 @@
                             <!-- Hidden ID Column -->
                             <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
                             <!-- Visible Text Column -->
-                            <TextBlock Text="{Binding Name}"  Margin="0"/>
+
+                            <!--<ItemsView x:Name="CharacterListView"
+                                       IsTabStop="False"
+                                       SelectionMode="None"
+                                       ItemsSource="{Binding Name,Converter={StaticResource StringToHighlightedStringConverter}}">
+                                <ItemsView.Layout>
+                                    <StackLayout Orientation="Horizontal" Spacing="0"/>
+                                </ItemsView.Layout>
+                            </ItemsView>-->
+                            <Grid>
+                                <TextBlock Text="{Binding Name}" Foreground="Black" FontFamily="Courier New"/>
+                                <TextBlock Text="{Binding Name, Converter={StaticResource StringToHighlightedStringConverter}}" Foreground="Red"  FontFamily="Courier New"/>
+                            </Grid>
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
                                 <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
                             </Frame>

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ESOAPIExplorer.Controls\ESOAPIExplorer.Controls.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.ValueConverters\ESOAPIExplorer.ValueConverters.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.ViewModels\ESOAPIExplorer.ViewModels.csproj" />
   </ItemGroup>
