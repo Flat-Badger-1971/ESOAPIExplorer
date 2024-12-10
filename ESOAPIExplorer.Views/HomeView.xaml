@@ -71,8 +71,8 @@
                                 </ItemsView.Layout>
                             </ItemsView>-->
                             <Grid>
-                                <TextBlock Text="{Binding Name}" Foreground="Black" FontFamily="Courier New"/>
-                                <TextBlock Text="{Binding Name, Converter={StaticResource StringToHighlightedStringConverter}}" Foreground="Red"  FontFamily="Courier New"/>
+                                <TextBlock Text="{Binding Name}" Foreground="Black" FontFamily="Cascadia Code"/>
+                                <TextBlock Text="{Binding Name, Converter={StaticResource StringToHighlightedStringConverter}}" Foreground="Red"  FontFamily="Cascadia Code"/>
                             </Grid>
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
                                 <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
