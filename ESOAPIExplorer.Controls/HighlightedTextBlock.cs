@@ -68,6 +68,7 @@ namespace ESOAPIExplorer.Controls
                 run.Foreground = Foreground;
                 run.FontWeight = FontWeight;
                 run.FontSize = FontSize;
+                textBlock.FontSize = FontSize;
                 textBlock.Inlines.Add(run);
             }
 
@@ -157,7 +158,7 @@ namespace ESOAPIExplorer.Controls
         //}
 
         public static readonly DependencyProperty FontSizeProperty =
-        DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(HighlightedTextBlock), new PropertyMetadata(12d));
+        DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(HighlightedTextBlock), new PropertyMetadata((double)11));
 
         public double FontSize
         {
@@ -172,7 +173,7 @@ namespace ESOAPIExplorer.Controls
         }
 
         public static readonly DependencyProperty FontWeightProperty =
-        DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(HighlightedTextBlock), new PropertyMetadata(new FontWeight(0)));
+        DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(HighlightedTextBlock), new PropertyMetadata(default(FontWeight)));
 
         public FontWeight FontWeight
         {
@@ -187,7 +188,7 @@ namespace ESOAPIExplorer.Controls
         }
 
         public static readonly DependencyProperty HighlightFontWeightProperty =
-        DependencyProperty.Register(nameof(HighlightFontWeight), typeof(FontWeight), typeof(HighlightedTextBlock), new PropertyMetadata(new FontWeight(0)));
+        DependencyProperty.Register(nameof(HighlightFontWeight), typeof(FontWeight), typeof(HighlightedTextBlock), new PropertyMetadata(default(FontWeight)));
 
         public FontWeight HighlightFontWeight
         {
