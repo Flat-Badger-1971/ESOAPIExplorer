@@ -222,7 +222,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             .OrderBy(item => item.Value.Name));
 
         FilterItems();
-        _ = _DialogService.ShowAsync("I fixed the dialog service, press 'Ok' if you acknowledge that I'm the best plzkthx.", "Yey");
+        //_ = _DialogService.ShowAsync("I fixed the dialog service, press 'Ok' if you acknowledge that I'm the best plzkthx.", "Yey");
     }
 
     private void UpdateSelectedElementDetails()
@@ -234,13 +234,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         _SelectedElementTokenSource = new CancellationTokenSource();
         Task.Run(() =>
         {
-            //_DialogService.RunOnMainThread(() =>
-            //{
-            //    SelectedFunctionDetails = null;
-            //    SelectedEventDetails = null;
-            //    SelectedGlobalDetails = null;
-            //});
             APIElement element = _SelectedElement;
+
             if (element != null)
             {
                 switch (element.ElementType)
@@ -284,20 +279,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             }
         }, _SelectedElementTokenSource.Token);
     }
-    private static bool ContainsInOrder(string source, string filter)
-    {
-        if (string.IsNullOrEmpty(filter)) return true;
-        int index = 0;
-        foreach (char c in source)
-        {
-            if (char.ToLowerInvariant(c) == char.ToLowerInvariant(filter[index]))
-            {
-                index++;
-                if (index == filter.Length) return true;
-            }
-        }
-        return false;
-    }
 
     private IEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
     {
@@ -310,6 +291,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     CancellationTokenSource token;
+
     private async void FilterItems()
     {
         if (token != null && !token.IsCancellationRequested)

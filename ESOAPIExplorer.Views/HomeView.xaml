@@ -57,20 +57,7 @@
                             <!-- Hidden ID Column -->
                             <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
                             <!-- Visible Text Column -->
-
-                            <!--<ItemsView x:Name="CharacterListView"
-                                       IsTabStop="False"
-                                       SelectionMode="None"
-                                       ItemsSource="{Binding Name,Converter={StaticResource StringToHighlightedStringConverter}}">
-                                <ItemsView.Layout>
-                                    <StackLayout Orientation="Horizontal" Spacing="0"/>
-                                </ItemsView.Layout>
-                            </ItemsView>-->
-                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="OrangeRed"/>
-                            <!--<Grid>
-                                <TextBlock Text="{Binding Name}" Foreground="Black" FontFamily="Cascadia Code"/>
-                                <TextBlock Text="{Binding Name, Converter={StaticResource StringToHighlightedStringConverter}}" Foreground="Red"  FontFamily="Cascadia Code"/>
-                            </Grid>-->
+                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod" Foreground="AliceBlue"/>
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
                                 <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
                             </Frame>
@@ -94,18 +81,13 @@
             </Grid.RowDefinitions>
 
             <!-- Name -->
-            <Grid Grid.Row="0" DataContext="{Binding SelectedElement}">
-                <c:HighlightedTextBlock 
-                           Text="{Binding Name}"
-                           Filter="{Binding Path=DataContext.FilterText, ElementName=_this}"
-                           HighlightForeground="OrangeRed"
+            <TextBlock Grid.Row="0" 
+                           Text="{Binding SelectedElement.Name}"
                            Foreground ="Goldenrod"
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
-                           HighlightFontWeight="Bold"
                            TextAlignment="Left"/>
-            </Grid>
 
             <!-- github -->
             <Grid Grid.Row="1" Margin="10">
