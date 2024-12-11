@@ -188,9 +188,9 @@
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0" Margin="0" Height="20" Padding="10,0,10,0" Background="#FF1A2B40">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Name" FontWeight="Bold" Foreground="LightGray" Margin="0" Grid.Column="0"/>
                             <TextBlock Text="Type" FontWeight="Bold"  Foreground="LightGray" Margin="0" Grid.Column="1"/>
