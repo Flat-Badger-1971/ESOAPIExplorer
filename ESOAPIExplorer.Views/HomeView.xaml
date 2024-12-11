@@ -205,18 +205,18 @@
             </StackPanel>
 
             <!-- used by -->
-            <Grid Grid.Row="7" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}}">
-                <Grid Visibility="{Binding SelectedGlobalEnum.UsedBy, Mode=TwoWay, Converter={StaticResource EmptyListToVisibilityConverter}}">
+            <Grid Grid.Row="7" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                <Grid DataContext="{Binding SelectedGlobalEnum}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Text="used by" FontWeight="Bold" FontSize="26" Margin="10"/>
-                    <ListView ItemsSource="{Binding SelectedGlobalEnum.UsedBy}" 
+                    <ListView ItemsSource="{Binding UsedBy}" 
                           Grid.Row="1"
                           Style="{StaticResource InvisibleListViewStyle}"
                           ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
-                          SelectedItem="{Binding SelectedUsedByItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedItem="{Binding Path=DataContext.SelectedUsedByItem, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="10" BorderThickness="0"
                     ItemTemplate="{StaticResource UsedByItemTemplate}"/>
                 </Grid>

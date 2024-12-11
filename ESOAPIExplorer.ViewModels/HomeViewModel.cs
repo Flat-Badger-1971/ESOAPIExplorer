@@ -53,14 +53,18 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedFunctionDetails, value);
             SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
-            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            //SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            SelectedGlobalEnum = null;
         }
     }
 
     public EsoUIEnum SelectedGlobalEnum
     {
         get => _SelectedGlobalEnum;
-        set => SetProperty(ref _SelectedGlobalEnum, value);
+        set
+        {
+            SetProperty(ref _SelectedGlobalEnum, value);
+        }
     }
 
     private string _SelectedUsedByItem;
@@ -267,7 +271,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             };
                         });
 
-                        IEnumerable<string> usedBy = GetUsedByParallel(element.Name);
+                        IEnumerable<string> usedBy = GetUsedByParallel(element.Parent);
 
                         _DialogService.RunOnMainThread(() =>
                         {
@@ -366,7 +370,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 if (arg.Type.Name == enumName)
                 {
                     usedBy.Add(item.Key);
-                };
+                }
             });
 
             Parallel.ForEach(item.Value.Returns, retval =>

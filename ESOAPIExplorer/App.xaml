@@ -137,14 +137,16 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="0"/>
+                        <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" />
+                        </Viewbox>
                         <TextBlock Text="integer"  Margin="0" Grid.Column="1"/>
                         <TextBlock Text="{Binding Name, Converter={StaticResource ConstantToValueConverter}}"  Margin="0" Grid.Column="2"/>
                     </Grid>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="EnumItemTemplate">
-                <Grid Height="20" 
+                <Grid Height="20"
                 Background="{Binding Value, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
@@ -152,7 +154,9 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="0" Foreground="{ThemeResource ESOStripedListForeground}"/>
+                        <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" Foreground="{ThemeResource ESOStripedListForeground}"/>
+                        </Viewbox>
                         <TextBlock Text="integer"  Margin="0" Grid.Column="1"  Foreground="{ThemeResource ESOStripedListForeground}"/>
                         <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2" Foreground="{ThemeResource ESOStripedListForeground}"/>
                     </Grid>
@@ -164,7 +168,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding}"  Margin="0" Padding="0" Grid.Column="0"/>
+                        <TextBlock Text="{Binding}"  Margin="0" Padding="0" Grid.Column="0" Foreground="Black"/>
                     </Grid>
                 </Grid>
             </DataTemplate>

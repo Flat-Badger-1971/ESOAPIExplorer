@@ -216,9 +216,9 @@
     </Style>
 	
 	<Style TargetType="ListViewItem" x:Key="NoPaddingListViewItemStyle">
-		<Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
-		<Setter Property="Height" Value="20"/>
-		<Setter Property="MinHeight" Value="0"/>
+        <Setter Property="HorizontalContentAlignment"  Value="Stretch"></Setter>
+        <Setter Property="MaxHeight" Value="20"/>
+        <Setter Property="MinHeight" Value="0"/>
 		<Setter Property="Margin" Value="0"/>
 		<Setter Property="Padding" Value="0"/>
 	</Style>
