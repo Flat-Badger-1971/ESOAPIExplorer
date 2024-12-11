@@ -17,6 +17,6 @@ public sealed partial class CustomMessageDialog : ContentDialog
 {
     public CustomMessageDialog()
     {
-        //this.InitializeComponent();
+        this.InitializeComponent();
     }
 }

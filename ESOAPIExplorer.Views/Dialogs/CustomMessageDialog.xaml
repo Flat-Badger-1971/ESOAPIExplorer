@@ -12,29 +12,34 @@
     xmlns:converters="using:ESOAPIExplorer.ValueConverters"
     mc:Ignorable="d"
     x:Name="_this"
-    Background="{StaticResource BaseWhite}"
+    Background="White"
     
-    SecondaryButtonText="{Binding PosativeText}"
+    SecondaryButtonText="{Binding PositiveText}"
     SecondaryButtonCommand="{Binding ResponseEnteredCommand}"
-    SecondaryButtonCommandParameter="{StaticResource True}"
-    SecondaryButtonStyle="{StaticResource LunaDialogButtonStyle}"
     PrimaryButtonText="{Binding NegativeText}"
     PrimaryButtonCommand="{Binding ResponseEnteredCommand}"
-    PrimaryButtonCommandParameter="{StaticResource False}"
-    PrimaryButtonStyle="{StaticResource LunaSecondaryDialogButtonStyle}"
-    d:DataContext="{d:DesignInstance Type=vm:CustomMessageDialogViewModel}">
-    
+    d:DataContext="{d:DesignInstance Type=vm:CustomMessageDialogViewModel}"
+    PrimaryButtonStyle="{StaticResource SecondaryDialogButtonStyle}"
+    SecondaryButtonStyle="{StaticResource DialogButtonStyle}">
+    <ContentDialog.PrimaryButtonCommandParameter>
+        <x:Boolean>True</x:Boolean>
+    </ContentDialog.PrimaryButtonCommandParameter>
+    <ContentDialog.SecondaryButtonCommandParameter>
+        <x:Boolean>False</x:Boolean>
+    </ContentDialog.SecondaryButtonCommandParameter>
+
     <Grid MinHeight="200">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Text="{Binding Title}" Style="{StaticResource LunaSubHeadingTextBlockStyle}" Grid.Row="0"/>
-        <TextBlock Text="{Binding Message}" Style="{StaticResource LunaDialogBodyTextBlockStyle}" Grid.Row="1" Margin="0,20,0,0" TextWrapping="WrapWholeWords" Visibility="{Binding IsSelectable, Converter={StaticResource InvertedBoolToVisibilityConverter}}"/>
+        <TextBlock Text="{Binding Title}" Style="{StaticResource DialogSubHeadingTextBlockStyle}" Grid.Row="0"/>
+        <TextBlock Text="{Binding Message}" Style="{StaticResource DialogBodyTextBlockStyle}" Grid.Row="1" Margin="0,20,0,0" TextWrapping="WrapWholeWords" Visibility="{Binding IsSelectable, Converter={StaticResource InvertedBoolToVisibilityConverter}}"/>
         <ScrollView Visibility="{Binding IsSelectable, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="1" Margin="0,20,0,0">
             <TextBox AcceptsReturn="True" TextWrapping="Wrap"
          ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="true"  Text="{Binding Message}"/>

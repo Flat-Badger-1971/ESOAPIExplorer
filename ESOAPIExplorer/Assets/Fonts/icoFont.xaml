@@ -1,0 +1,24 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <FontFamily x:Key="icoFont" >ms-appx:///Assets/Fonts/icoFont.ttf#IcoFont</FontFamily>
+    <x:String x:Key="glyph-home">&#xEC5E;</x:String>
+    <x:String x:Key="glyph-shirt">&#xEDAF;</x:String>
+    <x:String x:Key="glyph-camera">&#xEECE;</x:String>
+    <x:String x:Key="glyph-add">&#xEFC2;</x:String>
+    <x:String x:Key="glyph-save">&#xEE00;</x:String>
+    <x:String x:Key="glyph-delete">&#xEE09;</x:String>
+    <x:String x:Key="glyph-edit">&#xEBF6;</x:String>
+    <x:String x:Key="glyph-cog">&#xEF3A;</x:String>
+    <x:String x:Key="glyph-hanger">&#xEF42;</x:String>
+    <!--<x:String x:Key="glyph-all">&#xEF5D;</x:String>-->
+    <x:String x:Key="glyph-move">&#xEF0A;</x:String>
+    <x:String x:Key="glyph-phone">&#xE019;</x:String>
+    <x:String x:Key="glyph-clipboard">&#xE06B;</x:String>
+    <x:String x:Key="glyph-copy">&#xEC51;</x:String>
+    <x:String x:Key="glyph-arrowLeft">&#xE097;</x:String>
+    <x:String x:Key="glyph-arrowRight">&#xE093;</x:String>
+    <x:String x:Key="glyph-arrowUp">&#xE091;</x:String>
+    <x:String x:Key="glyph-arrowDown">&#xE095;</x:String>
+    <x:String x:Key="glyph-x">&#xEEE4;</x:String>
+</ResourceDictionary>

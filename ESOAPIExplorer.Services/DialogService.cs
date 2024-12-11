@@ -20,7 +20,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
         return ShowAsync(message, title, "Ok", null);
     }
 
-    public async Task ShowAsync(string message, string title = "Message", string posativeText = "Ok", string negativeText = "Cancel", Action posativeCallback = null, Action negativeCallback = null, bool isSelectable = false)
+    public async Task ShowAsync(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action posativeCallback = null, Action negativeCallback = null, bool isSelectable = false)
     {
         CustomMessageDialog messageDialog = new()
         {
@@ -33,10 +33,18 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
 
         _ViewModel.Title = title;
         _ViewModel.Message = message;
-        _ViewModel.PosativeText = posativeText;
+        _ViewModel.PositiveText = positiveText;
         _ViewModel.NegativeText = negativeText;
         _ViewModel.IsSelectable = isSelectable;
 
+        if (posativeCallback == null)
+        {
+            posativeCallback = () => messageDialog.Hide();
+        }
+        if (negativeCallback == null)
+        {
+            negativeCallback = () => messageDialog.Hide();
+        }
 
         _ViewModel.ResponseEntered += (source, args) =>
         {
@@ -54,7 +62,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
         await messageDialog.ShowAsync();
     }
 
-    public async Task ShowAsync_Legacy(string message, string title = "Message", string posativeText = "Ok", string negativeText = "Cancel", Action posativeCallback = null, Action negativeCallback = null)
+    public async Task ShowAsync_Legacy(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action posativeCallback = null, Action negativeCallback = null)
     {
         var messageDialog = new MessageDialog(message, title);
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
@@ -63,7 +71,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
 
         //Add commands and set their callbacks; both buttons use the same callback function instead of inline event handlers
         messageDialog.Commands.Add(new UICommand(
-            posativeText,
+            positiveText,
              new UICommandInvokedHandler((command) =>
              {
                  posativeCallback?.Invoke();

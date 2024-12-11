@@ -71,6 +71,9 @@
     <ProjectReference Include="..\ESOAPIExplorer.Views\ESOAPIExplorer.Views.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\Fonts\icoFont.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Content Update="Assets\Styles\BaseStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>

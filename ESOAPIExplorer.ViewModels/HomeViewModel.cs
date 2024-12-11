@@ -17,6 +17,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     private readonly IDialogService _DialogService = dialogService;
     private readonly IESODocumentationService _ESODocumentationService = eSODocumentationService;
 
+    #region Properties
     private APIElement _SelectedElement;
     public APIElement SelectedElement
     {
@@ -29,65 +30,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     CancellationTokenSource _SelectedElementTokenSource;
-    private void UpdateSelectedElementDetails()
-    {
-        if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
-        {
-            _SelectedElementTokenSource.Cancel();
-        }
-        _SelectedElementTokenSource = new CancellationTokenSource();
-        Task.Run(() =>
-        {
-            //_DialogService.RunOnMainThread(() =>
-            //{
-            //    SelectedFunctionDetails = null;
-            //    SelectedEventDetails = null;
-            //    SelectedGlobalDetails = null;
-            //});
-            APIElement element = _SelectedElement;
-            if (element != null)
-            {
-                switch (element.ElementType)
-                {
-                    case APIElementType.Event:
-                        _DialogService.RunOnMainThread(() => 
-                        { 
-                            SelectedEventDetails = _ESODocumentationService.Data.Events[element.Id]; 
-                        });
-                        break;
-                    case APIElementType.Function:
-                        _DialogService.RunOnMainThread(() => 
-                        { 
-                            SelectedFunctionDetails = _ESODocumentationService.Data.Functions[element.Id]; 
-                        });
-                        break;
-                    case APIElementType.Global:
-                        _DialogService.RunOnMainThread(() => 
-                        { 
-                            SelectedGlobalDetails = new EsoUIGlobal 
-                            { 
-                                Name = element.Name, 
-                                ParentName = element.Parent 
-                            }; 
-                        });
-
-                        IEnumerable<string> usedBy = GetUsedByParallel(element.Name);
-
-                        _DialogService.RunOnMainThread(() =>
-                        {
-                            SelectedGlobalEnum = new EsoUIEnum
-                            {
-                                ValueNames = _ESODocumentationService.Data.Globals[element.Parent],
-                                Name = element.Name,
-                                UsedBy = usedBy
-                            };
-                        });
-
-                        break;
-                }
-            }
-        }, _SelectedElementTokenSource.Token);
-    }
 
     private EsoUIEvent _SelectedEventDetails;
     public EsoUIEvent SelectedEventDetails
@@ -241,6 +183,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
+    #endregion Properties
     public override async Task InitializeAsync(object data)
     {
         await base.InitializeAsync(data);
@@ -279,8 +222,68 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             .OrderBy(item => item.Value.Name));
 
         FilterItems();
+        _ = _DialogService.ShowAsync("I fixed the dialog service, press 'Ok' if you acknowledge that I'm the best plzkthx.", "Yey");
     }
 
+    private void UpdateSelectedElementDetails()
+    {
+        if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
+        {
+            _SelectedElementTokenSource.Cancel();
+        }
+        _SelectedElementTokenSource = new CancellationTokenSource();
+        Task.Run(() =>
+        {
+            //_DialogService.RunOnMainThread(() =>
+            //{
+            //    SelectedFunctionDetails = null;
+            //    SelectedEventDetails = null;
+            //    SelectedGlobalDetails = null;
+            //});
+            APIElement element = _SelectedElement;
+            if (element != null)
+            {
+                switch (element.ElementType)
+                {
+                    case APIElementType.Event:
+                        _DialogService.RunOnMainThread(() =>
+                        {
+                            SelectedEventDetails = _ESODocumentationService.Data.Events[element.Id];
+                        });
+                        break;
+                    case APIElementType.Function:
+                        _DialogService.RunOnMainThread(() =>
+                        {
+                            SelectedFunctionDetails = _ESODocumentationService.Data.Functions[element.Id];
+                        });
+                        break;
+                    case APIElementType.Global:
+                        _DialogService.RunOnMainThread(() =>
+                        {
+                            SelectedGlobalDetails = new EsoUIGlobal
+                            {
+                                Name = element.Name,
+                                ParentName = element.Parent
+                            };
+                        });
+
+                        IEnumerable<string> usedBy = GetUsedByParallel(element.Name);
+
+                        _DialogService.RunOnMainThread(() =>
+                        {
+                            SelectedGlobalEnum = new EsoUIEnum
+                            {
+                                ValueNames = _ESODocumentationService.Data.Globals[element.Parent],
+                                Name = element.Name,
+                                UsedBy = usedBy
+                            };
+                        });
+
+                        break;
+                }
+            }
+        }, _SelectedElementTokenSource.Token);
+    }
     private static bool ContainsInOrder(string source, string filter)
     {
         if (string.IsNullOrEmpty(filter)) return true;

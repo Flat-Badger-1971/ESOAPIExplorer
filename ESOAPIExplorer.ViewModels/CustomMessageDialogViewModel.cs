@@ -32,8 +32,8 @@ public partial class CustomMessageDialogViewModel:ViewModelBase
     private bool _IsSelectable = false;
     public bool IsSelectable { get => _IsSelectable; set => SetProperty(ref _IsSelectable, value); }
 
-    private string _PosativeText;
-    public string PosativeText { get => _PosativeText; set => SetProperty(ref _PosativeText, value); }
+    private string _PositiveText;
+    public string PositiveText { get => _PositiveText; set => SetProperty(ref _PositiveText, value); }
 
     private string _NegativeText;
     public string NegativeText 

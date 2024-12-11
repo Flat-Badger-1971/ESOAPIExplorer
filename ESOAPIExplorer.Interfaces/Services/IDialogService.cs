@@ -6,6 +6,6 @@ namespace ESOAPIExplorer.Services;
 public interface IDialogService
 {
     Task ShowAsync(string message, string title = "Message");
-    Task ShowAsync(string message, string title = "Message", string posativeText = "Ok", string negativeText = "Cancel", Action posativeback = null, Action negativeback = null, bool isSelectable = false);
+    Task ShowAsync(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action posativeback = null, Action negativeback = null, bool isSelectable = false);
     void RunOnMainThread(Action action);
 }
