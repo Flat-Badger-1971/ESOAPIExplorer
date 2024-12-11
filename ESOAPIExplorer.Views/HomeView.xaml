@@ -14,10 +14,6 @@
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
 
-    <Page.Resources>
-        <converters:StringToHighlightedStringConverter x:Key="StringToHighlightedStringConverter" Parameter="{Binding FilterText}"/>
-    </Page.Resources>
-
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -70,10 +66,11 @@
                                     <StackLayout Orientation="Horizontal" Spacing="0"/>
                                 </ItemsView.Layout>
                             </ItemsView>-->
-                            <Grid>
+                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="OrangeRed"/>
+                            <!--<Grid>
                                 <TextBlock Text="{Binding Name}" Foreground="Black" FontFamily="Cascadia Code"/>
                                 <TextBlock Text="{Binding Name, Converter={StaticResource StringToHighlightedStringConverter}}" Foreground="Red"  FontFamily="Cascadia Code"/>
-                            </Grid>
+                            </Grid>-->
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
                                 <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
                             </Frame>
@@ -97,13 +94,18 @@
             </Grid.RowDefinitions>
 
             <!-- Name -->
-            <TextBlock Grid.Row="0" 
-                           Text="{Binding SelectedElement.Name}"
+            <Grid Grid.Row="0" DataContext="{Binding SelectedElement}">
+                <c:HighlightedTextBlock 
+                           Text="{Binding Name}"
+                           Filter="{Binding Path=DataContext.FilterText, ElementName=_this}"
+                           HighlightForeground="OrangeRed"
                            Foreground ="Goldenrod"
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
+                           HighlightFontWeight="Bold"
                            TextAlignment="Left"/>
+            </Grid>
 
             <!-- github -->
             <Grid Grid.Row="1" Margin="10">
