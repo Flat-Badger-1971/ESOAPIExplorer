@@ -11,6 +11,8 @@
     <Color x:Key="BaseGreen">#b4d012</Color>
     <Color x:Key="BaseBrand">#5f59ff</Color>
     <Color x:Key="BaseBrandHighlight">#363391</Color>
+    <Color x:Key="LightBrand">#b6b3fc</Color>
+    <Color x:Key="LightBrandHighlight">#8f8dc9</Color>
     <Color x:Key="BaseSecondaryHighlight">#fef5f0</Color>
     <Color x:Key="BaseRed">#e51400</Color>
     <Color x:Key="BaseBlue">#00aff0</Color>
@@ -19,9 +21,12 @@
     <Color x:Key="BaseBackgroundColourLight">#FFFFFF</Color>
     <Color x:Key="BaseBorderColourLight">#dcdcdc</Color>
     <Color x:Key="BaseBorderColour">#404040</Color>
-    
-    <SolidColorBrush x:Key="ESOSelectedBackground">#999999</SolidColorBrush>
-    <SolidColorBrush x:Key="ESOHoverBackground">#787878</SolidColorBrush>
+
+    <SolidColorBrush x:Key="ESOSelectedBackground" Color="{ThemeResource BaseBrand}"/>
+    <SolidColorBrush x:Key="ESOHoverBackground" Color="{ThemeResource BaseBrandHighlight}"/>
+    <SolidColorBrush x:Key="ESOSelectedBackgroundLight" Color="{ThemeResource LightBrand}"/>
+    <SolidColorBrush x:Key="ESOHoverBackgroundLight" Color="{ThemeResource LightBrandHighlight}"/>
+    <SolidColorBrush x:Key="ESOHoverForeground" Color="{ThemeResource BaseWhite}"/>
     <SolidColorBrush x:Key="ESOStripedListForeground">LightGray</SolidColorBrush>
 
     <SolidColorBrush x:Key="BaseBorderColourBrush" Color="{StaticResource BaseBorderColour}"/>
@@ -172,14 +177,14 @@
                         FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
                         FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
                         PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
-                        PointerOverBackground="{ThemeResource ESOHoverBackground}"
-                        PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
+                        PointerOverBackground="{ThemeResource ESOHoverBackgroundLight}"
+                        PointerOverForeground="{ThemeResource BaseBlack}"
                         PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
                         ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
-                        SelectedBackground="{ThemeResource ESOSelectedBackground}"
+                        SelectedBackground="{ThemeResource ESOSelectedBackgroundLight}"
+                        SelectedForeground="{ThemeResource BaseBlack}"
                         SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}"
-                        SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
-                        SelectedPointerOverBackground="{ThemeResource ESOHoverBackground}"
+                        SelectedPointerOverBackground="{ThemeResource ESOHoverBackgroundLight}"
                         SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
                         SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
                         SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
