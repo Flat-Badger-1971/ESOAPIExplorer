@@ -38,12 +38,12 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         _SelectedElementTokenSource = new CancellationTokenSource();
         Task.Run(() =>
         {
-            _DialogService.RunOnMainThread(() =>
-            {
-                SelectedFunctionDetails = null;
-                SelectedEventDetails = null;
-                SelectedGlobalDetails = null;
-            });
+            //_DialogService.RunOnMainThread(() =>
+            //{
+            //    SelectedFunctionDetails = null;
+            //    SelectedEventDetails = null;
+            //    SelectedGlobalDetails = null;
+            //});
             APIElement element = _SelectedElement;
             if (element != null)
             {
@@ -96,8 +96,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         set
         {
             SetProperty(ref _SelectedEventDetails, value);
-            SetProperty(ref _SelectedFunctionDetails, null);
-            SetProperty(ref _SelectedGlobalDetails, null);
+            SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
+            SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
+            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
         }
     }
 
@@ -107,16 +108,17 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         get => _SelectedFunctionDetails;
         set
         {
-            SetProperty(ref _SelectedEventDetails, null);
             SetProperty(ref _SelectedFunctionDetails, value);
-            SetProperty(ref _SelectedGlobalDetails, null);
+            SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
+            SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
+            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
         }
     }
 
     public EsoUIEnum SelectedGlobalEnum
     {
-        get => selectedGlobalEnum;
-        set => SetProperty(ref selectedGlobalEnum, value);
+        get => _SelectedGlobalEnum;
+        set => SetProperty(ref _SelectedGlobalEnum, value);
     }
 
     private string _SelectedUsedByItem;
@@ -139,8 +141,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         get => _SelectedGlobalDetails;
         set
         {
-            SetProperty(ref _SelectedEventDetails, null);
-            SetProperty(ref _SelectedFunctionDetails, null);
+            SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
+            SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
             SetProperty(ref _SelectedGlobalDetails, value);
         }
     }
@@ -228,7 +230,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     private ObservableCollection<APIElement> _FilteredItems;
-    private EsoUIEnum selectedGlobalEnum;
+    private EsoUIEnum _SelectedGlobalEnum;
 
     public ObservableCollection<APIElement> FilteredItems
     {

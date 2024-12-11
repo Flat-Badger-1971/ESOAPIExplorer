@@ -176,7 +176,7 @@
             </StackPanel>
 
             <!-- enum -->
-            <StackPanel Grid.Row="6" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="6" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <TextBlock Text="{Binding SelectedGlobalDetails.ParentName}" Margin="10"/>
                 <!-- enum Values -->
@@ -205,19 +205,21 @@
             </StackPanel>
 
             <!-- used by -->
-            <Grid Grid.Row="7" Visibility="{Binding SelectedGlobalEnum.UsedBy, Converter={StaticResource EmptyListToVisibilityConverter}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="used by" FontWeight="Bold" FontSize="26" Margin="10"/>
-                <ListView ItemsSource="{Binding SelectedGlobalEnum.UsedBy}" 
+            <Grid Grid.Row="7" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <Grid Visibility="{Binding SelectedGlobalEnum.UsedBy, Mode=TwoWay, Converter={StaticResource EmptyListToVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="used by" FontWeight="Bold" FontSize="26" Margin="10"/>
+                    <ListView ItemsSource="{Binding SelectedGlobalEnum.UsedBy}" 
                           Grid.Row="1"
                           Style="{StaticResource InvisibleListViewStyle}"
                           ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                           SelectedItem="{Binding SelectedUsedByItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="10" BorderThickness="0"
                     ItemTemplate="{StaticResource UsedByItemTemplate}"/>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
