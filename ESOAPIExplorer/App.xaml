@@ -118,9 +118,9 @@
             <DataTemplate x:Key="ValueHeaderTemplate">
                 <Grid Margin="0" Height="20" Padding="10,0,10,0" Background="#FF1A2B40">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Name" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{ThemeResource ESOStripedListForeground}"/>
                     <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{ThemeResource ESOStripedListForeground}"/>
@@ -132,9 +132,9 @@
                     <!--Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">-->
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="0"/>
                         <TextBlock Text="integer"  Margin="0" Grid.Column="1"/>
