@@ -2,6 +2,7 @@ using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
