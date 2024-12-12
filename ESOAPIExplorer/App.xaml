@@ -77,6 +77,7 @@
             </converters:StringToValueConverter>
             <converters:TypeToNameConverter x:Key="TypeToNameConverter"/>
             <converters:EmptyListToVisibilityConverter x:Key="EmptyListToVisibilityConverter"/>
+            <converters:ListToVisibilityConverter x:Key="ListToVisibilityConverter"/>
             <converters:EmptyListToTextConverter x:Key="EmptyListToTextConverter"/>
             <converters:SingleValueToListConverter x:Key="SingleValueToListConverter"/>
             <converters:ConstantToNumberConverter x:Key="ConstantToValueConverter"/>
@@ -85,6 +86,7 @@
                     <SolidColorBrush Color="#FF2ECC40" x:Key="Event"/>
                     <SolidColorBrush Color="#FFFF3B30" x:Key="Global"/>
                     <SolidColorBrush Color="#FFB10DC9" x:Key="Function"/>
+                    <SolidColorBrush Color="Blue" x:Key="Enum"/>
                 </converters:StringToValueConverter.Values>
             </converters:StringToValueConverter>
             <converters:EnumToSortedEnumConverter x:Key="EnumToSortedEnumConverter" />
@@ -130,7 +132,6 @@
             </DataTemplate>
             <DataTemplate x:Key="ValueItemTemplate">
                 <Grid Height="20" >
-                    <!--Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">-->
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -168,7 +169,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding}"  Margin="0" Padding="0" Grid.Column="0" Foreground="Black"/>
+                        <TextBlock Text="{Binding}"  Margin="0" Padding="0" Grid.Column="0" Foreground="AliceBlue"/>
                     </Grid>
                 </Grid>
             </DataTemplate>

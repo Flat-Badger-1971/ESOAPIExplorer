@@ -42,6 +42,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
             SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
         }
     }
 
@@ -54,8 +55,22 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedFunctionDetails, value);
             SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
-            //SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
-            SelectedGlobalEnum = null;
+            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
+        }
+    }
+
+    private EsoUIGlobal _SelectedEnumName;
+    public EsoUIGlobal SelectedEnumName
+    {
+        get => _SelectedEnumName;
+        set
+        {
+            SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
+            SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
+            SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
+            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            SetProperty(ref _SelectedEnumName, value);
         }
     }
 
@@ -75,9 +90,20 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         set
         {
             SetProperty(ref _SelectedUsedByItem, value);
+
             if (value != null)
             {
-                SelectedElement = _AllItems.FirstOrDefault(i => i.Value.Name == value)?.Value;
+                SetProperty(ref _ShowEvents, true, nameof(ShowEvents));
+                SetProperty(ref _ShowFunctions, true, nameof(ShowFunctions));
+                SetProperty(ref _ShowGlobals, true, nameof(ShowGlobals));
+
+                FilterItems(() =>
+                {
+                    _DialogService.RunOnMainThread(() =>
+                    {
+                        SelectedElement = _AllItems.FirstOrDefault(i => i.Value.Name == value)?.Value;
+                    });
+                });
             }
         }
     }
@@ -91,6 +117,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
             SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
             SetProperty(ref _SelectedGlobalDetails, value);
+            SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
         }
     }
 
@@ -157,7 +184,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     private ObservableCollection<APIElement> _Constants;
-    public ObservableCollection<APIElement> Constants
+    public ObservableCollection<APIElement> Globals
     {
         get => _Constants;
         set
@@ -205,25 +232,18 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             .OrderBy(f => f.Name)
             );
 
-        Constants = new ObservableCollection<APIElement>(_ESODocumentationService.Documentation.Globals
+        Globals = new ObservableCollection<APIElement>(_ESODocumentationService.Documentation.Globals
             .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail, Name = detail, ElementType = APIElementType.Global, Parent = item.Key }))
-            .OrderBy(c => c.Name)
-            );
+            .Concat(_ESODocumentationService.Documentation.Globals
+            .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.Enum }))
+            .GroupBy(e => e.Id)
+            .Select(e => e.First()))
+            .OrderBy(c => c.Name));
 
         AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
-            Events.Select(e =>
-            {
-                return new DisplayModelBase<APIElement> { Value = e };
-            })
-            .Concat(Functions.Select(f =>
-            {
-                return new DisplayModelBase<APIElement> { Value = f };
-            })
-            .Concat(Constants.Select(c =>
-            {
-                return new DisplayModelBase<APIElement> { Value = c };
-            })
-                ))
+            Events.Select(e => new DisplayModelBase<APIElement> { Value = e })
+            .Concat(Functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
+            .Concat(Globals.Select(c => new DisplayModelBase<APIElement> { Value = c }))
             .OrderBy(item => item.Value.Name));
 
         FilterItems();
@@ -236,7 +256,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             _SelectedElementTokenSource.Cancel();
         }
+
         _SelectedElementTokenSource = new CancellationTokenSource();
+
         Task.Run(() =>
         {
             APIElement element = _SelectedElement;
@@ -278,7 +300,27 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                                 UsedBy = usedBy
                             };
                         });
+                        break;
+                    case APIElementType.Enum:
+                        _DialogService.RunOnMainThread(() =>
+                        {
+                            SelectedEnumName = new EsoUIGlobal
+                            {
+                                Name = element.Name                            
+                            };
+                        });
 
+                        IEnumerable<string> eusedBy = GetUsedByParallel(element.Id);
+
+                        _DialogService.RunOnMainThread(() =>
+                        {
+                            SelectedGlobalEnum = new EsoUIEnum
+                            {
+                                ValueNames = _ESODocumentationService.Data.Globals[element.Id],
+                                Name = element.Name,
+                                UsedBy = eusedBy
+                            };
+                        });
                         break;
                 }
             }
@@ -297,7 +339,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     CancellationTokenSource token;
 
-    private async void FilterItems()
+    private async void FilterItems(Action callback = null)
     {
         if (token != null && !token.IsCancellationRequested)
         {
@@ -314,13 +356,18 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         .Where(i =>
                             ((ShowEvents && i.Value.ElementType == APIElementType.Event)
                             || (ShowFunctions && i.Value.ElementType == APIElementType.Function)
-                            || (ShowGlobals && i.Value.ElementType == APIElementType.Global))
+                            || (ShowGlobals && i.Value.ElementType == APIElementType.Global)
+                            || (ShowGlobals && i.Value.ElementType == APIElementType.Enum))
                         )
                         .Select(d => d.Value);
 
                 IEnumerable<APIElement> filtered = FilterKeywords(items, FilterText);
 
-                _DialogService.RunOnMainThread(() => { FilteredItems = new ObservableCollection<APIElement>(filtered); });
+                _DialogService.RunOnMainThread(() => { 
+                    FilteredItems = new ObservableCollection<APIElement>(filtered);
+
+                    callback?.Invoke();
+                });
             }
         }, token.Token);
     }
@@ -329,7 +376,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type="));
     });
-
 
     private IEnumerable<string> GetUsedByParallel(string enumName)
     {

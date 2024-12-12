@@ -26,11 +26,8 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
         set { SetProperty(ref _IsSelected, value); }
     }
 
-    protected bool SetProperty<T>(ref T backingStore, T value,
-        [CallerMemberName] string propertyName = "",
-        Action onChanged = null)
+    protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "", Action onChanged = null)
     {
-
         backingStore = value;
         onChanged?.Invoke();
         OnPropertyChanged(propertyName);
@@ -41,9 +38,13 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
     {
-        var changed = PropertyChanged;
+        PropertyChangedEventHandler changed = PropertyChanged;
+
         if (changed == null)
+        {
             return;
+        }
+
         try
         {
             changed?.Invoke(this, new PropertyChangedEventArgs(propertyName));

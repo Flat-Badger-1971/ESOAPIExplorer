@@ -4,5 +4,6 @@ public enum APIElementType
 {
     Event,
     Function,
-    Global
+    Global,
+    Enum
 }

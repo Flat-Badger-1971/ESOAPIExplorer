@@ -20,7 +20,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
         return ShowAsync(message, title, "Ok", null);
     }
 
-    public async Task ShowAsync(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action posativeCallback = null, Action negativeCallback = null, bool isSelectable = false)
+    public async Task ShowAsync(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action positiveCallback = null, Action negativeCallback = null, bool isSelectable = false)
     {
         CustomMessageDialog messageDialog = new()
         {
@@ -37,9 +37,9 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
         _ViewModel.NegativeText = negativeText;
         _ViewModel.IsSelectable = isSelectable;
 
-        if (posativeCallback == null)
+        if (positiveCallback == null)
         {
-            posativeCallback = () => messageDialog.Hide();
+            positiveCallback = () => messageDialog.Hide();
         }
         if (negativeCallback == null)
         {
@@ -51,7 +51,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
             //messageDialog.Hide();
             if (args)
             {
-                posativeCallback?.Invoke();
+                positiveCallback?.Invoke();
             }
             else
             {
@@ -62,7 +62,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
         await messageDialog.ShowAsync();
     }
 
-    public async Task ShowAsync_Legacy(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action posativeCallback = null, Action negativeCallback = null)
+    public async Task ShowAsync_Legacy(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action positiveCallback = null, Action negativeCallback = null)
     {
         var messageDialog = new MessageDialog(message, title);
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
@@ -74,7 +74,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
             positiveText,
              new UICommandInvokedHandler((command) =>
              {
-                 posativeCallback?.Invoke();
+                 positiveCallback?.Invoke();
              })));
 
         if (!string.IsNullOrEmpty(negativeText))
