@@ -51,12 +51,13 @@ public partial class App : Application
     {
         get
         {
-            var services = new ServiceCollection();
+            ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
             services.AddSingleton<IConfiguration>(_ConfigurationRoot);
             RegisterServices(services);
-            //RegisterViews(services);
+            RegisterViews(services);
             RegisterViewModels(services);
+
             return services.BuildServiceProvider();
         }
     }
@@ -74,6 +75,7 @@ public partial class App : Application
     {
         services.AddTransient<HomeView>();
     }
+
     private void RegisterServices(ServiceCollection services)
     {
         //App Services
@@ -87,12 +89,9 @@ public partial class App : Application
     {
         _ConfigurationManager = new ConfigurationManager()
             .SetBasePath(Package.Current.InstalledLocation.Path)
-            .AddJsonFile("appsettings.json", optional: false)
-            ;
-        // KeyVault
+            .AddJsonFile("appsettings.json", optional: false);
 
         _ConfigurationRoot = _ConfigurationManager.Build();
-        //services.Configure<List<EnvironmentSettings<Oidc>>>(_ConfigurationRoot.GetSection(nameof(Oidc)));
     }
 
 }

@@ -50,16 +50,16 @@
             <AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" PlaceholderText="Filter items..." Margin="5" Grid.Row="0"/>
             <!-- TextChanged="FilterTextBox_TextChanged"/> -->
             <!-- Full Height ListBox -->
-            <ListView x:Name="MainListView" ItemsSource="{Binding FilteredItems}" Grid.Row="1" SelectedItem="{Binding SelectedElement, Mode=TwoWay}">
+            <ListView Name="MainListView" ItemsSource="{Binding FilteredItems}" Grid.Row="1" SelectedItem="{Binding SelectedElement, Mode=TwoWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0" Height="20">
                             <!-- Hidden ID Column -->
                             <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
                             <!-- Visible Text Column -->
-                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod" Foreground="AliceBlue"/>
+                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod" Foreground="{ThemeResource SystemBaseHighColor}"/>
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
-                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{ThemeResource SystemBaseHighColor}"/>
                             </Frame>
                         </StackPanel>
                     </DataTemplate>
@@ -81,13 +81,20 @@
             </Grid.RowDefinitions>
 
             <!-- Name -->
-            <TextBlock Grid.Row="0" 
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Grid.Row="0" 
                            Text="{Binding SelectedElement.Name}"
                            Foreground ="Goldenrod"
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
                            TextAlignment="Left"/>
+                <ComboBox Name="themeMode" SelectionChanged="Themes_SelectionChanged">
+                    <ComboBoxItem>Light</ComboBoxItem>
+                    <ComboBoxItem>Dark</ComboBoxItem>
+                    <ComboBoxItem>Default</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
 
             <!-- github -->
             <Grid Grid.Row="1" Margin="10">
@@ -170,19 +177,19 @@
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" Margin="0" Height="20" Padding="10,0,10,0" Background="#FF1A2B40">
+                        <Grid Grid.Row="0" Margin="0" Height="20" Padding="10,0,10,0" Background="{ThemeResource SystemBaseMediumLowColor}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Name" FontWeight="Bold" Foreground="LightGray" Margin="0" Grid.Column="0"/>
-                            <TextBlock Text="Type" FontWeight="Bold"  Foreground="LightGray" Margin="0" Grid.Column="1"/>
-                            <TextBlock Text="Value" FontWeight="Bold"  Foreground="LightGray" Margin="0" Grid.Column="2"/>
+                            <TextBlock Text="Name" FontWeight="Bold" Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="0"/>
+                            <TextBlock Text="Type" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
+                            <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
                         </Grid>
                         <ListView Grid.Row="1" MaxHeight="300" ItemsSource="{Binding SelectedGlobalEnum.ValueNames, Converter={StaticResource EnumToSortedEnumConverter}}" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
-                                    ItemTemplate="{StaticResource EnumItemTemplate}"
-                                    Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                            ItemTemplate="{StaticResource EnumItemTemplate}"
+                            Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
                     </Grid>
                 </Border>
                 <TextBlock Text="nothing" Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>

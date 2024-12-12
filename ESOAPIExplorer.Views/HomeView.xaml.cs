@@ -1,4 +1,6 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -15,5 +17,16 @@ public sealed partial class HomeView : Page
     public HomeView()
     {
         this.InitializeComponent();
+    }
+
+    private void Themes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox comboBox &&
+            comboBox.SelectedItem is ComboBoxItem comboBoxItem &&
+            comboBoxItem.Content is string themeString &&
+            Enum.TryParse(themeString, out ElementTheme theme) is true)
+        {
+            this.RequestedTheme = theme;
+        }
     }
 }

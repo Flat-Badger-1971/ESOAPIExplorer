@@ -96,13 +96,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 SetProperty(ref _ShowEvents, true, nameof(ShowEvents));
                 SetProperty(ref _ShowFunctions, true, nameof(ShowFunctions));
                 SetProperty(ref _ShowGlobals, true, nameof(ShowGlobals));
-
                 FilterItems(() =>
                 {
-                    _DialogService.RunOnMainThread(() =>
-                    {
-                        SelectedElement = _AllItems.FirstOrDefault(i => i.Value.Name == value)?.Value;
-                    });
+                    SelectedElement = _AllItems.FirstOrDefault(i => i.Value.Name == value)?.Value;
                 });
             }
         }
@@ -306,7 +302,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         {
                             SelectedEnumName = new EsoUIGlobal
                             {
-                                Name = element.Name                            
+                                Name = element.Name
                             };
                         });
 
@@ -363,9 +359,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
                 IEnumerable<APIElement> filtered = FilterKeywords(items, FilterText);
 
-                _DialogService.RunOnMainThread(() => { 
+                _DialogService.RunOnMainThread(() =>
+                {
                     FilteredItems = new ObservableCollection<APIElement>(filtered);
-
                     callback?.Invoke();
                 });
             }

@@ -75,7 +75,7 @@ public partial class HighlightedTextBlock : Grid
                 Foreground = Foreground,
                 FontWeight = FontWeight,
                 FontSize = FontSize
-            };
+            }; 
 
             textBlock.FontSize = FontSize;
             textBlock.Inlines.Add(run);
