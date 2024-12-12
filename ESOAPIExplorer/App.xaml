@@ -8,36 +8,11 @@
     xmlns:local="using:ESOAPIExplorer">
     <Application.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Default" >
-                    <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="Assets/Styles/BaseColoursLight.xaml"/>
-                        <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
-                    </ResourceDictionary.MergedDictionaries>
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Dark" >
-                    <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="Assets/Styles/BaseColoursDark.xaml"/>
-                        <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
-                    </ResourceDictionary.MergedDictionaries>
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="HighContrast" >
-                    <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="Assets/Styles/BaseColoursDark.xaml"/>
-                        <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
-                    </ResourceDictionary.MergedDictionaries>
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Light" >
-                    <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="Assets/Styles/BaseColoursLight.xaml"/>
-                        <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
-                    </ResourceDictionary.MergedDictionaries>
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->
                 <!-- Styles -->
+                <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
                 <!-- Fonts -->
                 <ResourceDictionary Source="Assets/Fonts/Fonts.xaml"/>
                 <ResourceDictionary Source="Assets/Fonts/icoFont.xaml"/>
