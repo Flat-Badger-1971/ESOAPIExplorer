@@ -1,0 +1,46 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="BaseBackgroundColour">#404040</Color>
+    <Color x:Key="BaseForegroundColour">#FFFFFF</Color>
+    <Color x:Key="BaseTextBackgroundColour">#FFFFFF</Color>
+    <Color x:Key="BaseTextForegroundColour">#404040</Color>
+    <Color x:Key="BaseTextBodyBackgroundColour">#404040</Color>
+    <Color x:Key="BaseElementBackgroundColour">#FFFFFF</Color>
+    <Color x:Key="BaseElementForegroundColour">#404040</Color>
+    <Color x:Key="BaseGreen">#b4d012</Color>
+    <Color x:Key="BaseBrand">#5f59ff</Color>
+    <Color x:Key="BaseBrandHighlight">#363391</Color>
+    <Color x:Key="LightBrand">#b6b3fc</Color>
+    <Color x:Key="LightBrandHighlight">#8f8dc9</Color>
+    <Color x:Key="BaseSecondaryHighlight">#fef5f0</Color>
+    <Color x:Key="BaseRed">#e51400</Color>
+    <Color x:Key="BaseBlue">#00aff0</Color>
+    <Color x:Key="BaseBlack">#404040</Color>
+    <Color x:Key="BaseWhite">#FFFFFF</Color>
+    <Color x:Key="BaseBackgroundColourLight">#FFFFFF</Color>
+    <Color x:Key="BaseBorderColourLight">#dcdcdc</Color>
+    <Color x:Key="BaseBorderColour">#404040</Color>
+
+    <SolidColorBrush x:Key="ESOTextForeground" Color="{ThemeResource BaseTextForegroundColour}"/>
+    <SolidColorBrush x:Key="ESOSelectedBackground" Color="{ThemeResource BaseBrand}"/>
+    <SolidColorBrush x:Key="ESOHoverBackground" Color="{ThemeResource BaseBrandHighlight}"/>
+    <SolidColorBrush x:Key="ESOSelectedBackgroundLight" Color="{ThemeResource LightBrand}"/>
+    <SolidColorBrush x:Key="ESOHoverBackgroundLight" Color="{ThemeResource LightBrandHighlight}"/>
+    <SolidColorBrush x:Key="ESOHoverForeground" Color="{ThemeResource BaseWhite}"/>
+    <SolidColorBrush x:Key="ESOStripedListForeground">LightGray</SolidColorBrush>
+
+    <SolidColorBrush x:Key="BaseBorderColourBrush" Color="{StaticResource BaseBorderColour}"/>
+    <SolidColorBrush x:Key="BaseGreenBrush" Color="{StaticResource BaseGreen}"/>
+    <SolidColorBrush x:Key="BaseBrandBrush" Color="{StaticResource BaseBrand}"/>
+    <SolidColorBrush x:Key="BaseSecondaryHighlightBrush" Color="{StaticResource BaseSecondaryHighlight}"/>
+    <SolidColorBrush x:Key="BaseRedBrush" Color="{StaticResource BaseRed}"/>
+    <SolidColorBrush x:Key="BaseBlueBrush" Color="{StaticResource BaseBlue}"/>
+    <SolidColorBrush x:Key="BaseBackgroundBrush" Color="{StaticResource BaseBackgroundColour}"/>
+    <SolidColorBrush x:Key="BaseBackgroundBrushLight" Color="{StaticResource BaseBackgroundColourLight}" Opacity="0.15"/>
+    <SolidColorBrush x:Key="BaseBackgroundBrushLightSolid" Color="{StaticResource BaseBackgroundColourLight}"/>
+    <SolidColorBrush x:Key="BaseForegroundBrush" Color="{StaticResource BaseForegroundColour}"/>
+
+
+</ResourceDictionary>

@@ -55,11 +55,11 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0" Height="20">
                             <!-- Hidden ID Column -->
-                            <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
+                            <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0" Foreground="{ThemeResource ESOTextForeground}"/>
                             <!-- Visible Text Column -->
-                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod" Foreground="AliceBlue"/>
+                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod" Foreground="{ThemeResource ESOTextForeground}"/>
                             <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
-                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="White"/>
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0"  Foreground="{ThemeResource ESOTextForeground}"/>
                             </Frame>
                         </StackPanel>
                     </DataTemplate>

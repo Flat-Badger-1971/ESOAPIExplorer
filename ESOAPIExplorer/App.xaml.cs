@@ -3,10 +3,15 @@ using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.UI.ViewManagement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,6 +35,22 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+        var uiSettings = new Windows.UI.ViewManagement.UISettings();
+        uiSettings.ColorValuesChanged += UpdateTheme;
+        UpdateTheme(uiSettings, null);
+    }
+
+    private void UpdateTheme(Windows.UI.ViewManagement.UISettings sender, object args)
+    {
+        var color = sender.GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
+        if (color == Colors.Black)
+        {
+            App.Current.RequestedTheme = ApplicationTheme.Dark;
+        }
+        else if (color != Colors.Black)
+        {
+            App.Current.RequestedTheme = ApplicationTheme.Light;
+        }
     }
 
     /// <summary>
@@ -72,7 +93,7 @@ public partial class App : Application
 
     private static void RegisterViews(ServiceCollection services)
     {
-        services.AddTransient<HomeView>();
+        //services.AddTransient<HomeView>();
     }
     private void RegisterServices(ServiceCollection services)
     {

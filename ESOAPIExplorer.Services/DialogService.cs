@@ -1,19 +1,30 @@
 using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views.Dialogs;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
 using Window = Microsoft.UI.Xaml.Window;
 
 namespace ESOAPIExplorer.Services;
 
-public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDialogViewModel viewModel) : IDialogService
+public class DialogService : IDialogService
 {
     readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("Window").GetValue(Application.Current);
-    private readonly DispatcherQueue _MainDispatcherQueue = mainDispatcherQueue;
-    private readonly CustomMessageDialogViewModel _ViewModel = viewModel;
+    private readonly DispatcherQueue _MainDispatcherQueue;
+    private readonly CustomMessageDialogViewModel _ViewModel;
+
+    public DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDialogViewModel viewModel)
+    {
+        _MainDispatcherQueue = mainDispatcherQueue;
+        _ViewModel = viewModel;
+    }
+
+
 
     public Task ShowAsync(string message, string title = "Message")
     {
