@@ -29,7 +29,6 @@ public partial class ViewModelBase : INotifyPropertyChanged
         return true;
     }
 
-
     public virtual Task InitializeAsync(object data)
     {
         return Task.FromResult(false);
@@ -39,9 +38,13 @@ public partial class ViewModelBase : INotifyPropertyChanged
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
     {
-        var changed = PropertyChanged;
+        PropertyChangedEventHandler changed = PropertyChanged;
+
         if (changed == null)
+        {
             return;
+        }
+
         try
         {
             changed?.Invoke(this, new PropertyChangedEventArgs(propertyName));

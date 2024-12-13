@@ -17,8 +17,7 @@ public partial class RelayCommand : ICommand
     /// Creates a new command that can always execute.
     /// </summary>
     /// <param name="execute">The execution logic.</param>
-    public RelayCommand(Action execute)
-        : this(execute, null)
+    public RelayCommand(Action execute) : this(execute, null) 
     {
     }
 
@@ -64,13 +63,15 @@ public partial class RelayCommand : ICommand
     /// </summary>
     public void RaiseCanExecuteChanged()
     {
-        var handler = CanExecuteChanged;
+        EventHandler handler = CanExecuteChanged;
+
         if (handler != null)
         {
             try
             {
                 handler(this, EventArgs.Empty);
             }
+#pragma warning disable JS0025
             catch { }
         }
     }
