@@ -1,5 +1,7 @@
+using ESOAPIExplorer.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
 using System;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -28,5 +30,12 @@ public sealed partial class HomeView : Page
         {
             this.RequestedTheme = theme;
         }
+    }
+
+    private void OnHyperlinkClick(Hyperlink sender, HyperlinkClickEventArgs e)
+    {
+        HomeViewModel context = (HomeViewModel)this.DataContext;
+
+        context.SearchGithubCommand.Execute(this);
     }
 }

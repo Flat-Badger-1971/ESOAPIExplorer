@@ -97,11 +97,13 @@
             </StackPanel>
 
             <!-- github -->
-            <Grid Grid.Row="1" Margin="10">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Search Github" Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"/>
+                <TextBlock Margin="10" >
+                    <Hyperlink Click="OnHyperlinkClick" Foreground="{ThemeResource SystemBaseHighColor}">Search Github</Hyperlink>
+                </TextBlock>
             </Grid>
 
             <!-- access -->

@@ -147,7 +147,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="EnumItemTemplate">
-                <Grid Height="20" Background="{Binding Name, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">
+                <Grid Height="20" Background="{Binding Value, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
