@@ -101,7 +101,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Search Github" Command="{Binding SearchGithubCommand}" />
+                <Button Content="Search Github" Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"/>
             </Grid>
 
             <!-- access -->
