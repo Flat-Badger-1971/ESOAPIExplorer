@@ -18,8 +18,7 @@ namespace ESOAPIExplorer;
 /// </summary>
 public partial class App : Application
 {
-    private Window m_window;
-    public Window Window { get => m_window; }
+    public static Window MainWindow { get; private set; }
     public IServiceProvider Container { get; private set; }
     private IConfigurationRoot _ConfigurationRoot;
     private IConfigurationBuilder _ConfigurationManager;
@@ -38,12 +37,12 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        m_window = new MainWindow();
+        MainWindow = new MainWindow();
         Container = RegisterDependencyInjection;
 
         INavigationService navigation = Container.GetRequiredService<INavigationService>();
         navigation.InitializeAsync();
-        m_window.Activate();
+        MainWindow.Activate();
     }
 
 
@@ -79,7 +78,7 @@ public partial class App : Application
     private void RegisterServices(ServiceCollection services)
     {
         //App Services
-        services.AddSingleton<DispatcherQueue>(Window.DispatcherQueue);
+        services.AddSingleton<DispatcherQueue>(MainWindow.DispatcherQueue);
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IEventService, EventService>();
         services.AddTransient<IDialogService, DialogService>();

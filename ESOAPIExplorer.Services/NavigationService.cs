@@ -22,7 +22,7 @@ public class NavigationService : INavigationService
 
         _Container = container;
 
-        CurrentApplication = (MainWindow)Application.Current.GetType().GetProperty("Window").GetValue(Application.Current);
+        CurrentApplication = (MainWindow)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
         MainFrame = CurrentApplication.NavigationFrame;
 
         _EventService = eventService;

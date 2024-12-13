@@ -11,7 +11,7 @@ namespace ESOAPIExplorer.Services;
 
 public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDialogViewModel viewModel) : IDialogService
 {
-    readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("Window").GetValue(Application.Current);
+    readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
     private readonly DispatcherQueue _MainDispatcherQueue = mainDispatcherQueue;
     private readonly CustomMessageDialogViewModel _ViewModel = viewModel;
 

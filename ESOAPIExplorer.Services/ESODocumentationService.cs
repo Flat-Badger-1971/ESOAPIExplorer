@@ -35,7 +35,7 @@ public class ESODocumentationService : IESODocumentationService
         };
 
         // Get the current window's HWND by passing in the Window object
-        Window _MainWindow = (Window)Application.Current.GetType().GetProperty("Window").GetValue(Application.Current);
+        Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
 
         // Associate the HWND with the file picker

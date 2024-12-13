@@ -1,8 +1,12 @@
 using ESOAPIExplorer.ViewModels;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using System;
+using System.Diagnostics;
+using WinRT.Interop;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,9 +20,22 @@ namespace ESOAPIExplorer.Views;
 public sealed partial class HomeView : Page
 #pragma warning restore CsWinRT1029 // Class not trimming / AOT compatible
 {
+    readonly Window _window =  (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+
     public HomeView()
     {
         this.InitializeComponent();
+
+        //var hwnd = WindowNative.GetWindowHandle(this.XamlRoot.Content);
+        //var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+        
+        //nint hwnd = Process.GetCurrentProcess().MainWindowHandle;
+        //nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
+        //WindowId windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+        //AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
+        
+
+        //appWindow.SetIcon("Assets/Logo.ico");
     }
 
     private void Themes_SelectionChanged(object sender, SelectionChangedEventArgs e)
