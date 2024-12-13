@@ -88,7 +88,7 @@
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
-                           TextAlignment="Left"/>
+                           TextAlignment="Left" />
                 <ComboBox Name="themeMode" SelectionChanged="Themes_SelectionChanged">
                     <ComboBoxItem>Light</ComboBoxItem>
                     <ComboBoxItem>Dark</ComboBoxItem>
