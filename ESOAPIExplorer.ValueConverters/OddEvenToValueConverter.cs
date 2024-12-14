@@ -18,7 +18,8 @@ public class OddEvenToValueConverter : IValueConverter
             else
                 return OddValue;
         }
-        else return 0;
+
+        else return null;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string culture)

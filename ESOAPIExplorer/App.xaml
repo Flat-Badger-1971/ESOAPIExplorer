@@ -61,7 +61,7 @@
             </converters:NullToValueConverter>
             <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
                 <converters:OddEvenToValueConverter.EvenValue>
-                    <SolidColorBrush Color="{ThemeResource SystemChromeMediumColor}"/>
+                    <SolidColorBrush Color="{ThemeResource SystemListMediumColor}"/>
                 </converters:OddEvenToValueConverter.EvenValue>
                 <converters:OddEvenToValueConverter.OddValue>
                     <SolidColorBrush Color="{ThemeResource SystemListLowColor}"/>
@@ -131,7 +131,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="ValueItemTemplate">
-                <Grid Height="20" >
+                <Grid Height="20" Background="{ThemeResource SystemListMediumColor}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>

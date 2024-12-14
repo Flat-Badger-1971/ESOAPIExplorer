@@ -2,8 +2,6 @@ using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.UI.Core;
 
 namespace ESOAPIExplorer.ViewModels;
 
@@ -33,6 +30,17 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     CancellationTokenSource _SelectedElementTokenSource;
+
+    private APIElement _SelectedItemElement;
+    public APIElement SelectedItemElement
+    {
+        get => _SelectedItemElement;
+        set
+        {
+            SetProperty(ref _SelectedItemElement, value);
+            HandleSelectedItemElement();
+        }
+    }
 
     private EsoUIEvent _SelectedEventDetails;
     public EsoUIEvent SelectedEventDetails
@@ -372,7 +380,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     public ICommand SearchGithubCommand => new RelayCommand(() =>
     {
-        _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type="));
+        _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type=code"));
     });
 
     private IEnumerable<string> GetUsedByParallel(string enumName)
@@ -410,5 +418,17 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         });
 
         return usedBy.Order();
+    }
+
+    private void HandleSelectedItemElement()
+    {
+        if (SelectedItemElement != null)
+        {
+            switch (SelectedItemElement.ElementType)
+            {
+                case APIElementType.Enum:
+                    break;
+            }
+        }
     }
 }

@@ -120,7 +120,11 @@
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource ValueItemTemplate}"
-                    Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                    Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    <ListView.Resources>
+                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                    </ListView.Resources>
+                </ListView>
 
                 <!-- Global Values -->
                 <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
@@ -128,7 +132,11 @@
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource ValueItemTemplate}" 
-                    Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                    Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    <ListView.Resources>
+                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                    </ListView.Resources>
+                </ListView>
             </StackPanel>
 
             <!-- arguments -->
@@ -140,7 +148,11 @@
                           MaxHeight="300"
                           HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                          Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                          Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
+                        <ListView.Resources>
+                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                        </ListView.Resources>
+                    </ListView>
                     <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
                 </Grid>
 
@@ -151,7 +163,11 @@
                           MaxHeight="300"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                          Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                          Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <ListView.Resources>
+                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                        </ListView.Resources>
+                    </ListView>
                     <TextBlock Text="none" Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
                 </Grid>
             </StackPanel>
@@ -164,7 +180,11 @@
                           MaxHeight="300"
                     HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                     ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                    Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                    Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToVisibilityConverter}}">
+                    <ListView.Resources>
+                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                    </ListView.Resources>
+                </ListView>
                 <TextBlock Text="nothing" Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
             </StackPanel>
 
@@ -190,8 +210,13 @@
                             <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
                         </Grid>
                         <ListView Grid.Row="1" MaxHeight="300" ItemsSource="{Binding SelectedGlobalEnum.ValueNames, Converter={StaticResource EnumToSortedEnumConverter}}" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                            SelectedItem="{Binding SelectedItemElement, Mode=TwoWay}"
                             ItemTemplate="{StaticResource EnumItemTemplate}"
-                            Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}"/>
+                            Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}">
+                            <ListView.Resources>
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                            </ListView.Resources>
+                        </ListView>
                     </Grid>
                 </Border>
                 <TextBlock Text="nothing" Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
