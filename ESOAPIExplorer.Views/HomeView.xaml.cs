@@ -20,22 +20,9 @@ namespace ESOAPIExplorer.Views;
 public sealed partial class HomeView : Page
 #pragma warning restore CsWinRT1029 // Class not trimming / AOT compatible
 {
-    readonly Window _window =  (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-
     public HomeView()
     {
         this.InitializeComponent();
-
-        //var hwnd = WindowNative.GetWindowHandle(this.XamlRoot.Content);
-        //var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-        
-        //nint hwnd = Process.GetCurrentProcess().MainWindowHandle;
-        //nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
-        //WindowId windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-        //AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
-        
-
-        //appWindow.SetIcon("Assets/Logo.ico");
     }
 
     private void Themes_SelectionChanged(object sender, SelectionChangedEventArgs e)

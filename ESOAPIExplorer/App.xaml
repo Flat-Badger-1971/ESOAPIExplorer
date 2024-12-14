@@ -172,7 +172,9 @@
                     </Grid>
                 </Grid>
             </DataTemplate>
-<!-- END TEMPLATES -->
+
+            <CollectionViewSource x:Key="SortedItemsSource" />
+            <!-- END TEMPLATES -->
         </ResourceDictionary>
 
     </Application.Resources>
