@@ -6,6 +6,7 @@ public class EsoUIType
 {
     public string Name { get; set; }
     public string Type { get; set; }
+    public bool IsObject { get; set; } = false;
 
     public EsoUIType(string name, string type = null)
     {

@@ -2,6 +2,8 @@ using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,17 +32,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     }
 
     CancellationTokenSource _SelectedElementTokenSource;
-
-    private EsoUIElement _SelectedItemElement;
-    public EsoUIElement SelectedItemElement
-    {
-        get => _SelectedItemElement;
-        set
-        {
-            SetProperty(ref _SelectedItemElement, value);
-            HandleSelectedItemElement();
-        }
-    }
 
     private EsoUIEvent _SelectedEventDetails;
     public EsoUIEvent SelectedEventDetails
@@ -110,7 +101,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
             if (value != null)
             {
-                SetProperty(ref _SelectedElement, FilteredItems.First(i => i.Name == value), nameof(SelectedElement));
+                SelectElement(value);
             }
         }
     }
@@ -189,6 +180,22 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         await FilterItems();
     }
 
+    private void UpdateObjects(List<EsoUIArgument> arguments)
+    {
+        foreach (EsoUIArgument e in arguments)
+        {
+            if (!string.IsNullOrWhiteSpace(e.Type.Type))
+            {
+                DisplayModelBase<APIElement> matchingElement = AllItems.FirstOrDefault(i => i.Value.Name == e.Type.Type);
+
+                if (matchingElement?.Value != null)
+                {
+                    e.Type.IsObject = true;
+                }
+            }
+        }
+    }
+
     private void UpdateSelectedElementDetails()
     {
         if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
@@ -210,12 +217,15 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         _DialogService.RunOnMainThread(() =>
                         {
                             SelectedEventDetails = _ESODocumentationService.Data.Events[element.Id];
+                            UpdateObjects(SelectedEventDetails.Args);
                         });
                         break;
                     case APIElementType.Function:
                         _DialogService.RunOnMainThread(() =>
                         {
                             SelectedFunctionDetails = _ESODocumentationService.Data.Functions[element.Id];
+                            UpdateObjects(SelectedFunctionDetails.Args);
+                            UpdateObjects(SelectedFunctionDetails.Returns);
                         });
                         break;
                     case APIElementType.Global:
@@ -345,15 +355,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         return usedBy.Order();
     }
 
-    private void HandleSelectedItemElement()
+    private void SelectElement(string elementName)
     {
-        if (SelectedItemElement != null)
-        {
-            //switch (SelectedItemElement.ElementType)
-            //{
-            //    case APIElementType.Enum:
-            //        break;
-            //}
-        }
+        SetProperty(ref _SelectedElement, FilteredItems.First(i => i.Name == elementName), nameof(SelectedElement));
+        UpdateSelectedElementDetails();
+    }
+
+    public void HandleSelectedItemElement(string elementName)
+    {
+        SelectElement(elementName);   
     }
 }

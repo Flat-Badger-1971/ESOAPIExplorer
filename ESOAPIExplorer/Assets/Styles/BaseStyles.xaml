@@ -42,7 +42,7 @@
     <SolidColorBrush x:Key="BaseForegroundBrush" Color="{StaticResource BaseForegroundColour}"/>
 
     <!-- Default Styles -->
-    <Style x:Key="DefaultButtonStyle" TargetType="Button">
+    <!--<Style x:Key="DefaultButtonStyle" TargetType="Button">
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Background" Value="{StaticResource SystemChromeBlackMediumLowColor}" />
         <Setter Property="Foreground" Value="{StaticResource BaseElementBackgroundColour}"/>
@@ -155,7 +155,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
+    </Style>-->
     <Style TargetType="ListView" x:Key="DefaultListViewStyle">
         <Setter Property="MinWidth" Value="900"/>
     </Style>
@@ -288,7 +288,7 @@
         <Setter Property="TextWrapping" Value="WrapWholeWords"/>
     </Style>
 
-    <Style x:Key="DialogButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+    <!--<Style x:Key="DialogButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
         <Setter Property="HorizontalAlignment" Value="Right"/>
         <Setter Property="VerticalAlignment" Value="Bottom" />
         <Setter Property="Width" Value="150"/>
@@ -361,6 +361,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
+    </Style>-->
 
 </ResourceDictionary>
