@@ -230,6 +230,7 @@
                             <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
                         </Grid>
                         <ListView Grid.Row="1" MaxHeight="300" ItemsSource="{Binding SelectedGlobalEnum.ValueNames, Converter={StaticResource EnumToSortedEnumConverter}}" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                            SelectionChanged="SelectionChangedHandler"
                             ItemTemplate="{StaticResource EnumItemTemplate}"
                             Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}">
                             <ListView.Resources>

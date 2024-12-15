@@ -1,3 +1,4 @@
+using ESOAPIExplorer.Services;
 using ESOAPIExplorer.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -20,9 +21,13 @@ namespace ESOAPIExplorer.Views;
 public sealed partial class HomeView : Page
 #pragma warning restore CsWinRT1029 // Class not trimming / AOT compatible
 {
-    public HomeView()
+    private IDialogService _dialogService;
+
+    public HomeView(IDialogService dialogService)
     {
         this.InitializeComponent();
+
+        _dialogService = dialogService;
     }
 
     private void Themes_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -49,4 +54,16 @@ public sealed partial class HomeView : Page
 
         context.HandleSelectedItemElement(((Button)sender).Content as string);
     }
+
+    private void SelectionChangedHandler(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ListView listview)
+        {
+            if (listview.SelectedItems.Count > 0)
+            {
+                _dialogService.RunOnMainThread(() => listview.SelectedItems.Clear());
+            };
+        }
+    }
 }
+
