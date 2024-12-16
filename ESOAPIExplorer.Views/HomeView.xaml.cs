@@ -54,16 +54,5 @@ public sealed partial class HomeView : Page
 
         context.HandleSelectedItemElement(((Button)sender).Content as string);
     }
-
-    private void SelectionChangedHandler(object sender, SelectionChangedEventArgs e)
-    {
-        if (sender is ListView listview)
-        {
-            if (listview.SelectedItems.Count > 0)
-            {
-                _dialogService.RunOnMainThread(() => listview.SelectedItems.Clear());
-            };
-        }
-    }
 }
 

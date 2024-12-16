@@ -361,6 +361,17 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         UpdateSelectedElementDetails();
     }
 
+    //private void SelectionChangedHandler(object sender, SelectionChangedEventArgs e)
+    //{
+    //    if (sender is ListView listview)
+    //    {
+    //        if (listview.SelectedItems.Count > 0)
+    //        {
+    //            _dialogService.RunOnMainThread(() => listview.SelectedItems.Clear());
+    //        };
+    //    }
+    //}
+
     public void HandleSelectedItemElement(string elementName)
     {
         SelectElement(elementName);   
