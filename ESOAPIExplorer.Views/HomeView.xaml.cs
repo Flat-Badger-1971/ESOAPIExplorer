@@ -21,13 +21,9 @@ namespace ESOAPIExplorer.Views;
 public sealed partial class HomeView : Page
 #pragma warning restore CsWinRT1029 // Class not trimming / AOT compatible
 {
-    private IDialogService _dialogService;
-
-    public HomeView(IDialogService dialogService)
+    public HomeView()
     {
         this.InitializeComponent();
-
-        _dialogService = dialogService;
     }
 
     private void Themes_SelectionChanged(object sender, SelectionChangedEventArgs e)
