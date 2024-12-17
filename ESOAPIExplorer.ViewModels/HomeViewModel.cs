@@ -302,7 +302,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     CancellationTokenSource token;
 
-    private async Task FilterItems(Action callback = null)
+    private Task FilterItems(Action callback = null)
     {
         if (token != null && !token.IsCancellationRequested)
         {
@@ -310,21 +310,26 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
 
         token = new CancellationTokenSource();
-        await Task.Run(async () =>
+        _ = Task.Run(() =>
         {
             string searchQuery = _FilterText;
-            await Task.Delay(300);
-            if (searchQuery == _FilterText)
+            Thread.Sleep(300);
+            if (!token.IsCancellationRequested)
             {
-                IEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText);
-
-                dialogService.RunOnMainThread(() =>
+                if (searchQuery == _FilterText)
                 {
-                    FilteredItems = new ObservableCollection<APIElement>(filtered.Order());
+                    IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText).Order();
+
+                    dialogService.RunOnMainThread(() =>
+                    {
+                    FilteredItems = new ObservableCollection<APIElement>(filtered);
                     callback?.Invoke();
-                });
+                    });
+                }
             }
-        }, token.Token);
+        }
+        , token.Token);
+        return Task.CompletedTask;
     }
 
 

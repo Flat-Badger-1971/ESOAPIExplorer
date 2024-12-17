@@ -98,8 +98,9 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
 
     }
 
-    public void RunOnMainThread(Action action)
+    public bool RunOnMainThread(Action action)
     {
-        _MainDispatcherQueue.TryEnqueue(new DispatcherQueueHandler(action));
+        bool success = _MainDispatcherQueue.TryEnqueue(new DispatcherQueueHandler(action));
+        return success;
     }
 }
