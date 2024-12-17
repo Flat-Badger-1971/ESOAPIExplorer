@@ -31,19 +31,16 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public ICommand ClearCommand
     {
         get => new RelayCommand<object>((parameter) =>
-            {
-                if (parameter is IList<object> selected)
+                dialogService.RunOnMainThread(() =>
                 {
-                    Thread.Sleep(300);
-                    dialogService.RunOnMainThread(() =>
+                    if (parameter is IList<object> selected)
                     {
                         if (selected.Count > 0)
                         {
                             selected.Clear();
                         }
-                    });
-                }
-            });
+                    }
+                }));
     }
 
     private EsoUIEvent _SelectedEventDetails;
