@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -24,11 +23,21 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             SetProperty(ref _SelectedElement, value);
             UpdateSelectedElementDetails();
+            AddToHistory(_SelectedElement.Name);
         }
     }
 
     CancellationTokenSource _SelectedElementTokenSource;
 
+    private bool _CanGoBack;
+    public bool CanGoBack
+    {
+        get => _CanGoBack;
+        set
+        {
+            SetProperty(ref _CanGoBack, value);
+        }
+    }
 
     private EsoUIEvent _SelectedEventDetails;
     public EsoUIEvent SelectedEventDetails
@@ -72,7 +81,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
-
     private int _SelectedEnum;
     public int SelectedEnum
     {
@@ -80,7 +88,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         set
         {
             SetProperty(ref _SelectedEnum, value);
-            Task.Run(async () => 
+            Task.Run(async () =>
             {
                 await Task.Delay(10);
                 dialogService.RunOnMainThread(() => SelectedEnum = -1);
@@ -139,7 +147,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         set
         {
             SetProperty(ref _FilterText, value);
-            FilterItems().Wait();
+            FilterItemsAsync().Wait();
         }
     }
 
@@ -167,6 +175,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     #endregion Properties
 
+    private readonly Stack<string> _HistoryStack = new Stack<string>();
+
     public override async Task InitializeAsync(object data)
     {
         await base.InitializeAsync(data);
@@ -191,7 +201,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
             .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c })));
 
-        await FilterItems();
+        // AddToHistory(AllItems.First().Value.Name);
+
+        await FilterItemsAsync();
     }
 
     private void UpdateObjects(List<EsoUIArgument> arguments)
@@ -212,6 +224,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     private void UpdateSelectedElementDetails()
     {
+
         if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
         {
             _SelectedElementTokenSource.Cancel();
@@ -302,7 +315,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     CancellationTokenSource token;
 
-    private Task FilterItems(Action callback = null)
+    private Task FilterItemsAsync(Action callback = null)
     {
         if (token != null && !token.IsCancellationRequested)
         {
@@ -322,8 +335,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
                     dialogService.RunOnMainThread(() =>
                     {
-                    FilteredItems = new ObservableCollection<APIElement>(filtered);
-                    callback?.Invoke();
+                        FilteredItems = new ObservableCollection<APIElement>(filtered);
+                        callback?.Invoke();
                     });
                 }
             }
@@ -331,22 +344,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         , token.Token);
         return Task.CompletedTask;
     }
-
-
-    public ICommand ClearCommand => new RelayCommand<string>((selectItem) => 
-    {
-        //if (parameter is IList<object> selected)
-        //{
-        //    Thread.Sleep(300);
-        //    dialogService.RunOnMainThread(() =>
-        //    {
-        //        if (selected.Count > 0)
-        //        {
-        //            selected.Clear();
-        //        }
-        //    });
-        //}
-    });
 
     public ICommand SearchGithubCommand => new RelayCommand(() =>
     {
@@ -390,8 +387,24 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         return usedBy.Order();
     }
 
-    private void SelectElement(string elementName)
+    private void AddToHistory(string value)
     {
+        _HistoryStack.Push(value);
+
+        if (_HistoryStack.Count > 1 && !CanGoBack)
+        {
+            SetProperty(ref _CanGoBack, true, nameof(CanGoBack));
+        }
+
+    }
+
+    private void SelectElement(string elementName, bool doNotAddToHistory = false)
+    {
+        if (!doNotAddToHistory)
+        {
+            AddToHistory(elementName);
+        }
+
         SetProperty(ref _SelectedElement, FilteredItems.First(i => i.Name == elementName), nameof(SelectedElement));
         UpdateSelectedElementDetails();
     }
@@ -399,5 +412,28 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public ICommand HandleSelectedItemElement => new RelayCommand<string>((elementName) =>
     {
         SelectElement(elementName);
+    });
+
+    public ICommand GoBack => new RelayCommand(() =>
+    {
+        string previous = _HistoryStack.Pop();
+
+        if (previous == SelectedElement.Name)
+        {
+            // pop again to remove the current selection from the stack
+            previous = _HistoryStack.Pop();
+        }
+
+        if (_HistoryStack.Count == 0)
+        {
+            SetProperty(ref _CanGoBack, false, nameof(CanGoBack));
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(previous))
+            {
+                SelectElement(previous, true);
+            }
+        }
     });
 }
