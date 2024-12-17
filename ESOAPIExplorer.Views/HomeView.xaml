@@ -20,7 +20,10 @@
                 <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{ThemeResource SystemBaseHighColor}" />
             </DataTemplate>
             <DataTemplate x:Key="ArgButtonTemplate">
-                <Button Content="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{ThemeResource SystemColorHighlightColor}" FontWeight="SemiBold" Background="Transparent" Padding="0" BorderThickness="0" Click="ArgButtonOnClick"/>
+                <Button Content="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{ThemeResource SystemColorHighlightColor}" 
+                        FontWeight="SemiBold" 
+                        Background="Transparent" Padding="0" BorderThickness="0" 
+                        Command="{Binding Path=DataContext.HandleSelectedItemElement, ElementName=_this}" CommandParameter="{Binding Type, Converter={StaticResource TypeToNameConverter}}"/>
             </DataTemplate>
             <converters:TypeTemplateSelector x:Key="TypeTemplateSelector" TextBlockTemplate="{StaticResource ArgTextBlockTemplate}" ButtonTemplate="{StaticResource ArgButtonTemplate}" />
             <DataTemplate x:Key="ArgumentHeaderTemplate">
@@ -122,9 +125,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Margin="10" >
-                    <Hyperlink Click="OnHyperlinkClick" Foreground="{ThemeResource SystemBaseHighColor}">Search Github</Hyperlink>
-                </TextBlock>
+
+                <Button Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="Search On Github"/>
             </Grid>
 
             <!-- access -->

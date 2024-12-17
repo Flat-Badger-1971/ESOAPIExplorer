@@ -37,18 +37,5 @@ public sealed partial class HomeView : Page
         }
     }
 
-    private void OnHyperlinkClick(Hyperlink sender, HyperlinkClickEventArgs e)
-    {
-        HomeViewModel context = (HomeViewModel)this.DataContext;
 
-        context.SearchGithubCommand.Execute(this);
-    }
-
-    private void ArgButtonOnClick(object sender, RoutedEventArgs e)
-    {
-        HomeViewModel context = (HomeViewModel)this.DataContext;
-
-        context.HandleSelectedItemElement(((Button)sender).Content as string);
-    }
 }
-

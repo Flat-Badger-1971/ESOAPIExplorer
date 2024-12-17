@@ -391,8 +391,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         UpdateSelectedElementDetails();
     }
 
-    public void HandleSelectedItemElement(string elementName)
+    public ICommand HandleSelectedItemElement => new RelayCommand<string>((elementName) =>
     {
         SelectElement(elementName);
-    }
+    });
 }
