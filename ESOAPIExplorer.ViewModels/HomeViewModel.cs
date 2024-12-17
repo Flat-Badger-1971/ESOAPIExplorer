@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -28,23 +29,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     CancellationTokenSource _SelectedElementTokenSource;
 
-    public ICommand ClearCommand
-    {
-        get => new RelayCommand<object>((parameter) =>
-            {
-                if (parameter is IList<object> selected)
-                {
-                    Thread.Sleep(300);
-                    dialogService.RunOnMainThread(() =>
-                    {
-                        if (selected.Count > 0)
-                        {
-                            selected.Clear();
-                        }
-                    });
-                }
-            });
-    }
 
     private EsoUIEvent _SelectedEventDetails;
     public EsoUIEvent SelectedEventDetails
@@ -85,6 +69,22 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
             SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
             SetProperty(ref _SelectedEnumName, value);
+        }
+    }
+
+
+    private int _SelectedEnum;
+    public int SelectedEnum
+    {
+        get => _SelectedEnum;
+        set
+        {
+            SetProperty(ref _SelectedEnum, value);
+            Task.Run(async () => 
+            {
+                await Task.Delay(10);
+                dialogService.RunOnMainThread(() => SelectedEnum = -1);
+            });
         }
     }
 
@@ -326,6 +326,22 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             }
         }, token.Token);
     }
+
+
+    public ICommand ClearCommand => new RelayCommand<string>((selectItem) => 
+    {
+        //if (parameter is IList<object> selected)
+        //{
+        //    Thread.Sleep(300);
+        //    dialogService.RunOnMainThread(() =>
+        //    {
+        //        if (selected.Count > 0)
+        //        {
+        //            selected.Clear();
+        //        }
+        //    });
+        //}
+    });
 
     public ICommand SearchGithubCommand => new RelayCommand(() =>
     {

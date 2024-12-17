@@ -234,13 +234,14 @@
                                   ItemsSource="{Binding SelectedGlobalEnum.ValueNames, Converter={StaticResource EnumToSortedEnumConverter}}"
                                   ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                                   ItemTemplate="{StaticResource EnumItemTemplate}"
+                                  SelectedIndex="{Binding SelectedEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}">
                             <ListView.Resources>
                                 <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                             </ListView.Resources>
-                            <interactivity:Interaction.Behaviors>
+                            <!--<interactivity:Interaction.Behaviors>
                                 <converters:SelectedItemsBehaviour Command="{Binding Path=DataContext.ClearCommand, ElementName=_this, Mode=TwoWay}"/>
-                            </interactivity:Interaction.Behaviors>
+                            </interactivity:Interaction.Behaviors>-->
                         </ListView>
                     </Grid>
                 </Border>

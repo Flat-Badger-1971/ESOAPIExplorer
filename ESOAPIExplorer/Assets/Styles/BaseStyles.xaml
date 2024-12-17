@@ -287,6 +287,8 @@
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="TextWrapping" Value="WrapWholeWords"/>
     </Style>
+    
+    
 
     <!--<Style x:Key="DialogButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
         <Setter Property="HorizontalAlignment" Value="Right"/>
