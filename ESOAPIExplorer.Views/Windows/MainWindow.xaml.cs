@@ -1,7 +1,12 @@
 using Microsoft.UI;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
+using System;
 using WinRT.Interop;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -53,5 +58,27 @@ public sealed partial class MainWindow : Window
                 titleBar.IconShowOptions = IconShowOptions.ShowIconAndSystemMenu;
             }
         }
+    }
+
+    private void NavigationViewControl_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        NavigationTransitionInfo transition = args.RecommendedNavigationTransitionInfo;
+        NavigationViewItemBase container = args.InvokedItemContainer;
+        string tag = args.InvokedItemContainer?.Tag.ToString();
+
+        if (args.IsSettingsInvoked)
+        {
+            NavFrame.Navigate(typeof(SettingsView), null, transition);
+        }
+        else if (container != null && tag != null)
+        {
+            Type page = Type.GetType(tag);
+            NavFrame.Navigate(page, null, transition);
+        }
+    }
+
+    private void NavigationViewControl_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+    {
+
     }
 }

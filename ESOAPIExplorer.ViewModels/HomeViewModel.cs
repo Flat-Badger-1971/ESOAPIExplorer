@@ -428,12 +428,10 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             SetProperty(ref _CanGoBack, false, nameof(CanGoBack));
         }
-        else
+
+        if (!string.IsNullOrEmpty(previous))
         {
-            if (!string.IsNullOrEmpty(previous))
-            {
-                SelectElement(previous, true);
-            }
+            SelectElement(previous, true);
         }
     });
 }

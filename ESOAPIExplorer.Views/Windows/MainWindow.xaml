@@ -8,8 +8,24 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Title="ESO API Explorer">
 
-    <!--View Container-->
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="Base"/>
+    </Window.SystemBackdrop>
+    
     <Grid x:Name="MainGrid">
-        <Frame Grid.Column="1" x:Name="NavFrame"/>
+        <NavigationView
+            x:Name="NavigationViewControl"
+            AlwaysShowHeader="False"
+            IsBackButtonVisible="Collapsed"
+            IsTabStop="False"
+            IsTitleBarAutoPaddingEnabled="False"
+            IsPaneOpen="False"
+            ItemInvoked="NavigationViewControl_ItemInvoked">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Home" Content="Home" Tag="ESOAPIExplorer.Views.HomeView"/>
+            </NavigationView.MenuItems>
+
+            <Frame Grid.Column="1" x:Name="NavFrame"/>
+        </NavigationView>
     </Grid>
 </Window>
