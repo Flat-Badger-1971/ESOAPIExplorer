@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="SettingsView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Windows\MainWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>

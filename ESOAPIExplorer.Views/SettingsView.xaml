@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ESOAPIExplorer.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ESOAPIExplorer.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ESOAPIExplorer.ViewModels"    
+    xmlns:converters="using:ESOAPIExplorer.ValueConverters"    
+    xmlns:c="using:ESOAPIExplorer.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    x:Name="_this">
+    <!--d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}">-->
+    <Grid x:Name="RootGrid">
+        <TextBlock Text="Yay settings!" />
+    </Grid>
+</Page>

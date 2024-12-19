@@ -23,24 +23,20 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             SetProperty(ref _SelectedElement, value);
             UpdateSelectedElementDetails();
+            AddToHistory(_SelectedElement.Name);
         }
     }
 
     CancellationTokenSource _SelectedElementTokenSource;
 
-    public ICommand ClearCommand
+    private bool _CanGoBack;
+    public bool CanGoBack
     {
-        get => new RelayCommand<object>((parameter) =>
-                dialogService.RunOnMainThread(() =>
-                {
-                    if (parameter is IList<object> selected)
-                    {
-                        if (selected.Count > 0)
-                        {
-                            selected.Clear();
-                        }
-                    }
-                }));
+        get => _CanGoBack;
+        set
+        {
+            SetProperty(ref _CanGoBack, value);
+        }
     }
 
     private EsoUIEvent _SelectedEventDetails;
@@ -82,6 +78,21 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
             SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
             SetProperty(ref _SelectedEnumName, value);
+        }
+    }
+
+    private int _SelectedEnum;
+    public int SelectedEnum
+    {
+        get => _SelectedEnum;
+        set
+        {
+            SetProperty(ref _SelectedEnum, value);
+            Task.Run(async () =>
+            {
+                await Task.Delay(10);
+                dialogService.RunOnMainThread(() => SelectedEnum = -1);
+            });
         }
     }
 
@@ -136,7 +147,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         set
         {
             SetProperty(ref _FilterText, value);
-            FilterItems().Wait();
+            FilterItemsAsync().Wait();
         }
     }
 
@@ -164,6 +175,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     #endregion Properties
 
+    private readonly Stack<string> _HistoryStack = new Stack<string>();
+
     public override async Task InitializeAsync(object data)
     {
         await base.InitializeAsync(data);
@@ -188,7 +201,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
             .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c })));
 
-        await FilterItems();
+        // AddToHistory(AllItems.First().Value.Name);
+
+        await FilterItemsAsync();
     }
 
     private void UpdateObjects(List<EsoUIArgument> arguments)
@@ -209,6 +224,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     private void UpdateSelectedElementDetails()
     {
+
         if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
         {
             _SelectedElementTokenSource.Cancel();
@@ -299,7 +315,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     CancellationTokenSource token;
 
-    private async Task FilterItems(Action callback = null)
+    private Task FilterItemsAsync(Action callback = null)
     {
         if (token != null && !token.IsCancellationRequested)
         {
@@ -307,21 +323,26 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
 
         token = new CancellationTokenSource();
-        await Task.Run(async () =>
+        _ = Task.Run(() =>
         {
             string searchQuery = _FilterText;
-            await Task.Delay(300);
-            if (searchQuery == _FilterText)
+            Thread.Sleep(300);
+            if (!token.IsCancellationRequested)
             {
-                IEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText);
-
-                dialogService.RunOnMainThread(() =>
+                if (searchQuery == _FilterText)
                 {
-                    FilteredItems = new ObservableCollection<APIElement>(filtered.Order());
-                    callback?.Invoke();
-                });
+                    IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText).Order();
+
+                    dialogService.RunOnMainThread(() =>
+                    {
+                        FilteredItems = new ObservableCollection<APIElement>(filtered);
+                        callback?.Invoke();
+                    });
+                }
             }
-        }, token.Token);
+        }
+        , token.Token);
+        return Task.CompletedTask;
     }
 
     public ICommand SearchGithubCommand => new RelayCommand(() =>
@@ -366,14 +387,51 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         return usedBy.Order();
     }
 
-    private void SelectElement(string elementName)
+    private void AddToHistory(string value)
     {
+        _HistoryStack.Push(value);
+
+        if (_HistoryStack.Count > 1 && !CanGoBack)
+        {
+            SetProperty(ref _CanGoBack, true, nameof(CanGoBack));
+        }
+
+    }
+
+    private void SelectElement(string elementName, bool doNotAddToHistory = false)
+    {
+        if (!doNotAddToHistory)
+        {
+            AddToHistory(elementName);
+        }
+
         SetProperty(ref _SelectedElement, FilteredItems.First(i => i.Name == elementName), nameof(SelectedElement));
         UpdateSelectedElementDetails();
     }
 
-    public void HandleSelectedItemElement(string elementName)
+    public ICommand HandleSelectedItemElement => new RelayCommand<string>((elementName) =>
     {
         SelectElement(elementName);
-    }
+    });
+
+    public ICommand GoBack => new RelayCommand(() =>
+    {
+        string previous = _HistoryStack.Pop();
+
+        if (previous == SelectedElement.Name)
+        {
+            // pop again to remove the current selection from the stack
+            previous = _HistoryStack.Pop();
+        }
+
+        if (_HistoryStack.Count == 0)
+        {
+            SetProperty(ref _CanGoBack, false, nameof(CanGoBack));
+        }
+
+        if (!string.IsNullOrEmpty(previous))
+        {
+            SelectElement(previous, true);
+        }
+    });
 }
