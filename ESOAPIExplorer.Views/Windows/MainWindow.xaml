@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ESOAPIExplorer.Views"
+    xmlns:vm="using:ESOAPIExplorer.ViewModels" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Title="ESO API Explorer">
@@ -11,18 +12,28 @@
     <Window.SystemBackdrop>
         <MicaBackdrop Kind="Base"/>
     </Window.SystemBackdrop>
-    
-    <Grid x:Name="MainGrid">
+
+    <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
         <NavigationView
             x:Name="NavigationViewControl"
             AlwaysShowHeader="False"
+            IsSettingsVisible="False"
             IsBackButtonVisible="Collapsed"
             IsTabStop="False"
             IsTitleBarAutoPaddingEnabled="False"
-            IsPaneOpen="False"
-            ItemInvoked="NavigationViewControl_ItemInvoked">
+             SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsPaneOpen="False">
             <NavigationView.MenuItems>
-                <NavigationViewItem Icon="Home" Content="Home" Tag="ESOAPIExplorer.Views.HomeView"/>
+                <NavigationViewItem Tag="HomeViewModel" Content="Home">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource icoFont}" Glyph="{StaticResource glyph-home}"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem  Tag="SettingsViewModel" Content="Settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource icoFont}" Glyph="{StaticResource glyph-cog}"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <Frame Grid.Column="1" x:Name="NavFrame"/>
