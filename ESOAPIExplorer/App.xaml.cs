@@ -38,6 +38,7 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         MainWindow = new MainWindow();
+        MainWindow.AppWindow.SetIcon("Assets/Logo.ico");
         Container = RegisterDependencyInjection;
 
         INavigationService navigation = Container.GetRequiredService<INavigationService>();

@@ -12,7 +12,12 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageIcon>DSAPP.png</PackageIcon>
+    <ApplicationIcon>Assets\Logo.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="Assets\Logo.ico" />
+  </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="Assets\Fonts\Fonts.xaml" />
@@ -24,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <EmbeddedResource Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo.scale-200.png" />
@@ -66,14 +71,28 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Users\Dion.Mills\OneDrive - Sainsbury's Supermarkets Ltd\Images\DSAPP.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ESOAPIExplorer.Interfaces\ESOAPIExplorer.Interfaces.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.Services\ESOAPIExplorer.Services.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.ValueConverters\ESOAPIExplorer.ValueConverters.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.Views\ESOAPIExplorer.Views.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Logo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <Content Update="Assets\Fonts\icoFont.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Update="Assets\SplashScreen.scale-200.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\Styles\BaseStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
