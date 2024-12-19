@@ -24,18 +24,10 @@
             SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsPaneOpen="False">
             <NavigationView.MenuItems>
-                <NavigationViewItem Tag="HomeViewModel" Content="Home">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Home"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                <NavigationViewItem Tag="HomeViewModel" Content="Home" Icon="Home" />
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem Tag="SettingsViewModel" Content="Settings">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Setting"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                <NavigationViewItem Tag="SettingsViewModel" Content="Settings" Icon="Setting"/> 
             </NavigationView.FooterMenuItems>
             <Frame Grid.Column="1" x:Name="NavFrame"/>
         </NavigationView>
