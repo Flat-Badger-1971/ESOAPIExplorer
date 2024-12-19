@@ -21,21 +21,22 @@
             IsBackButtonVisible="Collapsed"
             IsTabStop="False"
             IsTitleBarAutoPaddingEnabled="False"
-             SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsPaneOpen="False">
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="HomeViewModel" Content="Home">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource icoFont}" Glyph="{StaticResource glyph-home}"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem  Tag="SettingsViewModel" Content="Settings">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource icoFont}" Glyph="{StaticResource glyph-cog}"/>
+                        <SymbolIcon Symbol="Home"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
-
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem Tag="SettingsViewModel" Content="Settings">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Setting"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
             <Frame Grid.Column="1" x:Name="NavFrame"/>
         </NavigationView>
     </Grid>
