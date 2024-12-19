@@ -25,61 +25,9 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
-        this.Activated += MainWindow_Activated;
 
         MainContainer = MainGrid;
         NavigationFrame = NavFrame;
     }
 
-    private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
-    {
-        if (args.WindowActivationState == WindowActivationState.CodeActivated || args.WindowActivationState == WindowActivationState.PointerActivated)
-        {
-            SetTitleBarIcon();
-
-            this.Activated -= MainWindow_Activated;
-        }
-    }
-
-    private void SetTitleBarIcon()
-    {
-        nint hwnd = WindowNative.GetWindowHandle(this);
-        WindowId windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-        AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
-
-        if (appWindow != null)
-        {
-            string iconPath = "Assets/Logo.ico";
-            appWindow.SetIcon(iconPath);
-
-            AppWindowTitleBar titleBar = appWindow.TitleBar;
-
-            if (titleBar != null)
-            {
-                titleBar.IconShowOptions = IconShowOptions.ShowIconAndSystemMenu;
-            }
-        }
-    }
-
-    //private void NavigationViewControl_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
-    //{
-    //NavigationTransitionInfo transition = args.RecommendedNavigationTransitionInfo;
-    //    NavigationViewItemBase container = args.InvokedItemContainer;
-    //    string tag = args.InvokedItemContainer?.Tag.ToString();
-
-    //    if (args.IsSettingsInvoked)
-    //    {
-    //        NavFrame.Navigate(typeof(SettingsView), null, transition);
-    //    }
-    //    else if (container != null && tag != null)
-    //    {
-    //        Type page = Type.GetType(tag);
-    //        NavFrame.Navigate(page, null, transition);
-    //    }
-    //}
-
-    //private void NavigationViewControl_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
-    //{
-
-    //}
 }
