@@ -1,3 +1,4 @@
+using ESOAPIExplorer.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -60,25 +61,25 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void NavigationViewControl_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
-    {
-        NavigationTransitionInfo transition = args.RecommendedNavigationTransitionInfo;
-        NavigationViewItemBase container = args.InvokedItemContainer;
-        string tag = args.InvokedItemContainer?.Tag.ToString();
+    //private void NavigationViewControl_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    //{
+    //NavigationTransitionInfo transition = args.RecommendedNavigationTransitionInfo;
+    //    NavigationViewItemBase container = args.InvokedItemContainer;
+    //    string tag = args.InvokedItemContainer?.Tag.ToString();
 
-        if (args.IsSettingsInvoked)
-        {
-            NavFrame.Navigate(typeof(SettingsView), null, transition);
-        }
-        else if (container != null && tag != null)
-        {
-            Type page = Type.GetType(tag);
-            NavFrame.Navigate(page, null, transition);
-        }
-    }
+    //    if (args.IsSettingsInvoked)
+    //    {
+    //        NavFrame.Navigate(typeof(SettingsView), null, transition);
+    //    }
+    //    else if (container != null && tag != null)
+    //    {
+    //        Type page = Type.GetType(tag);
+    //        NavFrame.Navigate(page, null, transition);
+    //    }
+    //}
 
-    private void NavigationViewControl_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
-    {
+    //private void NavigationViewControl_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+    //{
 
-    }
+    //}
 }
