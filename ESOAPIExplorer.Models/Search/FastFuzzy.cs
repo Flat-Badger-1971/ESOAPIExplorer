@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace ESOAPIExplorer.Models.Search;
 
-public static class FastFuzzy
+public class FastFuzzy : ISearchAlgorithm
 {
-    public static List<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
+    public IEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
     {
-        List<FuzzySearchResult> results = new List<FuzzySearchResult>();
+        List<FuzzySearchResult> results = [];
         searchTerm = searchTerm.ToLower();
 
-        foreach (var target in targets)
+        foreach (APIElement target in targets)
         {
             double score = CalculateScore(searchTerm, target.Name);
 
@@ -23,8 +23,7 @@ public static class FastFuzzy
         return
             results
             .OrderByDescending(result => result.Score)
-            .Select(result => result.Target)
-            .ToList();
+            .Select(result => result.Target);
     }
 
     private static double CalculateScore(string searchTerm, string target)

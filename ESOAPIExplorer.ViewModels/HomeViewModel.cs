@@ -1,4 +1,5 @@
 using ESOAPIExplorer.DisplayModels;
+using ESOAPIExplorer.Interfaces;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
@@ -179,12 +180,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     #endregion Properties
 
     private readonly Stack<string> _HistoryStack = new Stack<string>();
+    private readonly ISearchAlgorithm _searchAlgorithm;
 
     public override async Task InitializeAsync(object data)
     {
         await base.InitializeAsync(data);
         if (_AllItems == null || _AllItems?.Count == 0)
         {
+            GetSearchAlgorithm();
             await eSODocumentationService.InitialiseAsync();
 
             ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Events
@@ -309,14 +312,24 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }, _SelectedElementTokenSource.Token);
     }
 
-    private static IEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
+    private ISearchAlgorithm GetSearchAlgorithm()
+    {
+        if (_searchAlgorithm == null) // || typeof(_searchAlgorithm) != typeof(requested))
+        {
+            return new FastFuzzy();
+        }
+
+        return _searchAlgorithm;
+    }
+
+    private IEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
     {
         if (string.IsNullOrWhiteSpace(filter))
         {
             return keywordList;
         }
 
-        return FastFuzzy.Search(filter, keywordList);
+        return _searchAlgorithm.Search(filter, keywordList);
     }
 
     CancellationTokenSource token;
