@@ -9,11 +9,11 @@ namespace ESOAPIExplorer.Models.Search
         private readonly Dictionary<string, List<string>> _dictionary = [];
         private const int MAX_EDIT_DISTANCE = 2;
 
-        public IEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
+        public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {
             BuildDictionary(targets);
             searchTerm = searchTerm.ToLower();
-            var results = new List<APIElement>();
+            List<APIElement> results = [];
 
             foreach (string key in _dictionary.Keys)
             {
@@ -23,7 +23,7 @@ namespace ESOAPIExplorer.Models.Search
                 }
             }
 
-            return results;
+            return results.Order();
         }
 
         private void BuildDictionary(IEnumerable<APIElement> targets)

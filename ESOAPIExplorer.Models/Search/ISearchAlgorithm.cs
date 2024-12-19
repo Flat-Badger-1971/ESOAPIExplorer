@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ESOAPIExplorer.Models.Search;
 
 public interface ISearchAlgorithm
 {
-    public IEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets);
+    public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets);
 }

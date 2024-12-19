@@ -5,7 +5,7 @@ namespace ESOAPIExplorer.Models.Search;
 
 public class FastFuzzy : ISearchAlgorithm
 {
-    public IEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
+    public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
     {
         List<FuzzySearchResult> results = [];
         searchTerm = searchTerm.ToLower();
@@ -23,7 +23,13 @@ public class FastFuzzy : ISearchAlgorithm
         return
             results
             .OrderByDescending(result => result.Score)
-            .Select(result => result.Target);
+            .Select((result, index) =>
+            {
+                result.Target.Index = index;
+
+                return result.Target;
+            })
+            .OrderBy(r => r.Index);
     }
 
     private static double CalculateScore(string searchTerm, string target)
@@ -56,8 +62,8 @@ public class FastFuzzy : ISearchAlgorithm
             score -= matchesSimple[0] * matchesSimple[0] * 0.2;
         }
 
-        score -= (targetLen - searchLen) / 2; 
-        
+        score -= (targetLen - searchLen) / 2;
+
         return score;
     }
 }

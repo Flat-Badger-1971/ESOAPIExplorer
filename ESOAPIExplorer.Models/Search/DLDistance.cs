@@ -6,7 +6,7 @@ namespace ESOAPIExplorer.Models.Search;
 
 public class DLDistance : ISearchAlgorithm
 {
-    public IEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
+    public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
     {
         List<DLSearchResult> results = [];
         searchTerm = searchTerm.ToLower();
@@ -21,7 +21,13 @@ public class DLDistance : ISearchAlgorithm
         return results
             .OrderBy(result => result.Distance)
             .Where(result => result.Distance < 5)
-            .Select(result => result.Target);
+            .Select((result, index) =>
+            {
+                result.Target.Index = index;
+
+                return result.Target;
+            })
+            .OrderBy(r => r.Index);
     }
 
     private static int DamerauLevenshteinDistance(string source, string target)

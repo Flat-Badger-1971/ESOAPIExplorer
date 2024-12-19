@@ -89,7 +89,11 @@
                 <AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" PlaceholderText="Filter items..." Margin="5,0,5,0" Grid.Column="1" />
             </Grid>
             <!-- Full Height ListBox -->
-            <ListView Name="MainListView" ItemsSource="{Binding FilteredItems,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" SelectedItem="{Binding SelectedElement, Mode=TwoWay}" SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+            <ListView Name="MainListView"
+                      ItemsSource="{Binding FilteredItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                      Grid.Row="1" 
+                      SelectedItem="{Binding SelectedElement, Mode=TwoWay}" 
+                      SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0" Height="20">

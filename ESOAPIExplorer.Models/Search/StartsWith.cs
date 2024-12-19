@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ESOAPIExplorer.Models.Search
 {
     internal class StartsWith : ISearchAlgorithm
     {
-        public IEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
+        public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {
             List<APIElement> results = [];
 
@@ -17,7 +18,7 @@ namespace ESOAPIExplorer.Models.Search
                 }
             }
 
-            return results;
+            return results.Order();
         }
     }
 }

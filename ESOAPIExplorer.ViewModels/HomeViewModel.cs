@@ -1,5 +1,4 @@
 using ESOAPIExplorer.DisplayModels;
-using ESOAPIExplorer.Interfaces;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
@@ -24,6 +23,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             SetProperty(ref _SelectedElement, value);
             UpdateSelectedElementDetails();
+
             if (value != null)
             {
                 AddToHistory(_SelectedElement.Name);
@@ -180,7 +180,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     #endregion Properties
 
     private readonly Stack<string> _HistoryStack = new Stack<string>();
-    private readonly ISearchAlgorithm _searchAlgorithm;
+    private ISearchAlgorithm _searchAlgorithm;
 
     public override async Task InitializeAsync(object data)
     {
@@ -208,8 +208,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 events.Select(e => new DisplayModelBase<APIElement> { Value = e })
                 .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
                 .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c })));
-
-            // AddToHistory(AllItems.First().Value.Name);
 
             await FilterItemsAsync();
         }
@@ -322,11 +320,16 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         return _searchAlgorithm;
     }
 
-    private IEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
+    private IOrderedEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
     {
         if (string.IsNullOrWhiteSpace(filter))
         {
-            return keywordList;
+            return keywordList.Order();
+        }
+
+        if (_searchAlgorithm == null)
+        {
+            _searchAlgorithm = GetSearchAlgorithm();
         }
 
         return _searchAlgorithm.Search(filter, keywordList);
@@ -334,7 +337,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     CancellationTokenSource token;
 
-    private Task FilterItemsAsync(Action callback = null)
+    private Task FilterItemsAsync()
     {
         if (token != null && !token.IsCancellationRequested)
         {
@@ -350,13 +353,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             {
                 if (searchQuery == _FilterText)
                 {
-                    IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText).Order();
-
-                    dialogService.RunOnMainThread(() =>
-                    {
-                        FilteredItems = new ObservableCollection<APIElement>(filtered);
-                        callback?.Invoke();
-                    });
+                    IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText);
+                    dialogService.RunOnMainThread(() => FilteredItems = new ObservableCollection<APIElement>(filtered));
                 }
             }
         }
