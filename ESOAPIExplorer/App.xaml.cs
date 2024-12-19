@@ -64,7 +64,7 @@ public partial class App : Application
 
     private static void RegisterViewModels(ServiceCollection services)
     {
-        services.AddTransient<HomeViewModel>();
+        services.AddSingleton<HomeViewModel>();
 
         //Non View ViewModels
         services.AddTransient<MainViewModel>();

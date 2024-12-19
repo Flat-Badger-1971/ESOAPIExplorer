@@ -23,7 +23,10 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             SetProperty(ref _SelectedElement, value);
             UpdateSelectedElementDetails();
-            AddToHistory(_SelectedElement.Name);
+            if (value != null)
+            {
+                AddToHistory(_SelectedElement.Name);
+            }
         }
     }
 
@@ -180,30 +183,33 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public override async Task InitializeAsync(object data)
     {
         await base.InitializeAsync(data);
-        await eSODocumentationService.InitialiseAsync();
+        if (_AllItems == null || _AllItems?.Count == 0)
+        {
+            await eSODocumentationService.InitialiseAsync();
 
-        ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Events
-            .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.Event }));
+            ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Events
+                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.Event }));
 
-        ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Functions
-            .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.Function })
-            );
+            ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Functions
+                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.Function })
+                );
 
-        ObservableCollection<APIElement> globals = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Globals
-            .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail, Name = detail, ElementType = APIElementType.Global, Parent = item.Key }))
-            .Concat(eSODocumentationService.Documentation.Globals
-            .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.Enum }))
-            .GroupBy(e => e.Id)
-            .Select(e => e.First())));
+            ObservableCollection<APIElement> globals = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Globals
+                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail, Name = detail, ElementType = APIElementType.Global, Parent = item.Key }))
+                .Concat(eSODocumentationService.Documentation.Globals
+                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.Enum }))
+                .GroupBy(e => e.Id)
+                .Select(e => e.First())));
 
-        AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
-            events.Select(e => new DisplayModelBase<APIElement> { Value = e })
-            .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
-            .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c })));
+            AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
+                events.Select(e => new DisplayModelBase<APIElement> { Value = e })
+                .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
+                .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c })));
 
-        // AddToHistory(AllItems.First().Value.Name);
+            // AddToHistory(AllItems.First().Value.Name);
 
-        await FilterItemsAsync();
+            await FilterItemsAsync();
+        }
     }
 
     private void UpdateObjects(List<EsoUIArgument> arguments)
