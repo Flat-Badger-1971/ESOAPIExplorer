@@ -1,5 +1,4 @@
-﻿using ESOAPIExplorer.DisplayModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,8 +8,8 @@ namespace ESOAPIExplorer.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
-        private ObservableCollection<DisplayModelBase<string>> _SearchAlgorithmItemSource;
-        public ObservableCollection<DisplayModelBase<string>> SearchAlgorithmItemSource
+        private ObservableCollection<string> _SearchAlgorithmItemSource;
+        public ObservableCollection<string> SearchAlgorithmItemSource
         {
             get => _SearchAlgorithmItemSource;
             set
@@ -25,10 +24,10 @@ namespace ESOAPIExplorer.ViewModels
 
             List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
 
-            SearchAlgorithmItemSource = new ObservableCollection<DisplayModelBase<string>>(
+            SearchAlgorithmItemSource = new ObservableCollection<string>(
                 searchAlgorithms
-                    .Select(a => new DisplayModelBase<string> { Value = a.Name })
-                    .OrderBy(a => a.Value)
+                    .Select(a => a.Name)
+                    .OrderBy(a => a)
                 );
         }
     }

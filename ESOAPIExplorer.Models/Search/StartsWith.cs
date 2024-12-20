@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ESOAPIExplorer.Models.Search
 {
-    internal class StartsWith : ISearchAlgorithm
+    public class StartsWith : ISearchAlgorithm
     {
         public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {

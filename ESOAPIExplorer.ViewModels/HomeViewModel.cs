@@ -326,10 +326,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             return keywordList.Order();
         }
 
-        if (_searchAlgorithm == null)
-        {
-            _searchAlgorithm = GetSearchAlgorithm();
-        }
+        _searchAlgorithm ??= GetSearchAlgorithm();
 
         return _searchAlgorithm.Search(filter, keywordList);
     }

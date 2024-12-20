@@ -10,13 +10,14 @@ public static class Utility
 {
     public static List<Type> ListSearchAlgorithms()
     {
+        Assembly assembly = Assembly.Load("ESOAPIExplorer.Models");
+
         return
-            Assembly
-            .GetExecutingAssembly()
+            assembly
             .GetTypes()
             .Where(t =>
                 t.IsClass &&
-                t.Namespace == "EsoAPIExplorer.Models.Search" &&
+                t.Namespace == "ESOAPIExplorer.Models.Search" &&
                 typeof(ISearchAlgorithm).IsAssignableFrom(t))
             .ToList();
     }
