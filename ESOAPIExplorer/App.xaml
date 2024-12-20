@@ -14,8 +14,7 @@
                 <!-- Styles -->
                 <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
                 <!-- Fonts -->
-                <ResourceDictionary Source="Assets/Fonts/Fonts.xaml"/>
-                <ResourceDictionary Source="Assets/Fonts/icoFont.xaml"/>
+                <ResourceDictionary Source="Assets/Fonts/segoeMDL.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- ValueConverters -->
             <converters:BoolToValueConverter x:Key="BoolToVisibilityConverter" ReturnType="Visibility">

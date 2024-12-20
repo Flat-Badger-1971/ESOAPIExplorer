@@ -12,9 +12,26 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    x:Name="_this">
-    <!--d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}">-->
-    <Grid x:Name="RootGrid">
-        <TextBlock Text="Yay settings!" />
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}">
+    <Grid x:Name="RootGrid" Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="Settings" FontSize="32" Grid.Row="0" Grid.Column="0" Margin="0,10,10,10"/>
+        <TextBlock Text="Filter Algorithm" Grid.Row="1" Grid.Column="0"/>
+        <ComboBox Name="themeMode" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding SearchAlgorithmItemSource}" />
     </Grid>
 </Page>

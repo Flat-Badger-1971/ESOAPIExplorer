@@ -20,11 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
-    <None Remove="Assets\Fonts\Fonts.xaml" />
     <None Remove="Assets\Styles\BaseStyles.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Remove="Assets\Fonts\Fonts.xaml" />
+    <Page Remove="Assets\Fonts\segoeMDL.xaml" />
     <Page Remove="Assets\Styles\BaseStyles.xaml" />
   </ItemGroup>
 
@@ -82,18 +81,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Update="Assets\Fonts\icoFont.xaml">
+    <Content Update="Assets\Fonts\segoeMDL.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Update="Assets\SplashScreen.scale-200.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\Styles\BaseStyles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="Assets\Fonts\Fonts.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
   </ItemGroup>

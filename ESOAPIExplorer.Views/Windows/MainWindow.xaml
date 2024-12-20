@@ -28,7 +28,7 @@
                 <NavigationViewItem Tag="SearchViewModel" Content="Search" Icon="Find" />
                 <NavigationViewItem Tag="ExportViewModel" Content="Export">
                     <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xEdE1;" />
+                        <FontIcon Glyph="{StaticResource segoe-export}" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

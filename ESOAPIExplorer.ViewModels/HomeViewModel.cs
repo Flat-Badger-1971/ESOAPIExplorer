@@ -187,7 +187,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         await base.InitializeAsync(data);
         if (_AllItems == null || _AllItems?.Count == 0)
         {
-            GetSearchAlgorithm();
             await eSODocumentationService.InitialiseAsync();
 
             ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Events
