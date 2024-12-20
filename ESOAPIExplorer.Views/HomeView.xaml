@@ -9,7 +9,6 @@
     xmlns:vm="using:ESOAPIExplorer.ViewModels"    
     xmlns:converters="using:ESOAPIExplorer.ValueConverters"    
     xmlns:c="using:ESOAPIExplorer.Controls"
-    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
@@ -260,9 +259,6 @@
                             <ListView.Resources>
                                 <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                             </ListView.Resources>
-                            <!--<interactivity:Interaction.Behaviors>
-                                <converters:SelectedItemsBehaviour Command="{Binding Path=DataContext.ClearCommand, ElementName=_this, Mode=TwoWay}"/>
-                            </interactivity:Interaction.Behaviors>-->
                         </ListView>
                     </Grid>
                 </Border>

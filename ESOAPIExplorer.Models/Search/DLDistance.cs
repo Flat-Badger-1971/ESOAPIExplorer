@@ -6,6 +6,8 @@ namespace ESOAPIExplorer.Models.Search;
 
 public class DLDistance : ISearchAlgorithm
 {
+    public static string Name => "Damerau-Levenshtein Distance";
+
     public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
     {
         List<DLSearchResult> results = [];

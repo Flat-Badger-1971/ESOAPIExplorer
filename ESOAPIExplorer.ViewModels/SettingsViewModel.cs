@@ -3,11 +3,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels
 {
+#pragma warning disable CA1416, CsWinRT1028
     public class SettingsViewModel : ViewModelBase
     {
+        private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
+
+        private int _SelectedAlgorithmIndex;
+        public int SelectedAlgorithmIndex
+        {
+            get => _SelectedAlgorithmIndex;
+            set
+            {
+                _settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
+                SetProperty(ref _SelectedAlgorithmIndex, value);
+            }
+        }
+
         private ObservableCollection<string> _SearchAlgorithmItemSource;
         public ObservableCollection<string> SearchAlgorithmItemSource
         {
@@ -22,13 +37,20 @@ namespace ESOAPIExplorer.ViewModels
         {
             await base.InitializeAsync(data);
 
+            if (_settings.Values["SearchAlgorithm"] == null)
+            {
+                _settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
+            }
+
             List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
 
             SearchAlgorithmItemSource = new ObservableCollection<string>(
                 searchAlgorithms
-                    .Select(a => a.Name)
+                    .Select(a => a.GetPropertyValue("Name"))
                     .OrderBy(a => a)
                 );
+
+            SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_settings.Values["SearchAlgorithm"].ToString());
         }
     }
 }

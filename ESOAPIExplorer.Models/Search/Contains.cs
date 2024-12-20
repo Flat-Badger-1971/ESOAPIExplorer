@@ -6,6 +6,8 @@ namespace ESOAPIExplorer.Models.Search
 {
     public class Contains : ISearchAlgorithm
     {
+        public static string Name => "Contains";
+
         public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {
             return

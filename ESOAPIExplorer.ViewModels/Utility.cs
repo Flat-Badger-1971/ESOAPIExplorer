@@ -21,4 +21,16 @@ public static class Utility
                 typeof(ISearchAlgorithm).IsAssignableFrom(t))
             .ToList();
     }
+
+    public static string GetPropertyValue(this Type type, string propertyName)
+    {
+        PropertyInfo property = type.GetProperty(propertyName);
+
+        if (property == null)
+        {
+            return null;
+        }
+
+        return property.GetValue(null).ToString();
+    }
 }

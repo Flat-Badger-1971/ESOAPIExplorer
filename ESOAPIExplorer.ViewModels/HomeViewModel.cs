@@ -408,7 +408,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             SetProperty(ref _CanGoBack, true, nameof(CanGoBack));
         }
-
     }
 
     private void SelectElement(string elementName, bool doNotAddToHistory = false)

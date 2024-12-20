@@ -5,6 +5,8 @@ namespace ESOAPIExplorer.Models.Search;
 
 public class FastFuzzy : ISearchAlgorithm
 {
+    public static string Name => "Fast Fuzzy";
+
     public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
     {
         List<FuzzySearchResult> results = [];

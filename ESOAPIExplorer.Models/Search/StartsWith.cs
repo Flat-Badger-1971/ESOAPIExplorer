@@ -6,6 +6,8 @@ namespace ESOAPIExplorer.Models.Search
 {
     public class StartsWith : ISearchAlgorithm
     {
+        public static string Name => "Starts With";
+
         public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {
             List<APIElement> results = [];
