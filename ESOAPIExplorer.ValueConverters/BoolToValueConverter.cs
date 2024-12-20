@@ -13,12 +13,18 @@ public class BoolToValueConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, string culture)
     {
-        if (value is bool && (bool)value)
+        if (value is bool v && v)
+        {
             return System.Convert.ChangeType(TrueValue, ReturnType);
+        }
         else if (value is null)
+        {
             return System.Convert.ChangeType(NullValue, ReturnType);
+        }
         else
+        {
             return System.Convert.ChangeType(FalseValue, ReturnType);
+        }
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string culture)

@@ -5,15 +5,16 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace ESOAPIExplorer.ViewModels;
 
-public partial class CustomMessageDialogViewModel:ViewModelBase
+public partial class CustomMessageDialogViewModel : ViewModelBase
 {
-    public CustomMessageDialogViewModel()
-    {
-        ActionMessage = "";
-    }
+    public CustomMessageDialogViewModel() => ActionMessage = "";
 
     private string _Title;
-    public string Title { get => _Title; set => SetProperty(ref _Title, value); }
+    public string Title
+    {
+        get => _Title;
+        set => SetProperty(ref _Title, value);
+    }
 
     private string _Message;
     public string Message
@@ -30,14 +31,22 @@ public partial class CustomMessageDialogViewModel:ViewModelBase
     }
 
     private bool _IsSelectable = false;
-    public bool IsSelectable { get => _IsSelectable; set => SetProperty(ref _IsSelectable, value); }
+    public bool IsSelectable
+    {
+        get => _IsSelectable;
+        set => SetProperty(ref _IsSelectable, value);
+    }
 
     private string _PositiveText;
-    public string PositiveText { get => _PositiveText; set => SetProperty(ref _PositiveText, value); }
+    public string PositiveText
+    {
+        get => _PositiveText;
+        set => SetProperty(ref _PositiveText, value);
+    }
 
     private string _NegativeText;
-    public string NegativeText 
-    { 
+    public string NegativeText
+    {
         get => _NegativeText;
         set
         {
@@ -47,12 +56,11 @@ public partial class CustomMessageDialogViewModel:ViewModelBase
     }
 
     private bool _IsNegativeButtonVisible;
-    public bool IsNegativeButtonVisible { get => _IsNegativeButtonVisible; set => SetProperty(ref _IsNegativeButtonVisible, value); }
-
-    public ICommand ResponseEnteredCommand => new RelayCommand<bool>((response) => 
+    public bool IsNegativeButtonVisible
     {
-        OnResponseEntered(response);
-    });
+        get => _IsNegativeButtonVisible;
+        set => SetProperty(ref _IsNegativeButtonVisible, value);
+    }
 
     protected virtual void OnResponseEntered(bool response)
     {
@@ -61,12 +69,14 @@ public partial class CustomMessageDialogViewModel:ViewModelBase
     }
 
     DateTime _LastCopied = DateTime.Now;
+
     public ICommand CopyToClipboardCommand => new RelayCommand(async () =>
     {
         DataPackage dataPackage = new()
         {
             RequestedOperation = DataPackageOperation.Copy
         };
+
         dataPackage.SetText(_Message);
         Clipboard.SetContent(dataPackage);
         ActionMessage = "Copied to clipboard";
@@ -75,12 +85,13 @@ public partial class CustomMessageDialogViewModel:ViewModelBase
         _LastCopied = now;
 
         await Task.Delay(4000);
+
         if (_LastCopied == now)
         {
             ActionMessage = "";
         }
-        
+
     });
 
-    public event EventHandler<bool>ResponseEntered;
+    public event EventHandler<bool> ResponseEntered;
 }

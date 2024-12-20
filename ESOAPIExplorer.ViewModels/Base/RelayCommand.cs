@@ -17,9 +17,7 @@ public partial class RelayCommand : ICommand
     /// Creates a new command that can always execute.
     /// </summary>
     /// <param name="execute">The execution logic.</param>
-    public RelayCommand(Action execute) : this(execute, null) 
-    {
-    }
+    public RelayCommand(Action execute) : this(execute, null) { }
 
     /// <summary>
     /// Creates a new command.
@@ -40,10 +38,7 @@ public partial class RelayCommand : ICommand
     /// Data used by the command. If the command does not require data to be passed, this object can be set to null.
     /// </param>
     /// <returns>true if this command can be executed; otherwise, false.</returns>
-    public bool CanExecute(object parameter)
-    {
-        return _canExecute == null || _canExecute();
-    }
+    public bool CanExecute(object parameter) => _canExecute == null || _canExecute();
 
     /// <summary>
     /// Executes the <see cref="RelayCommand"/> on the current command target.
@@ -51,10 +46,7 @@ public partial class RelayCommand : ICommand
     /// <param name="parameter">
     /// Data used by the command. If the command does not require data to be passed, this object can be set to null.
     /// </param>
-    public void Execute(object parameter)
-    {
-        _execute();
-    }
+    public void Execute(object parameter) => _execute();
 
     /// <summary>
     /// Method used to raise the <see cref="CanExecuteChanged"/> event

@@ -8,7 +8,8 @@ public static class DispatcherQueueExtensions
 {
     public static Task EnqueueAsync(this DispatcherQueue dispatcherQueue, Action action)
     {
-        var tcs = new TaskCompletionSource<bool>();
+        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
         dispatcherQueue.TryEnqueue(() =>
         {
             try

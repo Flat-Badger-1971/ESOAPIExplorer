@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ESOAPIExplorer.Services;
@@ -19,14 +20,12 @@ public class NavigationService : INavigationService
 
     public NavigationService(IServiceProvider container, IEventService eventService, IDialogService dialogService)
     {
-
         _Container = container;
+        _EventService = eventService;
+        _DialogService = dialogService;
 
         CurrentApplication = (MainWindow)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
         MainFrame = CurrentApplication.NavigationFrame;
-
-        _EventService = eventService;
-        _DialogService = dialogService;
     }
 
     public async Task InitializeAsync()
@@ -48,10 +47,13 @@ public class NavigationService : INavigationService
     public async Task NavigateBackAsync()
     {
         await Task.Delay(1);
+
         if (CurrentApplication is not null and MainWindow)
         {
             if (MainFrame.CanGoBack)
+            {
                 MainFrame.GoBack();
+            }
         }
         else if (CurrentApplication.Content != null)
         {
@@ -63,8 +65,7 @@ public class NavigationService : INavigationService
     {
         if (CurrentApplication is not null and MainWindow)
         {
-            MainFrame.BackStack.Remove( //was NavFrame
-                MainFrame.BackStack[MainFrame.BackStack.Count - 2]);
+            MainFrame.BackStack.Remove(MainFrame.BackStack[MainFrame.BackStack.Count - 2]);
         }
 
         return Task.FromResult(true);
@@ -79,14 +80,20 @@ public class NavigationService : INavigationService
     public async Task GoToAsync<TViewModel>() where TViewModel : class
     {
         if (typeof(TViewModel).BaseType != typeof(ViewModelBase))
+        {
             throw new Exception("View model is not derived from a valid type");
+        }
+
         await ClearBackStack();
         await InternalNavigateToAsync(typeof(TViewModel), null);
     }
     public async Task GoToAsync<TViewModel>(object parameter) where TViewModel : class
     {
         if (typeof(TViewModel).BaseType != typeof(ViewModelBase))
+        {
             throw new Exception("View model is not derived from a valid type");
+        }
+
         await ClearBackStack();
         await InternalNavigateToAsync(typeof(TViewModel), parameter);
     }
@@ -94,70 +101,52 @@ public class NavigationService : INavigationService
     public Task NavigateToAsync<TViewModel>() where TViewModel : class
     {
         if (typeof(TViewModel).BaseType != typeof(ViewModelBase))
+        {
             throw new Exception("View model is not derived from a valid type");
+        }
+
         return InternalNavigateToAsync(typeof(TViewModel), null);
     }
 
     public Task NavigateToAsync<TViewModel>(object parameter) where TViewModel : class
     {
         if (typeof(TViewModel).BaseType != typeof(ViewModelBase))
+        {
             throw new Exception("View model is not derived from a valid type");
+        }
+
         return InternalNavigateToAsync(typeof(TViewModel), parameter);
     }
 
-    public Task NavigateToAsync(Type viewModelType)
-    {
-        return InternalNavigateToAsync(viewModelType, null);
-    }
-
-    public Task NavigateToAsync(Type viewModelType, object parameter)
-    {
-        return InternalNavigateToAsync(viewModelType, parameter);
-    }
-
+    public Task NavigateToAsync(Type viewModelType) => InternalNavigateToAsync(viewModelType, null);
+    public Task NavigateToAsync(Type viewModelType, object parameter) => InternalNavigateToAsync(viewModelType, parameter);
 
     protected virtual async Task InternalNavigateToAsync(Type viewModelType, object parameter)
     {
         object vm = _Container.GetRequiredService(viewModelType);
         Type pageType = GetPageTypeForViewModel(viewModelType);
 
-        // Do not repeat app initialization when the Window already has content,
+        // Do not repeat app initialisation when the Window already has content,
         // just ensure that the window is active
         if (CurrentApplication.Content == null)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
-            var frame = new Frame();
+            Frame frame = new Frame();
             frame.NavigationFailed += CurrentApplication_NavigationFailed;
 
             // Place the frame in the current Window
             Window.Current.Content = frame;
         }
 
-
         if (vm is MainViewModel)
         {
-            //MainFrame.Content = page;
             MainFrame.Navigate(pageType);
             ((Page)MainFrame.Content).DataContext = vm;
         }
-        //else if (((Frame)CurrentApplication.Content).Content is MainWindow mainPage)
-        //{
-            MainFrame.Navigate(pageType);
-            ((Page)MainFrame.Content).DataContext = vm;
-            OnNavigationPerformed(viewModelType);
-        //}
-        //else if (!(MainFrame.Content is MainWindow))
-        //{
-        //    if (_MainVm == null)
-        //    {
-        //        _MainVm = _Container.GetRequiredService<MainViewModel>();
-        //    }
-        //    MainFrame.Navigate(typeof(MainWindow));
-        //    ((Page)MainFrame.Content).DataContext = _MainVm;
-        //    await (_MainVm as ViewModelBase).InitializeAsync(parameter);
-        //    await NavigateToAsync(pageType, parameter);
-        //    return;
-        //}
+
+        MainFrame.Navigate(pageType);
+        ((Page)MainFrame.Content).DataContext = vm;
+        OnNavigationPerformed(viewModelType);
 
         await (vm as ViewModelBase).InitializeAsync(parameter);
     }
@@ -177,28 +166,40 @@ public class NavigationService : INavigationService
         string ns = typeof(MainWindow).Namespace;
         string typeFullName = $"{ns}.{viewModelType.Name.Replace("ViewModel", "View")}";
         Type type = GetType(typeFullName);
+
         return type;
     }
 
     public static Type GetType(string typeName)
     {
-        var type = Type.GetType(typeName);
-        if (type != null) return type;
-        foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+        Type type = Type.GetType(typeName);
+
+        if (type != null)
+        {
+            return type;
+        }
+
+        foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
         {
             type = a.GetType(typeName);
+
             if (type != null)
+            {
                 return type;
+            }
         }
+
         return null;
     }
 
     protected static Page CreatePage(Type viewModelType)
     {
         Type pageType = GetPageTypeForViewModel(viewModelType) ?? throw new Exception($"Mapping type for {viewModelType} is not a page");
+
         try
         {
             Page page = Activator.CreateInstance(pageType) as Page;
+
             return page;
         }
         catch (Exception)
@@ -210,9 +211,11 @@ public class NavigationService : INavigationService
     protected Page GetPage(Type viewModelType)
     {
         Type pageType = GetPageTypeForViewModel(viewModelType) ?? throw new Exception($"Mapping type for {viewModelType} is not a page");
+
         try
         {
             Page page = _Container.GetRequiredService(pageType) as Page;
+
             return page;
         }
         catch (Exception)
@@ -220,6 +223,7 @@ public class NavigationService : INavigationService
             return null;
         }
     }
+
     protected virtual void OnNavigationPerformed(Type viewModelType)
     {
         NavigationEventArgs args = new() { ViewModelType = viewModelType };

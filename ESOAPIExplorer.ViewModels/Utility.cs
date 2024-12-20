@@ -22,6 +22,7 @@ public static class Utility
             .ToList();
     }
 
+    // Type extension method
     public static string GetPropertyValue(this Type type, string propertyName)
     {
         PropertyInfo property = type.GetProperty(propertyName);

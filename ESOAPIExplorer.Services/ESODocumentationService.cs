@@ -10,7 +10,6 @@ using Windows.Storage.Pickers;
 
 namespace ESOAPIExplorer.Services;
 
-
 public class ESODocumentationService : IESODocumentationService
 {
     private string FileName { get; set; }
@@ -20,15 +19,15 @@ public class ESODocumentationService : IESODocumentationService
     private EsoUIObject CurrentObject { get; set; }
     private EsoUIXMLElement CurrentElement { get; set; }
     private ReaderState State { get; set; }
-    private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
-    private readonly FileOpenPicker _filePicker;
+    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
+    private readonly FileOpenPicker _FilePicker;
 
     public EsoUIDocumentation Documentation { get; set; }
     public EsoUIDocumentation Data { get; set; }
 
     public ESODocumentationService()
     {
-        _filePicker = new FileOpenPicker
+        _FilePicker = new FileOpenPicker
         {
             ViewMode = PickerViewMode.List,
             SuggestedStartLocation = PickerLocationId.DocumentsLibrary
@@ -36,56 +35,47 @@ public class ESODocumentationService : IESODocumentationService
 
         // Get the current window's HWND by passing in the Window object
         Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
+        nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
 
         // Associate the HWND with the file picker
-        WinRT.Interop.InitializeWithWindow.Initialize(_filePicker, hwnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(_FilePicker, hwnd);
 
-        _filePicker.FileTypeFilter.Add(".txt");
+        _FilePicker.FileTypeFilter.Add(".txt");
     }
 
-    public async Task InitialiseAsync()
-    {
-        Documentation = await GetDocumentationAsync();
-    }
+    public async Task InitialiseAsync() => Documentation = await GetDocumentationAsync();
 
     private async Task<EsoUIDocumentation> GetDocumentationAsync()
     {
         string path = await GetPathAsync();
+
         return await ParseAsync(path);
     }
 
     private async Task<string> GetPathAsync()
     {
-        string path = _settings.Values["last path"] as string;
+        string path = _Settings.Values["last path"] as string;
 
         if (string.IsNullOrEmpty(path))
         {
-            StorageFile file = await _filePicker.PickSingleFileAsync();
+            StorageFile file = await _FilePicker.PickSingleFileAsync();
+
             if (file != null)
             {
-                _settings.Values["last path"] = file.Path;
+                _Settings.Values["last path"] = file.Path;
                 path = file.Path;
             }
         }
-        else if (!System.IO.File.Exists(path))
+        else if (!File.Exists(path))
         {
-            _settings.Values["last path"] = null;
+            _Settings.Values["last path"] = null;
             path = await GetPathAsync();
         }
 
         return path;
     }
 
-    private bool LineStartsWith(string prefix)
-    {
-        return CurrentLine.StartsWith(prefix);
-    }
-
-    private bool LineEndsWith(string suffix)
-    {
-        return CurrentLine.EndsWith(suffix);
-    }
+    private bool LineStartsWith(string prefix) => CurrentLine.StartsWith(prefix);
 
     private string GetFirstMatch(Regex pattern)
     {
@@ -191,6 +181,7 @@ public class ESODocumentationService : IESODocumentationService
         string[] argsArray = args.Split(',');
 
         int argId = 1;
+
         foreach (string arg in argsArray)
         {
             Match match = Regex.Match(arg, @"\*(.+)\* _(.+)_");

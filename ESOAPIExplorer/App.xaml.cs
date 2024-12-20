@@ -8,13 +8,10 @@ using Microsoft.UI.Xaml;
 using System;
 using Windows.ApplicationModel;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace ESOAPIExplorer;
 
 /// <summary>
-/// Provides application-specific behavior to supplement the default Application class.
+/// Provides application-specific behaviour to supplement the default Application class.
 /// </summary>
 public partial class App : Application
 {
@@ -23,7 +20,7 @@ public partial class App : Application
     private IConfigurationRoot _ConfigurationRoot;
     private IConfigurationBuilder _ConfigurationManager;
     /// <summary>
-    /// Initializes the singleton application object.  This is the first line of authored code
+    /// Initialises the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
     /// </summary>
     public App()
@@ -35,7 +32,7 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainWindow = new MainWindow();
         MainWindow.AppWindow.SetIcon("Assets/Logo.ico");
@@ -45,7 +42,6 @@ public partial class App : Application
         navigation.InitializeAsync();
         MainWindow.Activate();
     }
-
 
     private IServiceProvider RegisterDependencyInjection
     {
@@ -86,6 +82,7 @@ public partial class App : Application
         services.AddTransient<IDialogService, DialogService>();
         services.AddTransient<IESODocumentationService, ESODocumentationService>();
     }
+
     private void ConfigureServices(IServiceCollection services)
     {
         _ConfigurationManager = new ConfigurationManager()
@@ -94,5 +91,4 @@ public partial class App : Application
 
         _ConfigurationRoot = _ConfigurationManager.Build();
     }
-
 }

@@ -38,10 +38,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public bool CanGoBack
     {
         get => _CanGoBack;
-        set
-        {
-            SetProperty(ref _CanGoBack, value);
-        }
+        set => SetProperty(ref _CanGoBack, value);
     }
 
     private EsoUIEvent _SelectedEventDetails;
@@ -93,6 +90,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         set
         {
             SetProperty(ref _SelectedEnum, value);
+
             Task.Run(async () =>
             {
                 await Task.Delay(10);
@@ -104,10 +102,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public EsoUIEnum SelectedGlobalEnum
     {
         get => _SelectedGlobalEnum;
-        set
-        {
-            SetProperty(ref _SelectedGlobalEnum, value);
-        }
+        set => SetProperty(ref _SelectedGlobalEnum, value);
     }
 
     private int _SelectedFilterIndex;
@@ -160,10 +155,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public ObservableCollection<DisplayModelBase<APIElement>> AllItems
     {
         get => _AllItems;
-        set
-        {
-            SetProperty(ref _AllItems, value);
-        }
+        set => SetProperty(ref _AllItems, value);
     }
 
     private ObservableCollection<APIElement> _FilteredItems;
@@ -172,10 +164,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     public ObservableCollection<APIElement> FilteredItems
     {
         get => _FilteredItems;
-        set
-        {
-            SetProperty(ref _FilteredItems, value);
-        }
+        set => SetProperty(ref _FilteredItems, value);
     }
 
     #endregion Properties
@@ -349,10 +338,12 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
 
         token = new CancellationTokenSource();
+
         _ = Task.Run(() =>
         {
             string searchQuery = _FilterText;
             Thread.Sleep(300);
+
             if (!token.IsCancellationRequested)
             {
                 if (searchQuery == _FilterText)
@@ -363,13 +354,11 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             }
         }
         , token.Token);
+
         return Task.CompletedTask;
     }
 
-    public ICommand SearchGithubCommand => new RelayCommand(() =>
-    {
-        _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type=code"));
-    });
+    public ICommand SearchGithubCommand => new RelayCommand(() => _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type=code")));
 
     private IEnumerable<string> GetUsedByParallel(string enumName)
     {
@@ -428,11 +417,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         SetProperty(ref _SelectedElement, FilteredItems.First(i => i.Name == elementName), nameof(SelectedElement));
         UpdateSelectedElementDetails();
     }
-
-    public ICommand HandleSelectedItemElement => new RelayCommand<string>((elementName) =>
-    {
-        SelectElement(elementName);
-    });
 
     public ICommand GoBack => new RelayCommand(() =>
     {

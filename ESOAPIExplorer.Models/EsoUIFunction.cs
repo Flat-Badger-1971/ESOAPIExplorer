@@ -4,51 +4,31 @@ namespace ESOAPIExplorer.Models;
 
 public class EsoUIFunction
 {
-    private string _name;
-    private EsoUIFunctionAccess _access;
-    private List<EsoUIArgument> _args;
-    private List<EsoUIArgument> _returns;
-    private bool _variableReturns;
-    private int _argumentTotal;
+    private int _ArgumentTotal;
+
+    public string Name { get; }
+    public EsoUIFunctionAccess Access { get; }
+    public List<EsoUIArgument> Args { get; set; }
+    public List<EsoUIArgument> Returns { get; set; }
+    public bool HasVariableReturns { get; set; }
 
     public EsoUIFunction(string name, EsoUIFunctionAccess access = EsoUIFunctionAccess.PUBLIC)
     {
-        _name = name;
-        _access = access;
-        _args = [];
-        _returns = [];
-        _variableReturns = false;
+        Name = name;
+        Access = access;
+        Args = [];
+        Returns = [];
+        HasVariableReturns = false;
     }
 
     public void AddArgument(string name, string type = "")
     {
-        _argumentTotal++;
-        _args.Add(new EsoUIArgument(name, new EsoUIType(type), _argumentTotal));
+        _ArgumentTotal++;
+        Args.Add(new EsoUIArgument(name, new EsoUIType(type), _ArgumentTotal));
     }
 
     public void AddReturn(string name, string type = "")
     {
-        _returns.Add(new EsoUIArgument(name, new EsoUIType(type), _argumentTotal));
-    }
-
-    public string Name => _name;
-    public EsoUIFunctionAccess Access => _access;
-
-    public List<EsoUIArgument> Args
-    {
-        get => _args;
-        set => _args = value;
-    }
-
-    public List<EsoUIArgument> Returns
-    {
-        get => _returns;
-        set => _returns = value;
-    }
-
-    public bool HasVariableReturns
-    {
-        get => _variableReturns;
-        set => _variableReturns = value;
+        Returns.Add(new EsoUIArgument(name, new EsoUIType(type), _ArgumentTotal));
     }
 }

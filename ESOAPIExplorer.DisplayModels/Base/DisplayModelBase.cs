@@ -8,22 +8,20 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
 {
     private T _Value;
     public T Value { get => _Value; set { SetProperty(ref _Value, value); } }
-    public DisplayModelBase()
-    {
-    }
+    public DisplayModelBase() { }
 
     private bool _IsVisible = false;
     public bool IsVisible
     {
         get => _IsVisible;
-        set { SetProperty(ref _IsVisible, value); }
+        set => SetProperty(ref _IsVisible, value);
     }
 
     private bool _IsSelected = false;
     public bool IsSelected
     {
         get => _IsSelected;
-        set { SetProperty(ref _IsSelected, value); }
+        set => SetProperty(ref _IsSelected, value);
     }
 
     protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "", Action onChanged = null)
@@ -31,6 +29,7 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
         backingStore = value;
         onChanged?.Invoke();
         OnPropertyChanged(propertyName);
+
         return true;
     }
 

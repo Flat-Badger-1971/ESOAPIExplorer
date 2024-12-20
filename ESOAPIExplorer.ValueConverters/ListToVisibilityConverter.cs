@@ -13,30 +13,22 @@ public class ListToVisibilityConverter : IValueConverter
     {
         Type t = value?.GetType();
 
-        if (value == null)
+        switch (true)
         {
-            return Visibility.Visible;
-        }
-        else if (value is IList list)
-        {
-            return list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        }
-        else if(value is IOrderedEnumerable<string> ienum)
-        {
-            return ienum.Any() ? Visibility.Collapsed : Visibility.Visible;
-        }
-        else if(value is IDictionary idic)
-        {
-            return idic.Values.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
-        }
-        else if (t.GetProperty("ValueNames") != null)
-        {
-            List<string> valueList = (List<string>)t.GetProperty("ValueNames").GetValue(value);
-            return valueList?.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
-        }
-        else
-        {
-            return Visibility.Collapsed;
+            case true when value == null:
+                return Visibility.Visible;
+            case true when value is IList list:
+                return list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            case true when value is IOrderedEnumerable<string> ienum:
+                return ienum.Any() ? Visibility.Collapsed : Visibility.Visible;
+            case true when value is IDictionary idic:
+                return idic.Values.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
+            case true when t.GetProperty("ValueNames") != null:
+                List<string> valueList = (List<string>)t.GetProperty("ValueNames").GetValue(value);
+
+                return valueList?.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
+            default:
+                return Visibility.Collapsed;
         }
     }
 

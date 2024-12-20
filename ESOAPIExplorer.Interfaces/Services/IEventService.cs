@@ -5,6 +5,6 @@ namespace ESOAPIExplorer.Services;
 
 public interface IEventService
 {
-    event EventHandler<bool> Busy;
-    Task RaiseBusy(bool isBusy);
+    public event EventHandler<bool> Busy;
+    public Task RaiseBusy(bool isBusy);
 }

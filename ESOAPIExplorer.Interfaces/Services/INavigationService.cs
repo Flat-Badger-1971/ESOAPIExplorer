@@ -6,16 +6,16 @@ namespace ESOAPIExplorer.Services;
 
 public interface INavigationService
 {
-    Task InitializeAsync();
-    Task NavigateToAsync<TViewModel>() where TViewModel : class;
-    Task NavigateToAsync<TViewModel>(object parameter) where TViewModel : class;
-    Task GoToAsync<TViewModel>() where TViewModel : class;
-    Task GoToAsync<TViewModel>(object parameter) where TViewModel : class;
-    Task NavigateToAsync(Type viewModelType);
-    Task ClearBackStack();
-    Task NavigateToAsync(Type viewModelType, object parameter);
-    Task NavigateBackAsync();
-    Task RemoveLastFromBackStackAsync();
-    Task PopToRootAsync();
-    event EventHandler<NavigationEventArgs> NavigationPerformed;
+    public Task InitializeAsync();
+    public Task NavigateToAsync<TViewModel>() where TViewModel : class;
+    public Task NavigateToAsync<TViewModel>(object parameter) where TViewModel : class;
+    public Task GoToAsync<TViewModel>() where TViewModel : class;
+    public Task GoToAsync<TViewModel>(object parameter) where TViewModel : class;
+    public Task NavigateToAsync(Type viewModelType);
+    public Task ClearBackStack();
+    public Task NavigateToAsync(Type viewModelType, object parameter);
+    public Task NavigateBackAsync();
+    public Task RemoveLastFromBackStackAsync();
+    public Task PopToRootAsync();
+    public event EventHandler<NavigationEventArgs> NavigationPerformed;
 }

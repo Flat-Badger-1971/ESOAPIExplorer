@@ -11,7 +11,7 @@ public class SingleValueToListConverter : IValueConverter
     {
         if (value is EsoUIEvent esoevent)
         {
-            return new List<EsoUIEvent> {  esoevent };
+            return new List<EsoUIEvent> { esoevent };
         }
 
         if (value is EsoUIGlobal esoglobal)

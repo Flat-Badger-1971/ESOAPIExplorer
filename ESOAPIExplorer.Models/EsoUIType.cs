@@ -10,7 +10,7 @@ public class EsoUIType
 
     public EsoUIType(string name, string type = null)
     {
-        if (name.StartsWith("["))
+        if (name.StartsWith('['))
         {
             Match match = Regex.Match(name, @"\[(.+)\|\#(.+)\]");
 

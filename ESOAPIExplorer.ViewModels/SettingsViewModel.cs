@@ -5,55 +5,51 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace ESOAPIExplorer.ViewModels
-{
+namespace ESOAPIExplorer.ViewModels;
+
 #pragma warning disable CA1416, CsWinRT1028
-    public class SettingsViewModel : ViewModelBase
+public class SettingsViewModel : ViewModelBase
+{
+    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
+
+    private int _SelectedAlgorithmIndex;
+    public int SelectedAlgorithmIndex
     {
-        private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
-
-        private int _SelectedAlgorithmIndex;
-        public int SelectedAlgorithmIndex
+        get => _SelectedAlgorithmIndex;
+        set
         {
-            get => _SelectedAlgorithmIndex;
-            set
+            if (value > -1)
             {
-                if (value > -1)
-                {
-                    _Settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
-                    SetProperty(ref _SelectedAlgorithmIndex, value);
-                }
+                _Settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
+                SetProperty(ref _SelectedAlgorithmIndex, value);
             }
         }
+    }
 
-        private ObservableCollection<string> _SearchAlgorithmItemSource;
-        public ObservableCollection<string> SearchAlgorithmItemSource
+    private ObservableCollection<string> _SearchAlgorithmItemSource;
+    public ObservableCollection<string> SearchAlgorithmItemSource
+    {
+        get => _SearchAlgorithmItemSource;
+        set => SetProperty(ref _SearchAlgorithmItemSource, value);
+    }
+
+    public override async Task InitializeAsync(object data)
+    {
+        await base.InitializeAsync(data);
+
+        if (_Settings.Values["SearchAlgorithm"] == null)
         {
-            get => _SearchAlgorithmItemSource;
-            set
-            {
-                SetProperty(ref _SearchAlgorithmItemSource, value);
-            }
+            _Settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
         }
 
-        public override async Task InitializeAsync(object data)
-        {
-            await base.InitializeAsync(data);
+        List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
 
-            if (_Settings.Values["SearchAlgorithm"] == null)
-            {
-                _Settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
-            }
+        SearchAlgorithmItemSource = new ObservableCollection<string>(
+            searchAlgorithms
+                .Select(a => a.GetPropertyValue("Name"))
+                .OrderBy(a => a)
+            );
 
-            List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
-
-            SearchAlgorithmItemSource = new ObservableCollection<string>(
-                searchAlgorithms
-                    .Select(a => a.GetPropertyValue("Name"))
-                    .OrderBy(a => a)
-                );
-
-            SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values["SearchAlgorithm"].ToString());
-        }
+        SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values["SearchAlgorithm"].ToString());
     }
 }
