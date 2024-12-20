@@ -71,12 +71,6 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Users\Dion.Mills\OneDrive - Sainsbury's Supermarkets Ltd\Images\DSAPP.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ESOAPIExplorer.Interfaces\ESOAPIExplorer.Interfaces.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.Services\ESOAPIExplorer.Services.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.ValueConverters\ESOAPIExplorer.ValueConverters.csproj" />

@@ -8,17 +8,11 @@ namespace ESOAPIExplorer.Models.Search
     {
         public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {
-            List<APIElement> results = [];
-
-            foreach (APIElement target in targets)
-            {
-                if (target.Name.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    results.Add(target);
-                }
-            }
-
-            return results.Order();
+            return
+                targets
+                .Where(i =>
+                    string.IsNullOrEmpty(searchTerm) || i.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(r => r.Name);
         }
     }
 }
