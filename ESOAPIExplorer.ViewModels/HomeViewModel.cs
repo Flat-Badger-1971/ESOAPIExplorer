@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
 
@@ -179,14 +180,19 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     #endregion Properties
 
+    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
     private readonly Stack<string> _HistoryStack = new Stack<string>();
-    private ISearchAlgorithm _searchAlgorithm;
+    private string _CurrentAlgorithmName;
+    private IEnumerable<Type> _SearchAlgorithms;
+    private ISearchAlgorithm _SearchAlgorithm;
 
     public override async Task InitializeAsync(object data)
     {
         await base.InitializeAsync(data);
+
         if (_AllItems == null || _AllItems?.Count == 0)
         {
+            _SearchAlgorithms = Utility.ListSearchAlgorithms();
             await eSODocumentationService.InitialiseAsync();
 
             ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Events
@@ -309,14 +315,16 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }, _SelectedElementTokenSource.Token);
     }
 
-    private ISearchAlgorithm GetSearchAlgorithm()
+    private void SetSearchAlgorithm()
     {
-        if (_searchAlgorithm == null) // || typeof(_searchAlgorithm) != typeof(requested))
-        {
-            return new FastFuzzy();
-        }
+        string selectedAlgorithmName = _Settings.Values["SearchAlgorithm"].ToString();
 
-        return _searchAlgorithm;
+        if (selectedAlgorithmName != _CurrentAlgorithmName)
+        {
+            Type algorithm = _SearchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
+            _SearchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
+            _CurrentAlgorithmName = selectedAlgorithmName;
+        }
     }
 
     private IOrderedEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
@@ -326,9 +334,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             return keywordList.Order();
         }
 
-        _searchAlgorithm ??= GetSearchAlgorithm();
+        SetSearchAlgorithm();
 
-        return _searchAlgorithm.Search(filter, keywordList);
+        return _SearchAlgorithm.Search(filter, keywordList);
     }
 
     CancellationTokenSource token;

@@ -10,7 +10,7 @@ namespace ESOAPIExplorer.ViewModels
 #pragma warning disable CA1416, CsWinRT1028
     public class SettingsViewModel : ViewModelBase
     {
-        private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
+        private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
 
         private int _SelectedAlgorithmIndex;
         public int SelectedAlgorithmIndex
@@ -18,8 +18,11 @@ namespace ESOAPIExplorer.ViewModels
             get => _SelectedAlgorithmIndex;
             set
             {
-                _settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
-                SetProperty(ref _SelectedAlgorithmIndex, value);
+                if (value > -1)
+                {
+                    _Settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
+                    SetProperty(ref _SelectedAlgorithmIndex, value);
+                }
             }
         }
 
@@ -37,9 +40,9 @@ namespace ESOAPIExplorer.ViewModels
         {
             await base.InitializeAsync(data);
 
-            if (_settings.Values["SearchAlgorithm"] == null)
+            if (_Settings.Values["SearchAlgorithm"] == null)
             {
-                _settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
+                _Settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
             }
 
             List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
@@ -50,7 +53,7 @@ namespace ESOAPIExplorer.ViewModels
                     .OrderBy(a => a)
                 );
 
-            SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_settings.Values["SearchAlgorithm"].ToString());
+            SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values["SearchAlgorithm"].ToString());
         }
     }
 }

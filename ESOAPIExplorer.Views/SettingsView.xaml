@@ -9,7 +9,6 @@
     xmlns:vm="using:ESOAPIExplorer.ViewModels"    
     xmlns:converters="using:ESOAPIExplorer.ValueConverters"    
     xmlns:c="using:ESOAPIExplorer.Controls"
-    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
@@ -32,6 +31,8 @@
         </Grid.RowDefinitions>
         <TextBlock Text="Settings" FontSize="32" Grid.Row="0" Grid.Column="0" Margin="0,10,10,10"/>
         <TextBlock Text="Filter Algorithm" Grid.Row="1" Grid.Column="0"/>
-        <ComboBox Name="themeMode" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding SearchAlgorithmItemSource}" SelectedIndex="{Binding SelectedAlgorithmIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <ComboBox Name="themeMode" Grid.Row="1" Grid.Column="1"
+                  ItemsSource="{Binding SearchAlgorithmItemSource}"
+                  SelectedIndex="{Binding Path=DataContext.SelectedAlgorithmIndex, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </Page>
