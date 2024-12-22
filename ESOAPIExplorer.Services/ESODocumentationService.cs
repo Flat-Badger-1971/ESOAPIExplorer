@@ -21,11 +21,13 @@ public class ESODocumentationService : IESODocumentationService
     private ReaderState State { get; set; }
     private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
     private readonly FileOpenPicker _FilePicker;
+    private readonly ILuaFunctionScanner _LuaFunctionScanner;
+    private readonly IRegexService _RegexService;
 
     public EsoUIDocumentation Documentation { get; set; }
     public EsoUIDocumentation Data { get; set; }
 
-    public ESODocumentationService()
+    public ESODocumentationService(ILuaFunctionScanner luaFunctionScanner, IRegexService regexService)
     {
         _FilePicker = new FileOpenPicker
         {
@@ -41,6 +43,8 @@ public class ESODocumentationService : IESODocumentationService
         WinRT.Interop.InitializeWithWindow.Initialize(_FilePicker, hwnd);
 
         _FilePicker.FileTypeFilter.Add(".txt");
+        _LuaFunctionScanner = luaFunctionScanner;
+        _RegexService = regexService;
     }
 
     public async Task InitialiseAsync() => Documentation = await GetDocumentationAsync();
@@ -48,8 +52,13 @@ public class ESODocumentationService : IESODocumentationService
     private async Task<EsoUIDocumentation> GetDocumentationAsync()
     {
         string path = await GetPathAsync();
+        string directoryPath = Path.GetDirectoryName(path);
 
-        return await ParseAsync(path);
+        EsoUIDocumentation documentation = await ParseAsync(path);
+        _LuaFunctionScanner.FolderPath = directoryPath;
+        IDictionary<string, LuaFunctionDetails> funcs = _LuaFunctionScanner.ScanFolderForLuaFunctions();
+
+        return documentation;
     }
 
     private async Task<string> GetPathAsync()
@@ -113,6 +122,7 @@ public class ESODocumentationService : IESODocumentationService
             case true when LineStartsWith("{TOC:maxLevel"):
                 return ReaderState.READ_API_VERSION;
             case true when LineStartsWith("h2. VM Functions"):
+            case true when LineStartsWith("h2. ZOS helper functions"):
                 return ReaderState.READ_VM_FUNCTIONS;
             case true when LineStartsWith("h2. Global Variables"):
                 return ReaderState.READ_GLOBALS;
@@ -135,7 +145,7 @@ public class ESODocumentationService : IESODocumentationService
     {
         if (LineStartsWith("h1. "))
         {
-            Data.ApiVersion = int.Parse(GetFirstMatch(new Regex(@"(\d+)$")));
+            Data.ApiVersion = int.Parse(GetFirstMatch(_RegexService.ApiVersionMatcher()));
 
             return true;
         }
@@ -161,11 +171,11 @@ public class ESODocumentationService : IESODocumentationService
             case true when LineStartsWith("h2. "):
                 return true;
             case true when LineStartsWith("h5. "):
-                string enumName = GetFirstMatch(new Regex(@"h5\. (.+)$"));
+                string enumName = GetFirstMatch(_RegexService.EnumNameMatcher());
                 CurrentEnum = GetOrCreateGlobal(enumName);
                 break;
             case true when LineStartsWith("* "):
-                string enumValue = GetFirstMatch(new Regex(@"\* (.+)$"));
+                string enumValue = GetFirstMatch(_RegexService.EnumMatcher());
                 CurrentEnum.Add(enumValue);
                 break;
             default:
@@ -175,7 +185,7 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    private static List<EsoUIArgument> ParseArgs(string args)
+    private List<EsoUIArgument> ParseArgs(string args)
     {
         List<EsoUIArgument> data = [];
         string[] argsArray = args.Split(',');
@@ -184,7 +194,7 @@ public class ESODocumentationService : IESODocumentationService
 
         foreach (string arg in argsArray)
         {
-            Match match = Regex.Match(arg, @"\*(.+)\* _(.+)_");
+            Match match = _RegexService.ArgumentMatcher().Match(arg);
             data.Add(new EsoUIArgument(match.Groups[2].Value, new EsoUIType(match.Groups[1].Value), argId));
             argId++;
         }
@@ -209,8 +219,8 @@ public class ESODocumentationService : IESODocumentationService
         switch (true)
         {
             case true when LineStartsWith("* "):
-                List<string> matches = GetMatches(new Regex(@"^\* (.+)\((.*)\)$"));
-                Match nameMatch = Regex.Match(matches[0], @"([^\s]+)( \*(.+)\*)?");
+                List<string> matches = GetMatches(_RegexService.FunctionNameMatcher());
+                Match nameMatch = _RegexService.FunctionAccessMatcher().Match(matches[0]);
                 string name = nameMatch.Groups[1].Value;
                 string access = nameMatch.Groups[3].Value;
                 EsoUIFunctionAccess accessLevel = access == string.Empty ? EsoUIFunctionAccess.PUBLIC : access.ToEsoUIFunctionAccess();
@@ -228,7 +238,7 @@ public class ESODocumentationService : IESODocumentationService
                 CurrentFunction.HasVariableReturns = true;
                 break;
             case true when LineStartsWith("** _Returns:_"):
-                string args = GetFirstMatch(new Regex(@"\*\*\ _Returns:_ (.+)$"));
+                string args = GetFirstMatch(_RegexService.FunctionReturnMatcher());
                 CurrentFunction.Returns = ParseArgs(args);
                 break;
         }
@@ -263,11 +273,11 @@ public class ESODocumentationService : IESODocumentationService
                 // section ended
                 return true;
             case true when LineStartsWith("* "):
-                List<string> matches = GetMatches(new Regex(@"^\*\ ([^\s]+)(\s\((.+)\))?"));
+                List<string> matches = GetMatches(_RegexService.EventMatcher());
                 string name = matches[0];
                 string argsString = matches[2];
 
-                List<EsoUIArgument> args = null;
+                List<EsoUIArgument> args;
 
                 if (string.IsNullOrEmpty(argsString))
                 {
@@ -279,6 +289,7 @@ public class ESODocumentationService : IESODocumentationService
                 }
 
                 Data.Events[name] = new EsoUIEvent(name, args);
+
                 return false;
             default:
                 return false;
@@ -298,7 +309,7 @@ public class ESODocumentationService : IESODocumentationService
             return true;
         }
 
-        List<string> matches = GetMatches(new Regex(@"^\*\ (.+) \*(.+)\*$"));
+        List<string> matches = GetMatches(_RegexService.XMLAttributeMatcher());
         string name = matches[0];
         string type = matches[1];
         Data.XmlAttributes[name] = new EsoUIArgument(name, new EsoUIType(type), 1);
@@ -325,22 +336,22 @@ public class ESODocumentationService : IESODocumentationService
                 // section ended
                 return true;
             case true when LineStartsWith("h5. "):
-                string elementName = GetFirstMatch(new Regex(@"h5. (.+)$"));
+                string elementName = GetFirstMatch(_RegexService.XMLElementNameMatcher());
                 CurrentElement = GetOrCreateElement(elementName);
                 break;
             case true when LineStartsWith("* _attr"):
-                string attribute = GetFirstMatch(new Regex(@"\* _attribute:_ (.+)$"));
-                Match match = Regex.Match(attribute, @"\*(.+)\* _(.+)_");
+                string attribute = GetFirstMatch(_RegexService.XMLAttributeTypeMatcher());
+                Match match = _RegexService.XMLAttributeNameMatcher().Match(attribute);
                 string type = match.Groups[1].Value;
                 string name = match.Groups[2].Value;
                 CurrentElement.Attributes.Add(new EsoUIArgument(name, new EsoUIType(type), 1));
                 break;
             case true when LineStartsWith("* ScriptArguments"):
-                CurrentElement.Documentation = GetFirstMatch(new Regex(@"\* ScriptArguments: (.+)$"));
+                CurrentElement.Documentation = GetFirstMatch(_RegexService.XMLScriptArgumentMatcher());
                 break;
             case true when LineStartsWith("* ["):
                 {
-                    List<string> matches = GetMatches(new Regex(@"^\*\ \[(.+): (.+)\|#(.+)\]$"));
+                    List<string> matches = GetMatches(_RegexService.XMLLineTypeMatcher());
                     string lineType = matches[0];
                     string lname = matches[1];
                     string ltype = matches[2];
@@ -442,13 +453,33 @@ public class ESODocumentationService : IESODocumentationService
 
             if (!string.IsNullOrEmpty(FileName))
             {
-                using (StreamReader reader = new StreamReader(FileName))
+                using (MemoryStream combinedStream = new MemoryStream())
                 {
-                    string line;
-
-                    while ((line = reader.ReadLine()) != null)
+                    using (FileStream apifileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read))
                     {
-                        OnReadLine(line);
+                        apifileStream.CopyTo(combinedStream);
+                    }
+
+                    // add the zos helper functions if requested
+                    // TODO: check settings
+                    string embeddedContent = EmbeddedResourceReader.ReadEmbeddedResource("ESOAPIExplorer.Assets.Files.ZosHelperFunctions.txt");
+
+                    using (StreamWriter writer = new StreamWriter(combinedStream, leaveOpen: true))
+                    {
+                        writer.Write(embeddedContent);
+                        writer.Flush();
+                    }
+
+                    combinedStream.Position = 0;
+
+                    using (StreamReader reader = new StreamReader(combinedStream))
+                    {
+                        string line;
+
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            OnReadLine(line);
+                        }
                     }
                 }
 

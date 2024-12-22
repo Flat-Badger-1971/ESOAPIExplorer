@@ -1,0 +1,740 @@
+
+h2. ZOS helper functions
+* zo_strupper(*string* _stringToUppercase_)
+** _Returns:_ *string* _upperCasedString_
+
+* zo_strlower(*string* _stringToLowercase_)
+** _Returns:_ *string* _lowerCasedString_
+
+* zo_strsub(*string* _string_, *luaindex* _start_, *luaindex:nilable* _end_)
+** _Returns:_ *string* _substring_
+
+* zo_strgsub(*string* _string_, *string* _pattern_, *string* _replacement_, *integer:nilable* _n_)
+** _Returns:_ *string* _replacedString_
+
+* zo_strlen(*string* _string_)
+** _Returns:_ *integer* _length_
+
+* zo_strmatch(*string* _string_, *string* _pattern_, *luaindex:nilable* _index_)
+** _Uses variable returns..._
+** _Returns:_ *string* _strings_
+
+* zo_strgmatch(*string* _string_, *string* _pattern_)
+** _Returns:_ *function* _iterator_
+
+* zo_strfind(*string* _string_, *string* _pattern_, *luaindex:nilable* _index_, *bool* _plain_)
+** _Uses variable returns..._
+** _Returns:_ *luaindex* _start_, *luaindex* _end_, *string* _strings_
+
+* zo_plainstrfind(*string* _string_, *string* _searchFor_)
+** _Returns:_ *bool* _found_, *integer* _startIndex_, *integer* _endIndex_
+
+* zo_strsplit(*string* _delims_, *string* _stringToSplit_)
+** _Uses variable returns..._
+** _Returns:_ *string* _strings_
+
+* zo_loadstring(*string* _stringToCompile_, *string* _debugName_)
+** _Returns:_ *function* _compiledFunction_
+
+* zo_deg(*number* _radians_)
+** _Returns:_ *number* _degrees_
+
+* zo_rad(*number* _degrees_)
+** _Returns:_ *number* _radian_
+
+* zo_floor(*number* _number_)
+** _Returns:_ *integer* _nextSmallerInteger_
+
+* zo_ceil(*number* _number_)
+** _Returns:_ *integer* _nextHigherInteger_
+
+* zo_mod(*number* _number1_, *number* _number2_)
+** _Returns:_ *number* _modulus_
+
+* zo_decimalsplit(*number* _number_)
+** _Returns:_ *integer* _integerPart_, *number* _decimalPart_
+
+* zo_abs(*number* _number_)
+** _Returns:_ *number* _absoluteNumber_
+
+* zo_max(*number* _number1_,*number* _number2_,*number* _..._)
+** _Returns:_ *number* _highestNumber_
+
+* zo_min(*number* _number1_,*number* _number2_,*number* _..._)
+** _Returns:_ *number* _lowestNumber_
+
+* zo_sqrt(*number* _number_)
+** _Returns:_ *number* _squareRootNumber_
+
+* zo_pow(*number* _number_, *number* _power_)
+** _Returns:_ *number* _numberRaisedToPower_
+
+* zo_cos(*number* _number_)
+** _Returns:_ *number* _radians_
+
+* zo_sin(*number* _number_)
+** _Returns:_ *number* _radians_
+
+* zo_tan(*number* _number_)
+** _Returns:_ *number* _radians_
+
+* zo_atan2(*number* _number1_, *number* _number2_)
+** _Returns:_ *number* _radians_
+
+* zo_randomseed(*integer* _number_)
+
+* zo_random(*integer:nilable* _n_, *integer:nilable* _u_)
+** _Returns:_ *number* _randomNumber_
+
+* zo_insecureNext(*table* _table_, *type* _lastKey_)
+** _Returns:_ *type* _nextKey_, *type* _nextValue_
+
+* zo_randomDecimalRange(*number* _min_, *number* _max_)
+** _Returns:_ *number* _rangedRandomDecimal_
+
+* zo_insecurePairs (*table* _table_)
+** _Returns:_ *function* _iterator_
+
+* zo_sign(*number* _number_)
+** _Returns:_ *integer* _signIndicator_
+
+* zo_binarysearch(*object* _searchData_, *table* _dataList_, *function:nilable* _comparator_)
+** _Returns:_ *bool* _found_, *integer* _index_
+
+* zo_binaryinsert(*object* _item_, *object* _searchData_, *table* _dataList_, *function:nilable* _comparator_)
+
+* zo_binaryremove(*object* _searchData_, *table* _dataList_, *function:nilable* _comparator_)
+
+* zo_clamp(*number* _value_, *number* _minimum_, *number* _maximum_)
+** _Returns:_ *number* _clampedValue_
+
+* zo_saturate(*number* _value_)
+** _Returns:_ *number* _saturatedValue_
+
+* zo_round(*number* _value_)
+** _Returns:_ *integer* _roundedValue_
+
+* zo_roundToZero(*number* _value_, *number:nilable* _precision_)
+** _Returns:_ *number* _roundedValue_
+
+* zo_roundToEven(*number* _value_, *number:nilable* _precision_)
+** _Returns:_ *number* _roundedValue_
+
+* zo_roundToNearest(*number* _value_, *number* _precision_)
+** _Returns:_ *number* _roundedValue_
+
+* zo_strjoin(*string* _separator_, *string* _..._)
+** _Returns:_ *string* _joinedStrings_
+
+* zo_strIsUpper(*string* _string_)
+** _Returns:_ *bool* _stringIsUpperCase_
+
+* zo_strIsLower(*string* _string_)
+** _Returns:_ *bool* _stringIsLowerCase_
+
+* zo_lerp(*number* _from_, *number* _to_, *number* _amount_)
+** _Returns:_ *number* _lerpedValue_
+
+* zo_lerpVector(*table* _from_, *table* _to_, *number* _amount_)
+** _Returns:_ *table* _lerpedVector_
+
+* zo_frameDeltaNormalizedForTargetFramerate(*number* _targetFramesPerSecond_)
+** _Returns:_ *number* _frameDeltaNormalizedForTargetFramerate_
+
+* zo_deltaNormalizedLerp(*number* _from_, *number* _to_, *number* _amount_)
+** _Returns:_ *number* _normalizedValue_
+
+* zo_percentBetween(*number* _startValue_, *number* _endValue_, *number* _value_)
+** _Returns:_ *number* _percentBetween_
+
+* zo_clampedPercentBetween(*number* _startValue_, *number* _endValue_, *number* _value_)
+** _Returns:_ *number* _clampedPercentBetween_
+
+* zo_floatsAreEqual(*number* _a_, *number* _b_, *number:nilable* _epsilon_)
+** _Returns:_ *bool* _floatsAreEqual_
+
+* zo_parseUnsignedInteger(*string* _s_)
+** _Returns:_ *number* _parsedValue_
+
+* zo_iconFormat(*string* _path_, *integer* _width_, *integer* _height_)
+** _Returns:_ *string* _iconString_
+
+* zo_iconFormatInheritColor(*string* _path_, *integer* _width_, *integer* _height_)
+** _Returns:_ *string* _iconString_
+
+* zo_iconTextFormat(*string* _path_, *integer* _width_, *integer* _height_, *string* _text_, *bool* _inheritColor_)
+** _Returns:_ *string* _iconWithTextString_
+
+* zo_iconTextFormatNoSpace(*string* _path_, *integer* _width_, *integer* _height_, *string* _text_, *bool* _inheritColor_)
+** _Returns:_ *string* _iconWithTextString_
+
+* zo_iconTextFormatNoSpaceAlignedRight(*string* _path_, *integer* _width_, *integer* _height_, *string* _text_, *bool* _inheritColor_)
+** _Returns:_ *string* _iconWithTextString_
+
+* zo_bulletFormat(*control* _label_, *string* _text_)
+
+* zo_strikethroughTextFormat(*string* _text_)
+** _Returns:_ *string* _strikethroughString_
+
+* zo_callHandler(*object* _object_, *string* _handler_, *params* _..._)
+** _Returns:_ *bool* _handlerCalled_
+
+* zo_callLater(*function* _func_, *integer* _ms_)
+** _Returns:_ *integer* _id_
+
+* zo_removeCallLater(*integer* _id_)
+
+* zo_mixin(*object* _object_, *object* _..._)
+
+* zo_forwardArcSize(*number* _startAngle_, *number* _angle_)
+** _Returns:_ *number* _forwardArcSize_
+
+* zo_backwardArcSize(*number* _startAngle_, *number* _angle_)
+** _Returns:_ *number* _backwardArcSize_
+
+* zo_arcSize(*number* _startAngle_, *number* _angle_)
+** _Returns:_ *number* _arcSize_
+
+* zo_getSafeId64Key(*id64* _id_)
+** _Returns:_ *string* _key_
+
+* zo_distance(*number* _x1_, *number* _y1_, *number* _x2_, *number* _y2_)
+** _Returns:_ *number* _distance_
+
+* zo_distance3D(*number* _x1_, *number* _y1_, *number* _z1_, *number* _x2_, *number* _y2_, *number* _z2_)
+** _Returns:_ *number* _distance_
+
+* zo_normalize(*number* _value_, *number* _min_, *number* _max_)
+** _Returns:_ *number* _normalizedValue_
+
+* zo_clampLength2D(*number* _x_, *number* _y_, *number* _maxLength_)
+** _Returns:_ *number* _clampedLength_
+
+* zo_tokenize(*string* _sourceString_, *string:nilable* _pattern_)
+** _Returns:_ *table* _tokenizedStrings_
+
+* zo_getEnumStrings(*string* _siEnumString_, *integer* _..._)
+** _Uses variable returns..._
+** _Returns:_ *string* _enumStrings_
+
+* ZO_Rotate2D(*number* _angle_, *number* _x_, *number* _y_)
+** _Returns:_ *number* _rotatedXCoordinate_, *number* _rotatedYCoordinate_
+
+* ZO_ScaleAndRotateTextureCoords(*control* _control_, *number* _angle_, *number* _originX_, *number* _originY_, *number* _scaleX_, *number* _scaleY_)
+
+* ZO_RotateTexture3D(*control* _textureControl_, *number* _xRotationRadians_, *number* _yRotationRadians_, *number* _zRotationRadians_, *number:nilable* _scaleFactor_, *number:nilable* _normalizedOriginX_, *number:nilable* _normalizedOriginY_)
+** _Returns:_ *number* _normalizedScaleX_, *number* _normalizedScaleY_
+
+* ZO_GetNormalizedCameraFacingDirectionFromNormalizedAxisScales(*number* _normalizedScaleX_, *number* _normalizedScaleY_)
+** _Returns:_ *number* _normalizedCameraFacing_
+
+* ZO_SetTextureLighting(*control* _textureControl_, *number:nilable* _normalizedLightSourceFacingDirection_, *number:nilable* _minBrightness_, *number:nilable* _maxBrightness_)
+
+* ZO_SetTextureCell(*control* _control_, *integer* _numColumns_, *integer* _numRows_, *integer* _cellIndex_)
+
+* ZO_SetTextureCellAnimation(*control* _control_, *integer* _numColumns_, *integer* _numRows_, *integer* _intervalSeconds_, *integer* _elapsedSeconds_)
+
+* ZO_GetCallstackFunctionNamesIterator()
+** _Returns:_ *function* _iterator_
+
+* ZO_GetCallstackFunctionNames(*number:nilable* _numTopmostFunctionsToExclude_)
+** _Returns:_ *table* _functionNames_
+
+* ZO_GetCallstackFunctionName(*integer* _callstackIndex_)
+** _Returns:_ *string* _functionName_
+
+* ZO_GetCurrentFunctionName()
+** _Returns:_ *string* _functionName_
+
+* ZO_GetCallerFunctionName()
+** _Returns:_ *string* _functionName_
+
+* ZO_GetCallbackForwardingFunction(*object* _object_, *function* _receiverFunction_)
+** _Returns:_ *function* _forwardingFunction_
+
+* ZO_GetEventForwardingFunction(*object* _object_, *function* _receiverFunction_)
+** _Returns:_ *function* _forwardingFunction_
+
+* ZO_GetControlOwnerObject(*control* _control_)
+** _Returns:_ *object* _ownerObject_
+
+* ZO_ClearNumericallyIndexedTable(*table* _table_)
+
+* ZO_GetNextBagSlotIndex(*[Bag|#Bag]* _bagIndex_, *integer:nilable* _slotIndex_)
+** _Returns:_ *integer* _slotIndex_
+
+* ZO_IterateBagSlots(*[Bag|#Bag]* _bagIndex_)
+** _Returns:_ *function* _iterator_, *integer* _lastSlotIndex_, *integer* _initialIndex_)
+
+* ZO_GetAllianceIcon(*[Alliance|#Alliance]* _alliance_)
+** _Returns:_ *string* _allianceIcon_
+
+* ZO_ReanchorControlForLeftSidePanel(*control* _control_)
+
+* ZO_ReanchorControlTopHorizontalMenu(*control* _control_)
+
+* ZO_ShowBuyCrownsPlatformUI *private* ()
+
+* ZO_ShowBuyCrownsPlatformDialog *private* ()
+
+* ZO_ShowBuySubscriptionPlatformDialog *private* ()
+
+* ZO_ShowChapterUpgradePlatformDialog *private* (*bool* _isCollectorsEdition_, *string* _chapterUpgradeSource_, *bool* _showLogoutWarning_)
+
+* ZO_ShowChapterPrepurchasePlatformDialog *private* (*integer* _chapterId_, *bool* _isCollectorsEdition_, *string* _chapterUpgradeSource_)
+
+* ZO_SetJumpOrInteractDownAction(*[Action|#Action]* _action_)
+
+* ZO_GetJumpOrInteractDownAction()
+** _Returns:_ *[Action|#Action]* _action_
+
+* ZO_CanPlaceFurnitureInCurrentHouse()
+** _Returns:_ *bool* _canPlaceFurniture_
+
+* ZO_GetLevelOrChampionPointsStringNoIcon(*integer* _level_, *integer* _championPoints_)
+** _Returns:_ *string* _levelOrPoints_
+
+* ZO_GetLevelOrChampionPointsNarrationString(*integer* _level_, *integer* _championPoints_)
+** _Returns:_ *string* _levelOrPoints_
+
+* ZO_GetChampionIconMarkupString(*number* _iconSize_)
+** _Returns:_ *string* _iconString_
+
+* ZO_GetChampionIconMarkupStringInheritColor(*number* _iconSize_)
+** _Returns:_ *string* _iconString_
+
+* ZO_GetLevelOrChampionPointsString(*integer* _level_, *integer* _championPoints_, *integer* _iconSize_)
+** _Returns:_ *string* _levelOrPointsWithIcon_
+
+* ZO_GetLevelOrChampionPointsRangeString(*integer* _minLevel_, *integer* _maxLevel_, *bool* _isChampionPoints_, *integer* _iconSize_)
+** _Returns:_ *string* _levelOrPointsIcon_
+
+* ZO_FilterTargetDescriptor_GetQuestItemIdList()
+** _Returns:_ *table* _questItemList_
+
+* ZO_Animation_PlayForwardOrInstantlyToEnd(*[AnimationTimeline|#AnimationTimeline]* _timeline_, *bool* _instant_)
+
+* ZO_Animation_PlayFromStartOrInstantlyToEnd(*[AnimationTimeline|#AnimationTimeline]* _timeline_, *bool* _instant_)
+
+* ZO_Animation_PlayBackwardOrInstantlyToStart(*[AnimationTimeline|#AnimationTimeline]* _timeline_, *bool* _instant_)
+
+* d(*object* _..._)
+
+* df(*object* _formatter_, *object* _..._)
+
+* countGlobals(*string* _desiredType_)
+
+* eventArgumentDebugger(*object* _..._)
+** _Returns:_ *string* _argString_
+
+* ZO_Debug_EventNotification(*integer* _eventCode_, *bool* _register_, *bool* _allEvents_)
+
+* all()
+
+* ZO_Debug_MultiEventRegister(*integer* _eventIds..._)
+
+* ExecutePatternedChatCommand(*string* _baseCommand_, *integer* _startId_, *integer* _endId_)
+
+* mon()
+** _Returns:_ *control* _control_
+
+* moc()
+** _Returns:_ *control* _control_
+
+* ZO_StartMemProfile(*string* _tag_)
+
+* ZO_StopMemProfile(*string* _tag_)
+
+* ZO_GetLastMemProfileDelta(*string* _tag_)
+
+* GetConColor(*integer* _otherLevel_, *integer:nilable* _playerLevel_)
+** _Returns:_ *number* _red_, *number* _green_, *number* _blue_, *number* _alpha_
+
+* GetColorForCon(*integer* _fieldValue_)
+** _Returns:_ *number* _red_, *number* _green_, *number* _blue_, *number* _alpha_
+
+* GetColorDefForCon(*integer* _fieldValue_)
+** _Returns:_ *object* _colorDef_
+
+* GetAllianceColor(*[Alliance|#Alliance]* _alliance_)
+** _Returns:_ *object* _colorDef_
+
+* GetBattlegroundTeamColor(*[BattlegroundTeam|#BattlegroundTeam] _battlegroundTeam_)
+** _Returns:_ *object* _colorDef_
+
+* GetColoredAllianceName(*[Alliance|#Alliance]* _alliance_)
+** _Returns:_ *string* _allianceName_
+
+* GetColoredBattlegroundTeamName(*[BattlegroundTeam|#BattlegroundTeam] _battlegroundTeam_)
+** _Returns:_ *string* _battlegroundTeamName_
+
+* GetColoredBattlegroundYourTeamText(*[BattlegroundTeam|#BattlegroundTeam] _battlegroundTeam_)
+** _Returns:_ *string* _battlegroundTeamName_
+
+* GetColoredBattlegroundEnemyTeamText(*[BattlegroundTeam|#BattlegroundTeam] _battlegroundTeam_)
+** _Returns:_ *string* _battlegroundTeamName_
+
+* GetClassColor(*integer* _classId_)
+** _Returns:_ *object* _colorDef_
+
+* GetBuffColor(*[BuffEffectType|#BuffEffectType]* _effectType_)
+** _Returns:_ *object* _colorDef_
+
+* GetStatColor(*integer* _baseValue_, *integer* _currentValue_, *object* defaultOverrideColorDef)
+** _Returns:_ *object* _colorDef_
+
+* GetItemQualityColor(*[ItemDisplayQuality|#ItemDisplayQuality]* _displayQuality_)
+** _Returns:_ *object* _colorDef_
+
+* GetDimItemQualityColor(*[ItemQuality|#ItemQuality]* _quality_)
+** _Returns:_ *object* _colorDef_
+
+* GetAntiquityQualityColor(*[AntiquityQuality|#AntiquityQuality]* _antiquityQuality_)
+** _Returns:_ *object* _colorDef_
+
+* GetDimAntiquityQualityColor(*[AntiquityQuality|#AntiquityQuality]* _antiquityQuality_)
+** _Returns:_ *object* _colorDef_
+
+* GetStatusEffectColor(*[StatusEffectType|#StatusEffectType]* _statusEffectType_)
+** _Returns:_ *object* _colorDef_
+
+* ZO_SetDefaultIconSilhouette(*control* _textureControl_, *bool* _isSilhouette_)
+
+* ZO_SetIconAttributes(*control* _textureControl_, *table* _attributes_)
+
+* ZO_ResizeControlForBestScreenFit(*control* _control_)
+
+* ZO_ResizeTextureWidthAndMaintainAspectRatio(*control* _texture_, *integer* _width_)
+
+* ZO_StripGrammarMarkupFromCharacterName(*string* _characterName_)
+** _Returns:_ *string* _formattedCharacterName_
+
+* ZO_AbbreviateNumber(*number* _amount_, *number* _precision_, *bool* _useUppercaseSuffixes_)
+** _Returns:_ *string* _abbreviatedNumber_
+
+* ZO_AbbreviateAndLocalizeNumber(*number* _amount_, *number* _precision_, *bool* _useUppercaseSuffixes_)
+** _Returns:_ *string* _abbreviatedNumber_
+
+* ZO_GetSpecializedItemTypeText(*[ItemType|#ItemType]* _itemType_, *[SpecializedItemType|#SpecializedItemType]* _itemType_)
+** _Returns:_ *string* _typeText_
+
+* ZO_GetSpecializedItemTypeTextBySlot(*[Bag|#Bag]* _bagId_, *luaindex* _slotIndex_)
+** _Returns:_ *string* _typeText_
+
+* ZO_GetCraftingSkillName(*[TradeskillType|#TradeskillType]* _craftingType_)
+** _Returns:_ *string* _skillName_
+
+* ZO_FormatTime(*number* _seconds_, *[TimeFormatStyleCode|#TimeFormatStyleCode]* _formatStyle_, *[TimeFormatPrecisionCode|#TimeFormatPrecisionCode]* _precisionType_, *[TimeFormatDirectionCode|#TimeFormatDirectionCode]* _direction_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatTimeMilliseconds(*integer* _milliseconds_, *[TimeFormatStyleCode|#TimeFormatStyleCode]* _formatStyle_, *[TimeFormatPrecisionCode|#TimeFormatPrecisionCode]* _precisionType_, *[TimeFormatDirectionCode|#TimeFormatDirectionCode]* _direction_)
+** _Returns:_ *string* _formattedTimeString_, *integer* _nextUpdateTimeInMilliseconds_
+
+* ZO_FormatCountdownTimer(*number* _seconds_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatTimeLargestTwo(*number* _seconds_, *[TimeFormatStyleCode|#TimeFormatStyleCode]* _formatStyle_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatDurationAgo(*number* _seconds_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatRelativeTimeStamp(*integer53* _timestamp_)
+** _Returns:_ *string* _formattedTimeString_, *integer* _nextUpdateTimeInMilliseconds_
+
+* ZO_FormatTimeAsDecimalWhenBelowThreshold(*number* _seconds_, *number* _secondsThreshold_, *[TimeFormatStyleCode|#TimeFormatStyleCode]:nilable* _overThresholdTimeFormatOverride_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatTimeShowUnitOverThresholdShowDecimalUnderThreshold(*number* _seconds_, *number* _showUnitOverThresholdS_, *number* _showDecimalUnderThresholdS, *[TimeFormatStyleCode|#TimeFormatStyleCode]:nilable* _overThresholdTimeFormatOverride)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatClockTime()
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_SetClockFormat(*[TimeFormatStyleCode|#TimeFormatStyleCode]* _clockFormat_)
+
+* ZO_GetClockFormat()
+** _Returns:_ *[TimeFormatStyleCode|#TimeFormatStyleCode]* _clockFormat_
+
+* ZO_NormalizeSecondsPositive(*number* _seconds_)
+** _Returns:_ *number* _normalizedSeconds_
+
+* ZO_NormalizeSecondsNegative(*number* _seconds_)
+** _Returns:_ *number* _normalizedSeconds_
+
+* ZO_NormalizeSecondsSince(*number* _secondsSinceRequest_)
+** _Returns:_ *number* _normalizedSeconds_
+
+* ZO_NormalizeSecondsUntil(*number* _secondsUntilExpiry_)
+** _Returns:_ *number* _normalizedSeconds_
+
+* ZO_FormatTimeLongDurationExpiration(*number* _seconds_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_FormatTimeLongDurationExpirationNarration(*number* _seconds_)
+** _Returns:_ *string* _formattedTimeString_, *number* _nextUpdateTimeInSec_
+
+* ZO_AlphaAnimation_GetAnimation(*control* _control_)
+** _Returns:_ *object* _animation_
+
+* ZO_GetOpposingAnchorPoint(*[AnchorPosition|#AnchorPosition]* _anchorPoint_)
+** _Returns:_ *[AnchorPosition|#AnchorPosition]* _anchorPoint_
+
+* ZO_GetAnchorPointNearestScreenCenter(*integer* _controlCenterX_, *integer* _controlCenterY_)
+** _Returns:_ *[AnchorPosition|#AnchorPosition]* _anchorPoint_
+
+* ZO_Anchor_DynamicAnchorTo(*control* _control_, *control* _anchorTo_, *integer* _offsetX_, *integer* _offsetY_)
+
+* ZO_Anchor_OnRing(*control* _control_, *control* _anchorToControl_, *integer* _x_, *integer* _y_, *number* _radiusArg_)
+
+* ZO_Anchor_ByAngle(*control* _control_, *control* _anchorToControl_, *number* _theta_, *number* _radiusArg_)
+
+* ZO_Anchor_LineInContainer(*control* _line_, *control* _container_, *integer* _startX_, *integer* _startY_, *integer* _endX_, *integer* _endY_)
+
+* ZO_AuditObject(*table* _object_, *function:nilable* _beforeUpdateCallback_, *function:nilable* _afterUpdateCallback_)
+
+* ZO_Gamepad_GetLeftStickEasedX()
+** _Returns:_ *number* _easedX_
+
+* ZO_Gamepad_GetLeftStickEasedY()
+** _Returns:_ *number* _easedY_
+
+* ZO_Gamepad_GetRightStickEasedX()
+** _Returns:_ *number* _easedX_
+
+* ZO_Gamepad_GetRightStickEasedY()
+** _Returns:_ *number* _easedY_
+
+* ZO_PreHook(*object* _objectTable_, *string* _existingFunctionName_, *function* _hookFunction_)
+** _Returns:_ *function* _originalFunction_
+
+* ZO_PostHook(*object* _objectTable_, *string* _existingFunctionName_, *function* _hookFunction_)
+** _Returns:_ *function* _originalFunction_
+
+* ZO_PrehookHandler(*control* _control_, *string* _handlerName_, *function* _hookFunction_)
+** _Returns:_ *function* _originalHandlerFunction_
+
+* ZO_PosthookHandler(*control* _control_, *string* _handlerName_, *function* _hookFunction_)
+** _Returns:_ *function* _originalHandlerFunction_
+
+* ZO_ForwardUnimplementedMethodsForControl(*control* _sourceControl_, *object* _..._)
+
+* ZO_LabelUtils_GetNumLines(*string* _text_, *string* _fontDescriptor_, *integer:nilable* _optionalLabelWidth_, *integer:nilable* _optionalLabelHeight_)
+** _Returns:_ *integer* _numLines_
+
+* ZO_LabelUtils_GetTextDimensions(*string* _text_, *string* _fontDescriptor_, *integer:nilable* _optionalLabelWidth_, *integer:nilable* _optionalLabelHeight_)
+** _Returns:_ *number* _stringWidthUIUnits_, *number* _stringHeightUIUnits_
+
+* ZO_LabelUtils_GetFontHeight(*string* _fontDescriptor_)
+** _Returns:_ *number* _fontHeightUIUnits_
+
+* ZO_LinkHandler_InsertLink(*string* _link_)
+** _Returns:_ *object* _result_
+
+* ZO_LinkHandler_InsertLinkAndSubmit(*string* _link_)
+
+* ZO_LinkHandler_CreateLink(*string* _text_, *object* _color_, *string* _linkType_, *string* _dataToEncode_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_CreateLinkWithoutBrackets(*string* _text_, *object* _color_, *string* _linkType_, *string* _dataToEncode_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_ParseLink(*string* _link_)
+** _Uses variable returns..._
+** _Returns:_ *string* _text_, *string* _linkStyle_, *string* _dataItems_
+
+* ZO_LinkHandler_ParseLinkData(*string* _link_)
+** _Uses variable returns..._
+** _Returns:_ *string* _dataItems_
+
+* ZO_LinkHandler_CreatePlayerLink(*string* _displayOrCharacterName_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_CreateDisplayNameLink(*string* _displayName_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_CreateCharacterLink(*string* _characterName_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_CreateChannelLink(*string* _channelName_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_CreateURLLink(*string* _url_, *string* _displayText_)
+** _Returns:_ *string* _link_
+
+* ZO_LinkHandler_CreateChatLink(*function* _linkFunction_, *string* _argumentsForLinkFunction_)
+** _Returns:_ *string* _link_
+
+* ZO_ExtractLinksFromText(*string* _text_, *table* _validLinkTypes_, *table* _linksTable_)
+
+* ZO_ObjectPool_CreateControl(*string* _templateName_, *object* _objectPool_, *control* _parentControl_)
+** _Returns:_ *control* _control_
+
+* ZO_ObjectPool_CreateNamedControl(*string* _name_, *string* _templateName_, *object* _objectPool_, *control* _parentControl_)
+** _Returns:_ *control* _control_
+
+* ZO_ObjectPool_DefaultResetObject(*object* _object_)
+
+* ZO_ObjectPool_DefaultResetControl(*control* _control_)
+
+* ZO_FormatUserFacingDisplayName(*string* _name_)
+** _Returns:_ *string* _formattedName_
+
+* ZO_FormatUserFacingCharacterName(*string* _name_)
+** _Returns:_ *string* _formattedName_
+
+* ZO_FormatUserFacingCharacterOrDisplayName(*string* _characterOrDisplayName_)
+** _Returns:_ *string* _formattedName_
+
+* ZO_FormatManualNameEntry(*string* _name_)
+** _Returns:_ *string* _formattedName_
+
+* ZO_GetPlatformAccountLabel()
+** _Returns:_ *string* _label_
+
+* ZO_GetPlatformStoreName()
+** _Returns:_ *string* _storeName_
+
+* ZO_GetPlatformUserFacingName(*string* _characterName_, *string* _displayName_)
+** _Returns:_ *string* _userFacingName_
+
+* ZO_IsPCUI()
+** _Returns:_ *bool* _isPCUI_
+
+* ZO_IsConsoleUI()
+** _Returns:_ *bool* _isConsoleUI_
+
+* ZO_IsWindowsUI()
+** _Returns:_ *bool* _isWindowsUI_
+
+* ZO_IsPlaystationPlatform()
+** _Returns:_ *bool* _isPlaystationPlatform_
+
+* ZO_IsConsolePlatform()
+** _Returns:_ *bool* _isConsolePlatform_
+
+* IsIngameUI()
+** _Returns:_ *bool* _isInGameUI_
+
+* ZO_IsPregameUI()
+** _Returns:_ *bool* _isPreGameUI_
+
+* ZO_IsInternalIngameUI()
+** _Returns:_ *bool* _isInternalIngameUI_
+
+* ZO_GetGamerCardStringId()
+** _Returns:_ *number* _id_
+
+* ZO_ShouldPreferUserId()
+** _Returns:_ *bool* _shouldPreferUserId_
+
+* ZO_GetPrimaryPlayerNameFromUnitTag(*string* _unitTag_, *bool:nilable* _useInternalFormat_)
+** _Returns:_ *string* _name_
+
+* ZO_GetSecondaryPlayerNameFromUnitTag(*string* _unitTag_, *bool:nilable* _useInternalFormat_)
+** _Returns:_ *string* _name_
+
+* ZO_GetPrimaryPlayerName(*string* _displayName_, *string* _characterName_, *bool:nilable* _useInternalFormat_)
+** _Returns:_ *string* _name_
+
+* ZO_GetSecondaryPlayerName(*string* _displayName_, *string* _characterName_, *bool:nilable* _useInternalFormat_)
+** _Returns:_ *string* _name_
+
+* ZO_GetSecondaryPlayerNameWithTitleFromUnitTag(*string* _unitTag_)
+** _Returns:_ *string* _name_
+
+* ZO_GetPrimaryPlayerNameWithSecondary(*string* _displayName_, *string* _characterName_)
+** _Returns:_ *string* _name_
+
+* ZO_GetPrimaryPlayerNameHeader()
+** _Returns:_ *string* _name_
+
+* NonContiguousCount(*table* _table_)
+** _Returns:_ *integer* _count_
+
+* ZO_TableOrderingFunction(*table* _entry1_, *table* _entry2_, *object* _sortKey_, *table* _sortKeys_, *integer* _sortOrder_)
+** _Returns:_ *bool* _result_
+
+* ZO_ClearTable(*table* _table_)
+
+* ZO_ClearTableWithCallback(*table* _table_, *function* _callbackFunction_)
+
+* ZO_ShallowNumericallyIndexedTableCopy(*table* _source_, *table* _destination_)
+** _Returns:_ *table* _destination_
+
+* ZO_ShallowTableCopy(*table* _source_, *table* _destination_)
+** _Returns:_ *table* _destination_
+
+* ZO_DeepTableCopy(*table* _source_, *table* _destination_)
+** _Returns:_ *table* _destination_
+
+* ZO_IsTableEmpty(*table* _table_)
+** _Returns:_ *bool* _isTableEmpty_
+
+* ZO_IsIteratorEmpty(*function* _iteratorFunction_, *object* _invariantState_, *object* _controlValue_)
+** _Returns:_ *bool* _isIteratorEmpty_
+
+* ZO_CombineNumericallyIndexedTables(*table* _destination_, *table* _sources..._)
+** _Returns:_ *table* _destination_
+
+* ZO_CombineNonContiguousTables(*table* _destination_, *table* _sources..._)
+** _Returns:_ *table* _destination_
+
+* ZO_IsElementInNumericallyIndexedTable(*table* _table_, *object* _element_)
+** _Returns:_ *bool* _isElementInTable_
+
+* ZO_IndexOfElementInNumericallyIndexedTable(*table* _table_, *object* _element_)
+** _Returns:_ *integer* _index_
+
+* ZO_IsElementInNonContiguousTable(*table* _table_, *object* _element_)
+** _Returns:_ *bool* _isElementInTable_
+
+* ZO_KeyOfFirstElementInNonContiguousTable(*table* _table_, *object* _element_)
+** _Returns:_ *object* _key_
+
+* ZO_RemoveFirstElementFromNumericallyIndexedTable(*table* _table_, *object* _element_)
+** _Returns:_ *bool* _elementRemoved_
+
+* ZO_TableRandomInsert(*table* _table_, *object* _element_)
+
+* ZO_NumericallyIndexedTableIterator(*table* _table_)
+** _Returns:_ *function* _iterator_
+
+* ZO_FilteredNumericallyIndexedTableIterator(*table* _table_, *table* _filterFunctions_)
+** _Returns:_ *function* _iterator_
+
+* ZO_FilteredNonContiguousTableIterator(*table* _table_, *table:nilable* _filterFunctions_)
+** _Returns:_ *function* _iterator_
+
+* ZO_DeepAcyclicTableCompare(*table* _table1_, *table* _table2_, *integer* _maxTablesVisited_)
+** _Returns:_ *bool* _matched_
+
+* ZO_CreateSetFromArguments(*object* _arguments..._)
+** _Returns:_ *table* _set_
+
+* ZO_AreNumericallyIndexedTablesEqual(*table* _left_, *table* _right_)
+** _Returns:_ *bool* _areTablesEqual_
+
+* ZO_CreateSet(*table* _table_)
+** _Returns:_ *table* _set_
+
+* ZO_IntersectSets(*table* _set1_, *table* _set2_)
+** _Returns:_ *table* _intersectingTable_
+
+* ZO_AreIntersectingSets(*table* _set1_, *table* _set2_)
+** _Returns:_ *bool* _intersecting_
+
+* ZO_IntersectNumericallyIndexedTables(*table* _table1_, *table* _table2_)
+** _Returns:_ *table* _intersectingTable_
+
+* ZO_AreIntersectingNumericallyIndexedTables(*table* _table1_, *table* _table2_)
+** _Returns:_ *bool* _intersectinging_
+
+* ZO_AreEqualSets(*table* _set1_, *table* _set2_)
+** _Returns:_ *table* _areEqualSets_
+
+* ZO_CreateSortableTableFromKeys(*table* _source_)
+** _Returns:_ *table* _keys_
+
+* ZO_CreateSortableTableFromValues(*table* _source_)
+** _Returns:_ *table* _values_

@@ -418,6 +418,11 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         UpdateSelectedElementDetails();
     }
 
+    public ICommand HandleSelectedItemElement => new RelayCommand<string>((elementName) =>
+    {
+        SelectElement(elementName);
+    });
+
     public ICommand GoBack => new RelayCommand(() =>
     {
         string previous = _HistoryStack.Pop();

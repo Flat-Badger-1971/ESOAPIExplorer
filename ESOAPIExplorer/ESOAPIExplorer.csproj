@@ -17,10 +17,12 @@
     <DefaultLanguage>en-GB</DefaultLanguage>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="assets\files\ZosHelperFunctions.txt" />
     <Content Remove="Assets\Logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
+    <None Remove="Assets\Files\ZosHelperFunctions.txt" />
     <None Remove="Assets\Styles\BaseStyles.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Files\ZosHelperFunctions.txt" />
     <EmbeddedResource Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />

@@ -81,6 +81,8 @@ public partial class App : Application
         services.AddSingleton<IEventService, EventService>();
         services.AddTransient<IDialogService, DialogService>();
         services.AddTransient<IESODocumentationService, ESODocumentationService>();
+        services.AddTransient<ILuaFunctionScanner, LuaFunctionScanner>();
+        services.AddSingleton<IRegexService, RegexService>();
     }
 
     private void ConfigureServices(IServiceCollection services)
