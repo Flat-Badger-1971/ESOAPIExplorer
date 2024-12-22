@@ -4,6 +4,9 @@ public enum APIElementType
 {
     Event,
     Function,
-    Global,
-    Enum
+    Enum_Constant,
+    Enum_Type,
+    Constant,
+    C_Function,
+    Global
 }

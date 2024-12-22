@@ -12,6 +12,7 @@ public class EsoUIFunction(string name, EsoUIFunctionAccess access = EsoUIFuncti
     public List<EsoUIArgument> Args { get; set; } = [];
     public List<EsoUIArgument> Returns { get; set; } = [];
     public bool HasVariableReturns { get; set; } = false;
+    public List<string> Code { get; set; } = [];
 
     public void AddArgument(string name, string type = "")
     {
@@ -21,5 +22,10 @@ public class EsoUIFunction(string name, EsoUIFunctionAccess access = EsoUIFuncti
     public void AddReturn(string name, string type = "")
     {
         Returns.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ReturnsTotal));
+    }
+
+    public void AddCode(string line)
+    {
+        Code.Add(line);
     }
 }

@@ -188,13 +188,13 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.Event }));
 
             ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Functions
-                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.Function })
+                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = item.Value.Name.StartsWith("zo_", StringComparison.OrdinalIgnoreCase) ? APIElementType.Function : APIElementType.C_Function})
                 );
 
             ObservableCollection<APIElement> globals = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Globals
-                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail, Name = detail, ElementType = APIElementType.Global, Parent = item.Key }))
+                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail, Name = detail, ElementType = APIElementType.Enum_Constant, Parent = item.Key }))
                 .Concat(eSODocumentationService.Documentation.Globals
-                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.Enum }))
+                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.Enum_Type }))
                 .GroupBy(e => e.Id)
                 .Select(e => e.First())));
 
@@ -256,7 +256,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             UpdateObjects(SelectedFunctionDetails.Returns);
                         });
                         break;
-                    case APIElementType.Global:
+                    case APIElementType.Enum_Constant:
                         dialogService.RunOnMainThread(() =>
                         {
                             SelectedGlobalDetails = new EsoUIGlobal
@@ -278,7 +278,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             };
                         });
                         break;
-                    case APIElementType.Enum:
+                    case APIElementType.Enum_Type:
                         dialogService.RunOnMainThread(() =>
                         {
                             SelectedEnumName = new EsoUIGlobal

@@ -56,7 +56,7 @@ public class ESODocumentationService : IESODocumentationService
 
         EsoUIDocumentation documentation = await ParseAsync(path);
         _LuaFunctionScanner.FolderPath = directoryPath;
-        IDictionary<string, LuaFunctionDetails> funcs = _LuaFunctionScanner.ScanFolderForLuaFunctions();
+        // IDictionary<string, LuaFunctionDetails> funcs = _LuaFunctionScanner.ScanFolderForLuaFunctions();
 
         return documentation;
     }
@@ -226,6 +226,7 @@ public class ESODocumentationService : IESODocumentationService
                 EsoUIFunctionAccess accessLevel = access == string.Empty ? EsoUIFunctionAccess.PUBLIC : access.ToEsoUIFunctionAccess();
 
                 CurrentFunction = new EsoUIFunction(name, accessLevel);
+                CurrentFunction.AddCode(CurrentLine);
 
                 if (!string.IsNullOrEmpty(matches[1]))
                 {
@@ -236,10 +237,12 @@ public class ESODocumentationService : IESODocumentationService
                 break;
             case true when LineStartsWith("** _Uses variable returns"):
                 CurrentFunction.HasVariableReturns = true;
+                CurrentFunction.AddCode(CurrentLine);
                 break;
             case true when LineStartsWith("** _Returns:_"):
                 string args = GetFirstMatch(_RegexService.FunctionReturnMatcher());
                 CurrentFunction.Returns = ParseArgs(args);
+                CurrentFunction.AddCode(CurrentLine);
                 break;
         }
     }
@@ -289,6 +292,7 @@ public class ESODocumentationService : IESODocumentationService
                 }
 
                 Data.Events[name] = new EsoUIEvent(name, args);
+                Data.Events[name].AddCode(CurrentLine);
 
                 return false;
             default:
