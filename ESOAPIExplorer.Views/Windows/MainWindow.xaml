@@ -14,6 +14,10 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <NavigationView
             x:Name="NavigationViewControl"
             AlwaysShowHeader="False"
@@ -22,6 +26,7 @@
             IsTabStop="False"
             IsTitleBarAutoPaddingEnabled="False"
             SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Grid.Row="0"
             IsPaneOpen="False">
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="HomeViewModel" Content="Home" Icon="Home" />
@@ -33,9 +38,13 @@
                 </NavigationViewItem>
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem Tag="SettingsViewModel" Content="Settings" Icon="Setting"/> 
+                <NavigationViewItem Tag="SettingsViewModel" Content="Settings" Icon="Setting"/>
             </NavigationView.FooterMenuItems>
             <Frame Grid.Column="1" x:Name="NavFrame"/>
         </NavigationView>
+        <!-- Custom StatusBar at the bottom -->
+        <Grid Grid.Row="1" VerticalAlignment="Bottom" Background="{ThemeResource SystemBaseLowColor}" Height="30">
+            <TextBlock x:Name="StatusBarText" Text="Status: Ready" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{ThemeResource SystemBaseHighColor}"/>
+        </Grid>
     </Grid>
 </Window>
