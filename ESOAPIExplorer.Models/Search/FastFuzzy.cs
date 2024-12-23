@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ESOAPIExplorer.Models.Search;
 
@@ -9,10 +11,10 @@ public class FastFuzzy : ISearchAlgorithm
 
     public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
     {
-        List<FuzzySearchResult> results = [];
+        ConcurrentBag<FuzzySearchResult> results = [];
         searchTerm = searchTerm.ToLower();
 
-        foreach (APIElement target in targets)
+        Parallel.ForEach(targets, target =>
         {
             double score = CalculateScore(searchTerm, target.Name);
 
@@ -20,10 +22,14 @@ public class FastFuzzy : ISearchAlgorithm
             {
                 results.Add(new FuzzySearchResult { Target = target, Score = score });
             }
-        }
+        });
+
+        //double maxScore = results.Max(r => r.Score);
+        //double limit = maxScore - (maxScore / 3);
 
         return
             results
+            // .Where(r => r.Score <= limit)
             .OrderByDescending(result => result.Score)
             .Select((result, index) =>
             {
@@ -39,8 +45,11 @@ public class FastFuzzy : ISearchAlgorithm
         target = target.ToLower();
         int searchLen = searchTerm.Length;
         int targetLen = target.Length;
+
+        // Use Levenshtein Distance for a better score calculation
+        double score = 1.0 / (1 + Common.LevenshteinDistance(searchTerm, target));
+
         int searchIndex = 0, targetIndex = 0;
-        double score = 0;
         List<int> matchesSimple = [];
 
         while (searchIndex < searchLen && targetIndex < targetLen)

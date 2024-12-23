@@ -55,8 +55,8 @@
     </Page.Resources>
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -64,7 +64,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left: TextBox and ListBox -->
-        <Grid Grid.Column="0" Grid.Row="1" MinWidth="500" >
+        <Grid Grid.Column="0" Grid.Row="0" MinWidth="500" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -91,7 +91,7 @@
             <ListView Name="MainListView"
                       ItemsSource="{Binding FilteredItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                       Grid.Row="1" 
-                      SelectedItem="{Binding SelectedElement, Mode=TwoWay}" 
+                      SelectedItem="{Binding SelectedElement, Mode=TwoWay}"
                       SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -110,7 +110,7 @@
         </Grid>
 
         <!-- Right: Split Horizontally -->
-        <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
+        <Grid Grid.Column="1" Grid.Row="0" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -138,8 +138,17 @@
                 </ComboBox>
             </StackPanel>
 
+            <!-- code -->
+            <!--<Grid Background="Black" Grid.Row="1" Margin="10,0,10,0" Padding="10">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" MaxHeight="200" Padding="0,0,0,20"/>
+                </ScrollViewer>
+            </Grid>-->
+
+            <c:ScrollableTextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" Grid.Row="1"/>
+            
             <!-- github -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
@@ -148,13 +157,13 @@
             </Grid>
 
             <!-- access -->
-            <StackPanel Grid.Row="2" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="3" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" />
                 <TextBlock Text="{Binding SelectedFunctionDetails.Access, Converter={StaticResource LowercaseConverter}}" Foreground="{Binding SelectedFunctionDetails.Access, Converter={StaticResource AccessLevelToColourConverter}}" Margin="10" />
             </StackPanel>
 
             <!-- value -->
-            <StackPanel Grid.Row="3">
+            <StackPanel Grid.Row="4">
                 <!-- Event Values -->
                 <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
                 <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
@@ -181,7 +190,7 @@
             </StackPanel>
 
             <!-- arguments -->
-            <StackPanel Grid.Row="4">
+            <StackPanel Grid.Row="5">
                 <!-- Function Arguments -->
                 <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
                 <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
@@ -214,7 +223,7 @@
             </StackPanel>
 
             <!-- results -->
-            <StackPanel Grid.Row="5" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="6" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <!-- Function Return Values -->
                 <ListView ItemsSource="{Binding SelectedFunctionDetails.Returns}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
@@ -230,7 +239,7 @@
             </StackPanel>
 
             <!-- enum -->
-            <StackPanel Grid.Row="6" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="7" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <TextBlock Text="{Binding SelectedGlobalDetails.ParentName}" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}" Margin="10"/>
                 <!-- enum Values -->
@@ -266,7 +275,7 @@
             </StackPanel>
 
             <!-- used by -->
-            <Grid Grid.Row="7" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <Grid Grid.Row="8" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
                 <Grid DataContext="{Binding SelectedGlobalEnum}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -284,6 +293,47 @@
                           ItemTemplate="{StaticResource UsedByItemTemplate}"/>
                 </Grid>
             </Grid>
+        </Grid>
+        <!-- StatusBar at the bottom -->
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" Background="Black" Height="30">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="API Version: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.APIVersion}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Total Items: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.APIItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="C Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.CFunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.FunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Enum Types: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.EnumTypes}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Enum Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.EnumConstants}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Events: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.EventItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.ConstantItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                    <Run Text="Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                    <Run Text="{Binding Status.GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                </TextBlock>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

@@ -82,15 +82,16 @@
             <converters:ConstantToNumberConverter x:Key="ConstantToValueConverter"/>
             <converters:StringToValueConverter x:Key="APITypeToColourConverter" ReturnType="SolidColorBrush">
                 <converters:StringToValueConverter.Values>
-                    <SolidColorBrush Color="#FF004864" x:Key="Event"/>
-                    <SolidColorBrush Color="#FF6E7A07" x:Key="Enum_Constant"/>
-                    <SolidColorBrush Color="#FFB86D0B" x:Key="C_Function"/>
-                    <SolidColorBrush Color="#FF077A38" x:Key="Enum_Type"/>
-                    <SolidColorBrush Color="#FF464646" x:Key="Global"/>
-                    <SolidColorBrush Color="#FFB8500B" x:Key="Function"/>
+                    <SolidColorBrush Color="#FF004864" x:Key="EVENT"/>
+                    <SolidColorBrush Color="#FF6E7A07" x:Key="ENUM_CONSTANT"/>
+                    <SolidColorBrush Color="#FFB86D0B" x:Key="C_FUNCTION"/>
+                    <SolidColorBrush Color="#FF077A38" x:Key="ENUM_TYPE"/>
+                    <SolidColorBrush Color="#FF464646" x:Key="GLOBAL"/>
+                    <SolidColorBrush Color="#FFB8500B" x:Key="FUNCTION"/>
                 </converters:StringToValueConverter.Values>
             </converters:StringToValueConverter>
             <converters:EnumToSortedEnumConverter x:Key="EnumToSortedEnumConverter" />
+            <converters:ElementToCodeConverter x:Key="ElementToCodeConverter" />
 
 <!-- Templates -->
             <DataTemplate x:Key="ValueHeaderTemplate">
