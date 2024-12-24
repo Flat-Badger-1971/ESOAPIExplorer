@@ -169,7 +169,7 @@ public partial class HighlightedTextBlock : Grid
         bool isMatched = false;
         char charToFind = char.ToLower(character);
 
-        _charactersToMatch ??= filter.ToLower().ToList();
+        _charactersToMatch = filter?.Select(f => char.ToLower(f))?.ToList()?? [];
 
         if (_charactersToMatch.Contains(charToFind))
         {
