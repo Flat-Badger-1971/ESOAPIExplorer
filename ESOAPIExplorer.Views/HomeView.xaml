@@ -139,12 +139,6 @@
             </StackPanel>
 
             <!-- code -->
-            <!--<Grid Background="Black" Grid.Row="1" Margin="10,0,10,0" Padding="10">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <TextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" MaxHeight="200" Padding="0,0,0,20"/>
-                </ScrollViewer>
-            </Grid>-->
-
             <c:ScrollableTextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" Grid.Row="1"/>
             
             <!-- github -->
