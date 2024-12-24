@@ -290,45 +290,5 @@
         </Grid>
         <!-- StatusBar at the bottom -->
         <c:ESOStatusBar Grid.Row="1" Grid.ColumnSpan="2" DataContext="{Binding Status}" />
-        <!--<Grid Grid.Row="1" Grid.ColumnSpan="2" Background="Black" Height="30">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="API Version: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.APIVersion}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Total Items: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.APIItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="C Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.CFunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.FunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Enum Types: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.EnumTypes}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Enum Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.EnumConstants}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Events: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.EventItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.ConstantItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-                <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                    <Run Text="Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                    <Run Text="{Binding Status.GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
-                </TextBlock>
-            </StackPanel>
-        </Grid>-->
     </Grid>
 </Page>
