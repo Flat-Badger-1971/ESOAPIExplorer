@@ -289,7 +289,8 @@
             </Grid>
         </Grid>
         <!-- StatusBar at the bottom -->
-        <Grid Grid.Row="1" Grid.ColumnSpan="2" Background="Black" Height="30">
+        <c:ESOStatusBar Grid.Row="1" Grid.ColumnSpan="2" DataContext="{Binding Status}" />
+        <!--<Grid Grid.Row="1" Grid.ColumnSpan="2" Background="Black" Height="30">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
                     <Run Text="API Version: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
@@ -328,6 +329,6 @@
                     <Run Text="{Binding Status.GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
                 </TextBlock>
             </StackPanel>
-        </Grid>
+        </Grid>-->
     </Grid>
 </Page>

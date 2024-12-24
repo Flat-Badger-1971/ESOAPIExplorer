@@ -9,9 +9,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Title="ESO API Explorer">
 
-    <!--<Window.SystemBackdrop>
+    <Window.SystemBackdrop>
         <MicaBackdrop Kind="Base"/>
-    </Window.SystemBackdrop>-->
+    </Window.SystemBackdrop>
 
     <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
         <NavigationView
