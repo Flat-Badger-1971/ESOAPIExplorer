@@ -454,7 +454,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         string previous = _HistoryStack.Pop();
 
-        if (previous == SelectedElement.Name)
+        if (previous == SelectedElement?.Name)
         {
             // pop again to remove the current selection from the stack
             previous = _HistoryStack.Pop();
