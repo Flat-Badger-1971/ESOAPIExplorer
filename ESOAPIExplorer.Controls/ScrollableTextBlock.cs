@@ -80,7 +80,7 @@ public partial class ScrollableTextBlock : UserControl
 
     private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is ScrollableTextBlock control)
+        if (d is ScrollableTextBlock control && control._TextBlock != null)
         {
             control._TextBlock.Text = e.NewValue as string;
         }
