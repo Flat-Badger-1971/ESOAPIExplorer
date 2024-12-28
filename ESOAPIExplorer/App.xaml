@@ -88,6 +88,7 @@
                     <SolidColorBrush Color="#FF077A38" x:Key="ENUM_TYPE"/>
                     <SolidColorBrush Color="#FF464646" x:Key="GLOBAL"/>
                     <SolidColorBrush Color="#FFB8500B" x:Key="FUNCTION"/>
+                    <SolidColorBrush Color="#FF3890AB" x:Key="CONSTANT"/>
                 </converters:StringToValueConverter.Values>
             </converters:StringToValueConverter>
             <converters:EnumToSortedEnumConverter x:Key="EnumToSortedEnumConverter" />
@@ -122,6 +123,22 @@
                     </Grid>
                 </Grid>
             </DataTemplate>
+            <DataTemplate x:Key="GlobalItemTemplate">
+                <Grid Height="20" Background="{ThemeResource SystemListMediumColor}">
+                    <Grid Margin="10,0,10,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" />
+                        </Viewbox>
+                        <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="1"/>
+                        <TextBlock Text="{Binding Name, Converter={StaticResource ConstantToValueConverter}}"  Margin="0" Grid.Column="2"/>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
             <DataTemplate x:Key="EnumItemTemplate">
                 <Grid Height="20" Background="{Binding Value, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">
                     <Grid Margin="10,0,10,0">
@@ -133,7 +150,7 @@
                         <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
                             <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" Foreground="{ThemeResource SystemBaseHighColor}"/>
                         </Viewbox>
-                        <TextBlock Text="integer"  Margin="0" Grid.Column="1"  Foreground="{ThemeResource SystemBaseHighColor}"/>
+                        <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="1"  Foreground="{ThemeResource SystemBaseHighColor}"/>
                         <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2" Foreground="{ThemeResource SystemBaseHighColor}"/>
                     </Grid>
                 </Grid>
@@ -148,7 +165,22 @@
                     </Grid>
                 </Grid>
             </DataTemplate>
-
+            <DataTemplate x:Key="GlobalConstantTemplate">
+                <Grid Height="20" Background="{ThemeResource SystemListMediumColor}">
+                    <Grid Margin="10,0,10,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" />
+                        </Viewbox>
+                        <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="1"/>
+                        <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2"/>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
             <CollectionViewSource x:Key="SortedItemsSource" />
             <!-- END TEMPLATES -->
         </ResourceDictionary>

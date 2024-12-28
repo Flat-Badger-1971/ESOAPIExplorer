@@ -13,6 +13,7 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
       <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
       <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+      <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

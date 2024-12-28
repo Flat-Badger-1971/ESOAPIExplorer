@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.Threading;
 
 namespace ESOAPIExplorer.Controls;
 
@@ -22,7 +23,7 @@ public partial class ScrollableTextBlock : UserControl
         InitialiseComponents();
         UpdateTextBlockPadding();
 
-        _ScrollViewer.ViewChanged += OnScrollViewerViewChanged;
+        _ScrollViewer.ViewChanged += (s, args) => UpdateTextBlockPadding();
         _TextBlock.SizeChanged += (s, args) => UpdateTextBlockPadding();
     }
 
@@ -38,12 +39,12 @@ public partial class ScrollableTextBlock : UserControl
         _ScrollViewer = new ScrollViewer
         {
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            MaxHeight = 200
         };
 
         _TextBlock = new TextBlock
         {
-            MaxHeight = 200,
             TextWrapping = TextWrapping.NoWrap
         };
 
@@ -53,16 +54,14 @@ public partial class ScrollableTextBlock : UserControl
         Content = _RootGrid;
     }
 
-    private void OnScrollViewerViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
-    {
-        UpdateTextBlockPadding();
-    }
-
     private void UpdateTextBlockPadding()
     {
-        if (_ScrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible)
+        var horizontalVisible = _ScrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
+        var verticalVisible = _ScrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
+
+        if (horizontalVisible || verticalVisible)
         {
-            _TextBlock.Padding = new Thickness(0, 0, 0, 20);
+            _TextBlock.Padding = new Thickness(0, 0, 0, horizontalVisible ? 20 : 0);
         }
         else
         {
@@ -83,7 +82,8 @@ public partial class ScrollableTextBlock : UserControl
         if (d is ScrollableTextBlock control && control._TextBlock != null)
         {
             control._TextBlock.Text = e.NewValue as string;
+            Thread.Sleep(100);
+            control.UpdateTextBlockPadding();
         }
     }
 }
-

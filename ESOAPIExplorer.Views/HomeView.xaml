@@ -119,6 +119,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -140,7 +141,7 @@
 
             <!-- code -->
             <c:ScrollableTextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" Grid.Row="1"/>
-            
+
             <!-- github -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -175,8 +176,20 @@
                 <ListView ItemsSource="{Binding SelectedGlobalDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
-                    ItemTemplate="{StaticResource ValueItemTemplate}" 
+                    ItemTemplate="{StaticResource GlobalItemTemplate}" 
                     Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    <ListView.Resources>
+                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                    </ListView.Resources>
+                </ListView>
+
+                <!-- Constant Value -->
+                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedConstantValue, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                <ListView ItemsSource="{Binding SelectedConstantValue, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                    MaxHeight="300"
+                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
+                    ItemTemplate="{StaticResource GlobalConstantTemplate}" 
+                    Visibility="{Binding SelectedConstantValue, Converter={StaticResource NotNullToVisibilityConverter}}">
                     <ListView.Resources>
                         <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                     </ListView.Resources>
@@ -254,11 +267,11 @@
                             <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
                         </Grid>
                         <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
-                                  ItemsSource="{Binding SelectedGlobalEnum.ValueNames, Converter={StaticResource EnumToSortedEnumConverter}}"
+                                  ItemsSource="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EnumToSortedEnumConverter}}"
                                   ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                                   ItemTemplate="{StaticResource EnumItemTemplate}"
                                   SelectedIndex="{Binding SelectedEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToVisibilityConverter}}">
+                                  Visibility="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EmptyListToVisibilityConverter}}">
                             <ListView.Resources>
                                 <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                             </ListView.Resources>

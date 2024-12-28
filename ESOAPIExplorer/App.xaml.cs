@@ -3,7 +3,6 @@ using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using System;
 using Windows.ApplicationModel;
@@ -25,7 +24,7 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     /// <summary>
@@ -76,13 +75,14 @@ public partial class App : Application
     private void RegisterServices(ServiceCollection services)
     {
         //App Services
-        services.AddSingleton<DispatcherQueue>(MainWindow.DispatcherQueue);
+        services.AddSingleton(MainWindow.DispatcherQueue);
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IEventService, EventService>();
         services.AddTransient<IDialogService, DialogService>();
         services.AddTransient<IESODocumentationService, ESODocumentationService>();
-        services.AddTransient<ILuaFunctionScanner, LuaFunctionScanner>();
+        services.AddTransient<ILuaObjectScanner, LuaObjectScanneService>();
         services.AddSingleton<IRegexService, RegexService>();
+        services.AddTransient<ILuaParserService, LuaParserService>();
     }
 
     private void ConfigureServices(IServiceCollection services)

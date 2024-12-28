@@ -12,6 +12,7 @@ public class MainViewModel(INavigationService navigationService) :ViewModelBase
         set
         {
             SetProperty(ref _SelectedNavigationItem, value);
+
             switch (value.Tag.ToString())
             {
                 default:

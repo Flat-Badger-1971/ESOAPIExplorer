@@ -14,18 +14,7 @@ public class EsoUIFunction(string name, EsoUIFunctionAccess access = EsoUIFuncti
     public bool HasVariableReturns { get; set; } = false;
     public List<string> Code { get; set; } = [];
 
-    public void AddArgument(string name, string type = "")
-    {
-        Args.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ArgumentTotal));
-    }
-
-    public void AddReturn(string name, string type = "")
-    {
-        Returns.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ReturnsTotal));
-    }
-
-    public void AddCode(string line)
-    {
-        Code.Add(line);
-    }
+    public void AddArgument(string name, string type = "") => Args.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ArgumentTotal));
+    public void AddReturn(string name, string type = "") => Returns.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ReturnsTotal));
+    public void AddCode(string line) => Code.Add(line);
 }

@@ -24,7 +24,7 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
         set => SetProperty(ref _IsSelected, value);
     }
 
-    protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "", Action onChanged = null)
+    protected bool SetProperty<U>(ref U backingStore, U value, [CallerMemberName] string propertyName = "", Action onChanged = null)
     {
         backingStore = value;
         onChanged?.Invoke();

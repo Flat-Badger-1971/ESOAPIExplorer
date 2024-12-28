@@ -1,8 +1,10 @@
 using ESOAPIExplorer.Models;
 using Microsoft.UI.Xaml;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -14,20 +16,20 @@ public class ESODocumentationService : IESODocumentationService
 {
     private string FileName { get; set; }
     private string CurrentLine { get; set; }
-    private List<string> CurrentEnum { get; set; }
+    private ICollection<EsoUIConstantValue> CurrentEnum { get; set; }
     private EsoUIFunction CurrentFunction { get; set; }
     private EsoUIObject CurrentObject { get; set; }
     private EsoUIXMLElement CurrentElement { get; set; }
     private ReaderState State { get; set; }
     private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
     private readonly FileOpenPicker _FilePicker;
-    private readonly ILuaFunctionScanner _LuaFunctionScanner;
+    private readonly ILuaObjectScanner _LuaObjectScanner;
     private readonly IRegexService _RegexService;
 
     public EsoUIDocumentation Documentation { get; set; }
     public EsoUIDocumentation Data { get; set; }
 
-    public ESODocumentationService(ILuaFunctionScanner luaFunctionScanner, IRegexService regexService)
+    public ESODocumentationService(ILuaObjectScanner luaObjectScanner, IRegexService regexService)
     {
         _FilePicker = new FileOpenPicker
         {
@@ -43,7 +45,7 @@ public class ESODocumentationService : IESODocumentationService
         WinRT.Interop.InitializeWithWindow.Initialize(_FilePicker, hwnd);
 
         _FilePicker.FileTypeFilter.Add(".txt");
-        _LuaFunctionScanner = luaFunctionScanner;
+        _LuaObjectScanner = luaObjectScanner;
         _RegexService = regexService;
     }
 
@@ -55,8 +57,50 @@ public class ESODocumentationService : IESODocumentationService
         string directoryPath = Path.GetDirectoryName(path);
 
         EsoUIDocumentation documentation = await ParseAsync(path);
-        _LuaFunctionScanner.FolderPath = directoryPath;
-        // IDictionary<string, LuaFunctionDetails> funcs = _LuaFunctionScanner.ScanFolderForLuaFunctions();
+        _LuaObjectScanner.FolderPath = directoryPath;
+        _LuaObjectScanner.ScanFolderForLuaFunctions();
+        LuaScanResults luaobjects = _LuaObjectScanner.Results;
+
+        Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
+        Parallel.ForEach(luaobjects.Globals, global => documentation.Globals.TryAdd(global.Name, [new EsoUIConstantValue(global.Name, null)]));
+
+        // find constants
+        ConcurrentDictionary<string, EsoUIConstantValue> otherGlobals = [];
+
+        List<string> globalKeys = documentation.Globals
+            .SelectMany(item => item.Value.Select(detail => detail.Name))
+            .Concat(documentation.Globals.SelectMany(item => item.Value.Select(detail => item.Key)))
+            .ToList();
+
+
+
+        Parallel.ForEach(ConstantValues.Values, kvp =>
+        {
+            if (!globalKeys.Contains(kvp.Key))
+            {
+                EsoUIConstantValue global = new EsoUIConstantValue(kvp.Key, kvp.Value);
+                EsoUIGlobalValue value = new EsoUIGlobalValue
+                {
+                    Code = $"{global.Name} = {global.Value}",
+                    DisplayValue = global.Value
+                };
+
+                switch (global.Type)
+                {
+                    case "number":
+                        if (double.TryParse(global.Value, out double doubleValue)) { value.DoubleValue = doubleValue; }
+                        break;
+                    case "integer":
+                        if (int.TryParse(global.Value, out int intValue)) { value.IntValue = intValue; }
+                        break;
+                    default:
+                        value.StringValue = global.Value;
+                        break;
+                }
+
+                documentation.Constants.TryAdd(global.Name, new EsoUIGlobalConstantValue(global.Name, value));
+            }
+        });
 
         return documentation;
     }
@@ -153,9 +197,9 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    private List<string> GetOrCreateGlobal(string name)
+    private ICollection<EsoUIConstantValue> GetOrCreateGlobal(string name)
     {
-        if (!Data.Globals.TryGetValue(name, out List<string> value))
+        if (!Data.Globals.TryGetValue(name, out ICollection<EsoUIConstantValue> value))
         {
             value = [];
             Data.Globals[name] = value;
@@ -176,7 +220,7 @@ public class ESODocumentationService : IESODocumentationService
                 break;
             case true when LineStartsWith("* "):
                 string enumValue = GetFirstMatch(_RegexService.EnumMatcher());
-                CurrentEnum.Add(enumValue);
+                CurrentEnum.Add(new EsoUIConstantValue(enumValue, ConstantValues.GetConstantValue(enumValue)));
                 break;
             default:
                 break;
@@ -209,7 +253,7 @@ public class ESODocumentationService : IESODocumentationService
             return true;
         }
 
-        ReadFunction(Data.Functions);
+        ReadFunction(Data.Functions.ToDictionary());
 
         return false;
     }
@@ -457,33 +501,13 @@ public class ESODocumentationService : IESODocumentationService
 
             if (!string.IsNullOrEmpty(FileName))
             {
-                using (MemoryStream combinedStream = new MemoryStream())
+                using (StreamReader reader = new StreamReader(FileName))
                 {
-                    using (FileStream apifileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read))
+                    string line;
+
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        apifileStream.CopyTo(combinedStream);
-                    }
-
-                    // add the zos helper functions if requested
-                    // TODO: check settings
-                    string embeddedContent = EmbeddedResourceReader.ReadEmbeddedResource("ESOAPIExplorer.Assets.Files.ZosHelperFunctions.txt");
-
-                    using (StreamWriter writer = new StreamWriter(combinedStream, leaveOpen: true))
-                    {
-                        writer.Write(embeddedContent);
-                        writer.Flush();
-                    }
-
-                    combinedStream.Position = 0;
-
-                    using (StreamReader reader = new StreamReader(combinedStream))
-                    {
-                        string line;
-
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            OnReadLine(line);
-                        }
+                        OnReadLine(line);
                     }
                 }
 

@@ -29,10 +29,16 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        
+        <!-- Algorithm -->
         <TextBlock Text="Settings" FontSize="32" Grid.Row="0" Grid.Column="0" Margin="0,10,10,10"/>
-        <TextBlock Text="Filter Algorithm" Grid.Row="1" Grid.Column="0"/>
-        <ComboBox Name="themeMode" Grid.Row="1" Grid.Column="1"
+        <TextBlock Text="Filter Algorithm" Grid.Row="1" Grid.Column="0" Margin="0,0,0,10"/>
+        <ComboBox Name="themeMode" Grid.Row="1" Grid.Column="1" Margin="10,0,0,10"
                   ItemsSource="{Binding SearchAlgorithmItemSource}"
                   SelectedIndex="{Binding Path=DataContext.SelectedAlgorithmIndex, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <!-- Generated constants class -->
+        <TextBlock Text="Generate New ConstantValues class" Grid.Row="2" Grid.Column="0" Margin="0,0,0,10"/>
+        <Button Content="Generate" Grid.Row="2" Grid.Column="1" Command="{Binding Generate}" Margin="10, 0,0,0" Height="40" FontSize="14" Padding="5,0,5,0" />
     </Grid>
 </Page>

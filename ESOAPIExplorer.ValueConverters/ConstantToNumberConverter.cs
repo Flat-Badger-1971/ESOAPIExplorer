@@ -10,10 +10,23 @@ public class ConstantToNumberConverter : IValueConverter
     {
         if (value is string constant)
         {
-            return ConstantValues.GetConstantValue(constant);
+            EsoUIGlobalValue globalvalue = ConstantValues.GetConstantValue(constant);
+
+            if (globalvalue.IntValue.HasValue)
+            {
+                return globalvalue.IntValue.ToString();
+            }
+
+            if (globalvalue.DoubleValue.HasValue)
+            {
+                return globalvalue.DoubleValue.ToString();
+            }
+
+            return globalvalue.StringValue;
+
         }
 
-        return value;
+        return string.Empty;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string culture)

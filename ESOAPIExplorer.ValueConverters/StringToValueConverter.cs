@@ -13,9 +13,9 @@ public class StringToValueConverter : IValueConverter
     {
         string s = value.ToString();
 
-        if (!string.IsNullOrWhiteSpace(s) && Values != null && Values.ContainsKey(s))
+        if (!string.IsNullOrWhiteSpace(s) && Values != null && Values.TryGetValue(s, out object vout))
         {
-            return Values[s];
+            return vout;
         }
 
         return null;

@@ -14,7 +14,7 @@ using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
 
-public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService eSODocumentationService) : ViewModelBase
+public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties
     private APIElement _SelectedElement;
@@ -63,6 +63,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
             SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
             SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
+            SetProperty(ref _SelectedConstantValue, null, nameof(SelectedConstantValue));
         }
     }
 
@@ -77,6 +78,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
             SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
             SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
+            SetProperty(ref _SelectedConstantValue, null, nameof(SelectedConstantValue));
         }
     }
 
@@ -91,6 +93,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
             SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
             SetProperty(ref _SelectedEnumName, value);
+            SetProperty(ref _SelectedConstantValue, null, nameof(SelectedConstantValue));
         }
     }
 
@@ -148,6 +151,23 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
             SetProperty(ref _SelectedGlobalDetails, value);
             SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
+            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            SetProperty(ref _SelectedConstantValue, null, nameof(SelectedConstantValue));
+        }
+    }
+
+    private EsoUIGlobalConstantValue _SelectedConstantValue;
+    public EsoUIGlobalConstantValue SelectedConstantValue
+    {
+        get => _SelectedConstantValue;
+        set
+        {
+            SetProperty(ref _SelectedEventDetails, null, nameof(SelectedEventDetails));
+            SetProperty(ref _SelectedFunctionDetails, null, nameof(SelectedFunctionDetails));
+            SetProperty(ref _SelectedGlobalDetails, null, nameof(SelectedGlobalDetails));
+            SetProperty(ref _SelectedEnumName, null, nameof(SelectedEnumName));
+            SetProperty(ref _SelectedGlobalEnum, null, nameof(SelectedGlobalEnum));
+            SetProperty(ref _SelectedConstantValue, value);
         }
     }
 
@@ -190,29 +210,35 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         await base.InitializeAsync(data);
 
+        // intialise the constants dictionary
+        ConstantValues.InitialiseConstants();
+
         if (_AllItems == null || _AllItems?.Count == 0)
         {
             _SearchAlgorithms = Utility.ListSearchAlgorithms();
-            await eSODocumentationService.InitialiseAsync();
+            await esoDocumentationService.InitialiseAsync();
 
-            ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Events
+            ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Events
                 .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.EVENT, Code = item.Value.Code }));
 
-            ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Functions
-                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = item.Value.Name.StartsWith("zo_", StringComparison.OrdinalIgnoreCase) ? APIElementType.FUNCTION : APIElementType.C_FUNCTION, Code = item.Value.Code })
-                );
+            ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Functions
+                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = item.Value.Name.StartsWith("zo_", StringComparison.OrdinalIgnoreCase) ? APIElementType.FUNCTION : APIElementType.C_FUNCTION, Code = item.Value.Code }));
 
-            ObservableCollection<APIElement> globals = new ObservableCollection<APIElement>(eSODocumentationService.Documentation.Globals
-                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail, Name = detail, ElementType = APIElementType.ENUM_CONSTANT, Parent = item.Key }))
-                .Concat(eSODocumentationService.Documentation.Globals
-                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.ENUM_TYPE }))
+            ObservableCollection<APIElement> globals = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Globals
+                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail.Name, Name = detail.Name, ElementType = APIElementType.ENUM_CONSTANT, Parent = item.Key, Code = [$"* {detail.Name}"] }))
+                .Concat(esoDocumentationService.Documentation.Globals
+                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.ENUM_TYPE, Code = [$"* {item.Key}"] }))
                 .GroupBy(e => e.Id)
                 .Select(e => e.First())));
+
+            ObservableCollection<APIElement> constants = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Constants
+                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.CONSTANT, Code = [$"{item.Value.Name} = {item.Value.Value}"] }));
 
             AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
                 events.Select(e => new DisplayModelBase<APIElement> { Value = e })
                 .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
-                .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c })));
+                .Concat(globals.Select(c => new DisplayModelBase<APIElement> { Value = c }))
+                .Concat(constants.Select(c => new DisplayModelBase<APIElement> { Value = c })));
 
             await FilterItemsAsync();
         }
@@ -255,7 +281,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     case APIElementType.EVENT:
                         dialogService.RunOnMainThread(() =>
                         {
-                            SelectedEventDetails = eSODocumentationService.Data.Events[element.Id];
+                            SelectedEventDetails = esoDocumentationService.Data.Events[element.Id];
                             UpdateObjects(SelectedEventDetails.Args);
                         });
                         break;
@@ -263,7 +289,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     case APIElementType.C_FUNCTION:
                         dialogService.RunOnMainThread(() =>
                         {
-                            SelectedFunctionDetails = eSODocumentationService.Data.Functions[element.Id];
+                            SelectedFunctionDetails = esoDocumentationService.Data.Functions[element.Id];
                             UpdateObjects(SelectedFunctionDetails.Args);
                             UpdateObjects(SelectedFunctionDetails.Returns);
                         });
@@ -284,7 +310,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         {
                             SelectedGlobalEnum = new EsoUIEnum
                             {
-                                ValueNames = eSODocumentationService.Data.Globals[element.Parent],
+                                Values = esoDocumentationService.Data.Globals[element.Parent],
                                 Name = element.Name,
                                 UsedBy = usedBy
                             };
@@ -305,10 +331,16 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         {
                             SelectedGlobalEnum = new EsoUIEnum
                             {
-                                ValueNames = eSODocumentationService.Data.Globals[element.Id],
+                                Values = esoDocumentationService.Data.Globals[element.Id],
                                 Name = element.Name,
                                 UsedBy = eusedBy
                             };
+                        });
+                        break;
+                    case APIElementType.CONSTANT:
+                        dialogService.RunOnMainThread(() =>
+                        {
+                            SelectedConstantValue = esoDocumentationService.Data.Constants[element.Id];
                         });
                         break;
                 }
@@ -367,9 +399,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         Status = new StatusInformation
                         {
                             APIItems = _FilteredItems.Count,
-                            APIVersion = eSODocumentationService.Documentation.ApiVersion,
+                            APIVersion = esoDocumentationService.Documentation.ApiVersion,
                             CFunctionItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_FUNCTION).Count(),
-                            ConstantItems = 0,
+                            ConstantItems = esoDocumentationService.Documentation.Constants.Count,
                             EnumConstants = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_CONSTANT).Count(),
                             EnumTypes = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_TYPE).Count(),
                             EventItems = _FilteredItems.Where(e => e.ElementType == APIElementType.EVENT).Count(),
@@ -391,7 +423,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         ConcurrentBag<string> usedBy = [];
 
-        Parallel.ForEach(eSODocumentationService.Data.Events, item =>
+        Parallel.ForEach(esoDocumentationService.Data.Events, item =>
         {
             Parallel.ForEach(item.Value.Args, arg =>
             {
@@ -402,7 +434,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             });
         });
 
-        Parallel.ForEach(eSODocumentationService.Data.Functions, item =>
+        Parallel.ForEach(esoDocumentationService.Data.Functions, item =>
         {
             Parallel.ForEach(item.Value.Args, arg =>
             {

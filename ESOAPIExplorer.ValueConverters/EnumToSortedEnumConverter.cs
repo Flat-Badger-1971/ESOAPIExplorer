@@ -4,28 +4,42 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ESOAPIExplorer.ValueConverters;
-
-public class EnumToSortedEnumConverter : IValueConverter
+namespace ESOAPIExplorer.ValueConverters
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public class EnumToSortedEnumConverter : IValueConverter
     {
-        if (value is List<string> enumvalues)
+        public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return enumvalues
-                .Select(e => new EsoUIElement
-                {
-                    Name = e,
-                    Value = ConstantValues.GetConstantValue(e),
-                })
-                .OrderBy(e => e.Value);
+            if (value is List<EsoUIConstantValue> enumvalues)
+            {
+                int count = enumvalues.Count;
+                List<EsoUIElement> esoUIElements = new List<EsoUIElement>(count);
+
+                return enumvalues
+                    .Select(e =>
+                    {
+                        if (!int.TryParse(e.Value?.ToString(), out int order))
+                        {
+                            order = 0;
+                        };
+
+                        return new EsoUIElement
+                        {
+                            Name = e.Name,
+                            Value = e.Value?.ToString(),
+                            Type = e.Type,
+                            Order = order
+                        };
+                    })
+                    .OrderBy(e => e.Order);
+            }
+
+            return null;
         }
 
-        return null;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        throw new NotImplementedException();
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
