@@ -253,12 +253,12 @@ public class ESODocumentationService : IESODocumentationService
             return true;
         }
 
-        ReadFunction(Data.Functions.ToDictionary());
+        ReadFunction(Data.Functions);
 
         return false;
     }
 
-    private void ReadFunction(Dictionary<string, EsoUIFunction> functions)
+    private void ReadFunction(ConcurrentDictionary<string, EsoUIFunction> functions)
     {
         switch (true)
         {

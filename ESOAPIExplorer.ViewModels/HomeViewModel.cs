@@ -219,20 +219,60 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             await esoDocumentationService.InitialiseAsync();
 
             ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Events
-                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.EVENT, Code = item.Value.Code }));
+                .Select(item =>
+                    new APIElement
+                    {
+                        Id = item.Key,
+                        Name = item.Value.Name,
+                        ElementType = APIElementType.EVENT,
+                        Code = item.Value.Code
+                    }));
 
             ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Functions
-                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = item.Value.Name.StartsWith("zo_", StringComparison.OrdinalIgnoreCase) ? APIElementType.FUNCTION : APIElementType.C_FUNCTION, Code = item.Value.Code }));
+                .Select(item =>
+                    new APIElement
+                    {
+                        Id = item.Key,
+                        Name = item.Value.Name,
+                        ElementType = item.Value.Name.StartsWith("zo_", StringComparison.OrdinalIgnoreCase) ? APIElementType.FUNCTION : APIElementType.C_FUNCTION,
+                        Code = item.Value.Code
+                    }));
 
             ObservableCollection<APIElement> globals = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Globals
-                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = detail.Name, Name = detail.Name, ElementType = APIElementType.ENUM_CONSTANT, Parent = item.Key, Code = [$"* {detail.Name}"] }))
+                .SelectMany(item =>
+                    item.Value
+                    .Select(detail =>
+                        new APIElement
+                        {
+                            Id = detail.Name,
+                            Name = detail.Name,
+                            ElementType = APIElementType.ENUM_CONSTANT,
+                            Parent = item.Key,
+                            Code = [$"* {detail.Name}"]
+                        }))
                 .Concat(esoDocumentationService.Documentation.Globals
-                .SelectMany(item => item.Value.Select(detail => new APIElement { Id = item.Key, Name = item.Key, ElementType = APIElementType.ENUM_TYPE, Code = [$"* {item.Key}"] }))
+                .SelectMany(item =>
+                    item.Value
+                    .Select(detail =>
+                        new APIElement
+                        {
+                            Id = item.Key,
+                            Name = item.Key,
+                            ElementType = APIElementType.ENUM_TYPE,
+                            Code = [$"* {item.Key}"]
+                        }))
                 .GroupBy(e => e.Id)
                 .Select(e => e.First())));
 
             ObservableCollection<APIElement> constants = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Constants
-                .Select(item => new APIElement { Id = item.Key, Name = item.Value.Name, ElementType = APIElementType.CONSTANT, Code = [$"{item.Value.Name} = {item.Value.Value}"] }));
+                .Select(item =>
+                    new APIElement
+                    {
+                        Id = item.Key,
+                        Name = item.Value.Name,
+                        ElementType = APIElementType.CONSTANT,
+                        Code = [$"{item.Value.Name} = {item.Value.Value}"]
+                    }));
 
             AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
                 events.Select(e => new DisplayModelBase<APIElement> { Value = e })

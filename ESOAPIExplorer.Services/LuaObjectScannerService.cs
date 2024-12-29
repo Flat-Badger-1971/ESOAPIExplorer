@@ -61,43 +61,43 @@ public class LuaObjectScanneService(IRegexService _RegexService) : ILuaObjectSca
                 Results.Functions.Add(func);
             }
 
-            //// globals
-            match = _RegexService.GlobalMatcher().Match(line);
+            // globals
+            //match = _RegexService.GlobalMatcher().Match(line);
 
-            if (match.Success)
-            {
-                string globalName = match.Groups[1].Value;
-                string globalValue = match.Groups[3].Value;
-                string globalType = "unknown";
+            //if (match.Success)
+            //{
+            //    string globalName = match.Groups[1].Value;
+            //    string globalValue = match.Groups[3].Value;
+            //    string globalType = "unknown";
 
-                if (globalValue.Trim() != "{")
-                {
-                    if (double.TryParse(globalValue, out double _))
-                    {
-                        globalType = "number";
-                    }
+            //    if (globalValue.Trim() != "{")
+            //    {
+            //        if (double.TryParse(globalValue, out double _))
+            //        {
+            //            globalType = "number";
+            //        }
 
-                    if (int.TryParse(globalValue, out int _))
-                    {
-                        globalType = "integer";
-                    }
+            //        if (int.TryParse(globalValue, out int _))
+            //        {
+            //            globalType = "integer";
+            //        }
 
-                    if (globalValue.Contains('"'))
-                    {
-                        globalType = "string";
-                        globalValue = globalValue.Replace("\"", "");
-                    }
+            //        if (globalValue.Contains('"'))
+            //        {
+            //            globalType = "string";
+            //            globalValue = globalValue.Replace("\"", "");
+            //        }
 
-                    EsoUIGlobal global = new EsoUIGlobal
-                    {
-                        Name = globalName,
-                        StringValue = globalValue,
-                        Type = globalType
-                    };
+            //        EsoUIGlobal global = new EsoUIGlobal
+            //        {
+            //            Name = globalName,
+            //            StringValue = globalValue,
+            //            Type = globalType
+            //        };
 
-                    Results.Globals.Add(global);
-                }
-            }
+            //        Results.Globals.Add(global);
+            //    }
+            //}
         }
     }
 
