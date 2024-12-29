@@ -4,7 +4,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -16,7 +18,7 @@ public class ESODocumentationService : IESODocumentationService
 {
     private string FileName { get; set; }
     private string CurrentLine { get; set; }
-    private ICollection<EsoUIConstantValue> CurrentEnum { get; set; }
+    private ICollection<EsoUIEnumValue> CurrentEnum { get; set; }
     private EsoUIFunction CurrentFunction { get; set; }
     private EsoUIObject CurrentObject { get; set; }
     private EsoUIXMLElement CurrentElement { get; set; }
@@ -49,7 +51,55 @@ public class ESODocumentationService : IESODocumentationService
         _RegexService = regexService;
     }
 
-    public async Task InitialiseAsync() => Documentation = await GetDocumentationAsync();
+    public async Task InitialiseAsync()
+    {
+        string path = $"{ApplicationData.Current.LocalFolder.Path}\\apiCache.br";
+
+        // do we have cached data
+        try
+        {
+            if (File.Exists(path))
+            {
+                using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    using (MemoryStream data = new MemoryStream())
+                    {
+                        using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
+                        {
+                            decompressor.CopyTo(data);
+                        }
+
+                        byte[] byteData = data.ToArray();
+                        //TODO: check - why do I need to have two refs to the same data ....
+                        Data = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
+                        Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
+                    };
+                };
+            }
+            else
+            {
+                Documentation = await GetDocumentationAsync();
+
+                if (Documentation != null)
+                {
+                    // cache the documentation
+                    byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
+
+                    using (FileStream cacheFile = new FileStream(path, FileMode.Create))
+                    {
+                        using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
+                        {
+                            compressor.Write(data, 0, data.Length);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }
+    }
 
     private async Task<EsoUIDocumentation> GetDocumentationAsync()
     {
@@ -62,23 +112,21 @@ public class ESODocumentationService : IESODocumentationService
         LuaScanResults luaobjects = _LuaObjectScanner.Results;
 
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
-        Parallel.ForEach(luaobjects.Globals, global => documentation.Globals.TryAdd(global.Name, [new EsoUIConstantValue(global.Name, null)]));
+        Parallel.ForEach(luaobjects.Globals, global => documentation.Globals.TryAdd(global.Name, [new EsoUIEnumValue(global.Name, null)]));
 
         // find constants
-        ConcurrentDictionary<string, EsoUIConstantValue> otherGlobals = [];
+        ConcurrentDictionary<string, EsoUIEnumValue> otherGlobals = [];
 
         List<string> globalKeys = documentation.Globals
             .SelectMany(item => item.Value.Select(detail => detail.Name))
             .Concat(documentation.Globals.SelectMany(item => item.Value.Select(detail => item.Key)))
             .ToList();
 
-
-
         Parallel.ForEach(ConstantValues.Values, kvp =>
         {
             if (!globalKeys.Contains(kvp.Key))
             {
-                EsoUIConstantValue global = new EsoUIConstantValue(kvp.Key, kvp.Value);
+                EsoUIEnumValue global = new EsoUIEnumValue(kvp.Key, kvp.Value);
                 EsoUIGlobalValue value = new EsoUIGlobalValue
                 {
                     Code = $"{global.Name} = {global.Value}",
@@ -98,7 +146,7 @@ public class ESODocumentationService : IESODocumentationService
                         break;
                 }
 
-                documentation.Constants.TryAdd(global.Name, new EsoUIGlobalConstantValue(global.Name, value));
+                documentation.Constants.TryAdd(global.Name, new EsoUIConstantValue(global.Name, value));
             }
         });
 
@@ -197,9 +245,9 @@ public class ESODocumentationService : IESODocumentationService
         return false;
     }
 
-    private ICollection<EsoUIConstantValue> GetOrCreateGlobal(string name)
+    private ICollection<EsoUIEnumValue> GetOrCreateGlobal(string name)
     {
-        if (!Data.Globals.TryGetValue(name, out ICollection<EsoUIConstantValue> value))
+        if (!Data.Globals.TryGetValue(name, out ICollection<EsoUIEnumValue> value))
         {
             value = [];
             Data.Globals[name] = value;
@@ -220,7 +268,7 @@ public class ESODocumentationService : IESODocumentationService
                 break;
             case true when LineStartsWith("* "):
                 string enumValue = GetFirstMatch(_RegexService.EnumMatcher());
-                CurrentEnum.Add(new EsoUIConstantValue(enumValue, ConstantValues.GetConstantValue(enumValue)));
+                CurrentEnum.Add(new EsoUIEnumValue(enumValue, ConstantValues.GetConstantValue(enumValue)));
                 break;
             default:
                 break;

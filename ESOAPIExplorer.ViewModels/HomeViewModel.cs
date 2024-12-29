@@ -156,8 +156,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
-    private EsoUIGlobalConstantValue _SelectedConstantValue;
-    public EsoUIGlobalConstantValue SelectedConstantValue
+    private EsoUIConstantValue _SelectedConstantValue;
+    public EsoUIConstantValue SelectedConstantValue
     {
         get => _SelectedConstantValue;
         set
@@ -215,8 +215,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
         if (_AllItems == null || _AllItems?.Count == 0)
         {
-            _SearchAlgorithms = Utility.ListSearchAlgorithms();
             await esoDocumentationService.InitialiseAsync();
+
+            _SearchAlgorithms = Utility.ListSearchAlgorithms();
 
             ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Events
                 .Select(item =>

@@ -1,14 +1,14 @@
 ﻿namespace ESOAPIExplorer.Models;
 
-public class EsoUIEnumValue
+public class EsoUIConstantValue
 {
     public string Name { get; set; }
     public string Value { get; set; }
     public string Type { get; set; }
 
-    public EsoUIEnumValue() { }
+    public EsoUIConstantValue() { }
 
-    public EsoUIEnumValue(string name, EsoUIGlobalValue value)
+    public EsoUIConstantValue(string name, EsoUIGlobalValue value)
     {
         Name = name;
         Value = value?.DisplayValue;

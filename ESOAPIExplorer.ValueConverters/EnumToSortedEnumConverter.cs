@@ -10,7 +10,7 @@ namespace ESOAPIExplorer.ValueConverters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value is List<EsoUIConstantValue> enumvalues)
+            if (value is List<EsoUIEnumValue> enumvalues)
             {
                 int count = enumvalues.Count;
                 List<EsoUIElement> esoUIElements = new List<EsoUIElement>(count);

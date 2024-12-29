@@ -19,9 +19,9 @@ public class SingleValueToListConverter : IValueConverter
             return new List<EsoUIGlobal> { esoglobal };
         }
 
-        if (value is EsoUIGlobalConstantValue esoconstant)
+        if (value is EsoUIConstantValue esoconstant)
         {
-            return new List<EsoUIGlobalConstantValue> { esoconstant };
+            return new List<EsoUIConstantValue> { esoconstant };
         }
 
         return null;

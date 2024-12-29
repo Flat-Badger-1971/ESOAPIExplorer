@@ -4,7 +4,7 @@ namespace ESOAPIExplorer.Models;
 
 public class EsoUIEnum
 {
-    public IEnumerable<EsoUIConstantValue> Values { get; set; }
+    public IEnumerable<EsoUIEnumValue> Values { get; set; }
     public string Name { get; set; }
     public IEnumerable<string> UsedBy { get; set; }
 }
