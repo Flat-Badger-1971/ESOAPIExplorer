@@ -310,7 +310,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         Id = item.Key,
                         Name = item.Value.Name,
                         ElementType = APIElementType.OBJECT_TYPE,
-                        Code = [$"h3. {item.Value.Name}"]
+                        Code = item.Value.Code
                     }
                 ));
 

@@ -343,6 +343,7 @@ public class ESODocumentationService : IESODocumentationService
         if (!Documentation.Objects.TryGetValue(name, out EsoUIObject value))
         {
             value = new EsoUIObject(name);
+            value.AddCode(CurrentLine);
             Documentation.Objects[name] = value;
         }
 
@@ -360,14 +361,17 @@ public class ESODocumentationService : IESODocumentationService
                 CurrentObject = GetOrCreateObject(objectName);
                 break;
             case true when LineStartsWith("* "):
+                CurrentObject.AddCode(CurrentLine);
                 ReadFunction(CurrentObject.Functions);
                 break;
             case true when LineStartsWith("** _Uses variable returns"):
+                CurrentObject.AddCode(CurrentLine);
                 CurrentFunction.HasVariableReturns = true;
                 CurrentFunction.AddCode(CurrentLine);
                 break;
             case true when LineStartsWith("** _Returns:_"):
                 string args = GetFirstMatch(_RegexService.FunctionReturnMatcher());
+                CurrentObject.AddCode(CurrentLine);
                 CurrentFunction.Returns = ParseArgs(args);
                 CurrentFunction.AddCode(CurrentLine);
                 break;

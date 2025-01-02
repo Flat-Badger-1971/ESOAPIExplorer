@@ -302,6 +302,26 @@
                           ItemTemplate="{StaticResource UsedByItemTemplate}"/>
                 </Grid>
             </Grid>
+
+            <!-- object methods -->
+            <Grid Grid.Row="8" Visibility="{Binding SelectedObjectDetails, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="methods" FontWeight="Bold" FontSize="26" Margin="10"/>
+                    <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding SelectedObjectDetails.FunctionList, Converter={StaticResource ListToVisibilityConverter}}"/>
+                    <ListView ItemsSource="{Binding SelectedObjectDetails.FunctionList}" 
+                        Grid.Row="1"
+                        Style="{StaticResource InvisibleListViewStyle}"
+                        ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
+                        Margin="10" BorderThickness="0"
+                        Visibility="{Binding SelectedObjectDetails.FunctionList, Converter={StaticResource EmptyListToVisibilityConverter}}"
+                        ItemTemplate="{StaticResource UsedByItemTemplate}"/>
+                </Grid>
+            </Grid>
+            
         </Grid>
         <!-- StatusBar at the bottom -->
         <c:ESOStatusBar Grid.Row="1" Grid.ColumnSpan="2" DataContext="{Binding Status}" />
