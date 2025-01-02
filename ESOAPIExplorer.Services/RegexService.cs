@@ -49,6 +49,12 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
 
+    [GeneratedRegex(@"h3\. (.+)$")]
+    private static partial Regex _ObjectNameMatcher();
+
+    [GeneratedRegex(@"^function (.+):(.+)\(([.\.]+)\)")]
+    private static partial Regex _ObjectTypeMatcher();
+
     [GeneratedRegex(@"\[""(Constants|SI_String_Constants)""\]\s*=\s*{\s*((?:.*?,\s*)+)\s*}", RegexOptions.Multiline)]
     private static partial Regex _SectionMatcher();
 
@@ -85,6 +91,8 @@ public partial class RegexService : IRegexService
     public Regex FunctionReturnMatcher() => _FunctionReturnMatcher();
     public Regex GlobalMatcher() => _GlobalMatcher();
     public Regex IfKeywordMatcher() => _IfKeywordMatcher();
+    public Regex ObjectNameMatcher() => _ObjectNameMatcher();
+    public Regex ObjectTypeMatcher() => _ObjectTypeMatcher();
     public Regex SectionMatcher() => _SectionMatcher();
     public Regex XMLAttributeMatcher() => _XMLAttributeMatcher();
     public Regex XMLAttributeNameMatcher() => _XMLAttributeNameMatcher();

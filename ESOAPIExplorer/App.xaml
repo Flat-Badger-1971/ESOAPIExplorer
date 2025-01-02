@@ -85,10 +85,12 @@
                     <SolidColorBrush Color="#FF004864" x:Key="EVENT"/>
                     <SolidColorBrush Color="#FF6E7A07" x:Key="ENUM_CONSTANT"/>
                     <SolidColorBrush Color="#FFB86D0B" x:Key="C_FUNCTION"/>
+                    <SolidColorBrush Color="#FF7A4207" x:Key="CONSTANT"/>
                     <SolidColorBrush Color="#FF077A38" x:Key="ENUM_TYPE"/>
                     <SolidColorBrush Color="#FF464646" x:Key="GLOBAL"/>
                     <SolidColorBrush Color="#FFB8500B" x:Key="FUNCTION"/>
-                    <SolidColorBrush Color="#FF3890AB" x:Key="CONSTANT"/>
+                    <SolidColorBrush Color="#FF46077A" x:Key="OBJECT_TYPE"/>
+                    <SolidColorBrush Color="#FF7A0754" x:Key="OBJECT_METHOD"/>
                 </converters:StringToValueConverter.Values>
             </converters:StringToValueConverter>
             <converters:EnumToSortedEnumConverter x:Key="EnumToSortedEnumConverter" />

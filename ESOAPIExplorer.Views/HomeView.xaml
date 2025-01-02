@@ -142,13 +142,15 @@
             <!-- code -->
             <c:ScrollableTextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" Grid.Row="1"/>
 
-            <!-- github -->
+            <!-- github/wiki -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="Search Github"/>
+                <Button Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="search github" Grid.Column="0"/>
+                <Button Command="{Binding SearchWikiCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="show on wiki" Grid.Column="1"/>
             </Grid>
 
             <!-- access -->
@@ -184,12 +186,12 @@
                 </ListView>
 
                 <!-- Constant Value -->
-                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedConstantValue, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-                <ListView ItemsSource="{Binding SelectedConstantValue, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                <ListView ItemsSource="{Binding SelectedConstantDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource GlobalConstantTemplate}" 
-                    Visibility="{Binding SelectedConstantValue, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                     <ListView.Resources>
                         <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                     </ListView.Resources>

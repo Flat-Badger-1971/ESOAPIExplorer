@@ -2,11 +2,13 @@ namespace ESOAPIExplorer.Models;
 
 public enum APIElementType
 {
-    EVENT,
-    FUNCTION,
+    C_FUNCTION,
+    CONSTANT,
     ENUM_CONSTANT,
     ENUM_TYPE,
-    CONSTANT,
-    C_FUNCTION,
-    GLOBAL
+    EVENT,
+    FUNCTION,
+    GLOBAL,
+    OBJECT_METHOD,
+    OBJECT_TYPE
 }

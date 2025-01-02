@@ -1,4 +1,5 @@
 ﻿using ESOAPIExplorer.Models;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,10 +25,12 @@ public class LuaObjectScanneService(IRegexService _RegexService) : ILuaObjectSca
     private void ScanFile(string fileContent)
     {
         string[] lines = fileContent.Split('\n');
+        string lastMatchedObject = null;
+        Dictionary<string, EsoUIObject> objects = [];
 
         for (int i = 0; i < lines.Length; i++)
         {
-            string line = lines[i];
+            string line = lines[i].Replace("\r","");
 
             // functions
             Match match = _RegexService.FunctionMatcher().Match(line);
@@ -61,43 +64,61 @@ public class LuaObjectScanneService(IRegexService _RegexService) : ILuaObjectSca
                 Results.Functions.Add(func);
             }
 
-            // globals
-            //match = _RegexService.GlobalMatcher().Match(line);
+            // objects
+            match = _RegexService.ObjectTypeMatcher().Match(line);
 
-            //if (match.Success)
-            //{
-            //    string globalName = match.Groups[1].Value;
-            //    string globalValue = match.Groups[3].Value;
-            //    string globalType = "unknown";
+            if (match.Success)
+            {
+                string objectName = match.Groups[1].Value;
+                string objectMethod = match.Groups[2].Value;
+                string[] objectParameters = match.Groups[3].Value.Split(",");
+                EsoUIObject obj;
 
-            //    if (globalValue.Trim() != "{")
-            //    {
-            //        if (double.TryParse(globalValue, out double _))
-            //        {
-            //            globalType = "number";
-            //        }
+                if (objects.TryGetValue(objectName, out EsoUIObject value))
+                {
+                    obj = value;
+                }
+                else
+                {
+                    obj = new EsoUIObject(objectName);
+                    objects.Add(objectName, obj);
+                }
 
-            //        if (int.TryParse(globalValue, out int _))
-            //        {
-            //            globalType = "integer";
-            //        }
+                EsoUIFunction func = new EsoUIFunction(objectMethod)
+                {
+                    Code = [$"{objectName}:{objectMethod}"],
+                };
 
-            //        if (globalValue.Contains('"'))
-            //        {
-            //            globalType = "string";
-            //            globalValue = globalValue.Replace("\"", "");
-            //        }
+                foreach (string p in objectParameters)
+                {
+                    func.AddArgument(p);
+                }
 
-            //        EsoUIGlobal global = new EsoUIGlobal
-            //        {
-            //            Name = globalName,
-            //            StringValue = globalValue,
-            //            Type = globalType
-            //        };
+                obj.AddFunction(func);
+                lastMatchedObject = objectName;
+            }
 
-            //        Results.Globals.Add(global);
-            //    }
-            //}
+            if (!string.IsNullOrEmpty(lastMatchedObject))
+            {
+                string regex = $@"^\s+([A-Z_]*)\s=\s{lastMatchedObject}:New\(";
+                match = Regex.Match(line, regex);
+
+                if (match.Success)
+                {
+                    if (objects.TryGetValue(lastMatchedObject, out EsoUIObject esoUIObject))
+                    { 
+                        esoUIObject.AddInstanceName(match.Groups[1].Value);
+                    }
+                }
+            }
+        }
+
+        if (objects.Count > 0)
+        {
+            foreach (KeyValuePair<string, EsoUIObject> obj in objects)
+            {
+                Results.Objects.Add(obj.Value);
+            }
         }
     }
 

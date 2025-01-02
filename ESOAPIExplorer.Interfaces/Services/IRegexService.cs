@@ -19,6 +19,8 @@ namespace ESOAPIExplorer.Services
         public Regex FunctionReturnMatcher();
         public Regex GlobalMatcher();
         public Regex IfKeywordMatcher();
+        public Regex ObjectNameMatcher();
+        public Regex ObjectTypeMatcher();
         public Regex SectionMatcher();
         public Regex XMLAttributeMatcher();
         public Regex XMLAttributeNameMatcher();

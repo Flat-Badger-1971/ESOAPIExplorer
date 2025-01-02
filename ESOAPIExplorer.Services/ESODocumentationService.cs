@@ -21,7 +21,7 @@ public class ESODocumentationService : IESODocumentationService
     private ICollection<EsoUIEnumValue> CurrentEnum { get; set; }
     private EsoUIFunction CurrentFunction { get; set; }
     private EsoUIObject CurrentObject { get; set; }
-    private EsoUIXMLElement CurrentElement { get; set; }
+    // private EsoUIXMLElement CurrentElement { get; set; }
     private ReaderState State { get; set; }
     private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
     private readonly FileOpenPicker _FilePicker;
@@ -29,7 +29,7 @@ public class ESODocumentationService : IESODocumentationService
     private readonly IRegexService _RegexService;
 
     public EsoUIDocumentation Documentation { get; set; }
-    public EsoUIDocumentation Data { get; set; }
+    // public EsoUIDocumentation Data { get; set; }
 
     public ESODocumentationService(ILuaObjectScanner luaObjectScanner, IRegexService regexService)
     {
@@ -55,45 +55,43 @@ public class ESODocumentationService : IESODocumentationService
     {
         string path = $"{ApplicationData.Current.LocalFolder.Path}\\apiCache.br";
 
-        // do we have cached data
         try
         {
-            if (File.Exists(path))
-            {
-                using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    using (MemoryStream data = new MemoryStream())
-                    {
-                        using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
-                        {
-                            decompressor.CopyTo(data);
-                        }
+            // do we have cached data
+            //if (File.Exists(path))
+            //{
+            //    using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
+            //    {
+            //        using (MemoryStream data = new MemoryStream())
+            //        {
+            //            using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
+            //            {
+            //                decompressor.CopyTo(data);
+            //            }
 
-                        byte[] byteData = data.ToArray();
-                        //TODO: check - why do I need to have two refs to the same data ....
-                        Data = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
-                        Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
-                    };
-                };
-            }
-            else
-            {
-                Documentation = await GetDocumentationAsync();
+            //            byte[] byteData = data.ToArray();
+            //            Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
+            //        };
+            //    };
+            //}
+            //else
+            //{
+            Documentation = await GetDocumentationAsync();
 
-                if (Documentation != null)
-                {
-                    // cache the documentation
-                    byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
+            //    if (Documentation != null)
+            //    {
+            //        // cache the documentation
+            //        byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
 
-                    using (FileStream cacheFile = new FileStream(path, FileMode.Create))
-                    {
-                        using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
-                        {
-                            compressor.Write(data, 0, data.Length);
-                        }
-                    }
-                }
-            }
+            //        using (FileStream cacheFile = new FileStream(path, FileMode.Create))
+            //        {
+            //            using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
+            //            {
+            //                compressor.Write(data, 0, data.Length);
+            //            }
+            //        }
+            //    }
+            //}
         }
         catch (Exception e)
         {
@@ -113,6 +111,7 @@ public class ESODocumentationService : IESODocumentationService
 
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
         Parallel.ForEach(luaobjects.Globals, global => documentation.Globals.TryAdd(global.Name, [new EsoUIEnumValue(global.Name, null)]));
+        Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
 
         // find constants
         ConcurrentDictionary<string, EsoUIEnumValue> otherGlobals = [];
@@ -224,10 +223,10 @@ public class ESODocumentationService : IESODocumentationService
                 return ReaderState.READ_OBJECT_API;
             case true when LineStartsWith("h2. Events"):
                 return ReaderState.READ_EVENTS;
-            case true when LineStartsWith("h2. UI XML Layout"):
-                return ReaderState.READ_XML_ATTRIBUTES;
-            case true when (State == ReaderState.READ_XML_ATTRIBUTES):
-                return ReaderState.READ_XML_LAYOUT;
+            //case true when LineStartsWith("h2. UI XML Layout"):
+            //    return ReaderState.READ_XML_ATTRIBUTES;
+            //case true when (State == ReaderState.READ_XML_ATTRIBUTES):
+            //    return ReaderState.READ_XML_LAYOUT;
             default:
                 return ReaderState.UNDETERMINED;
         }
@@ -237,7 +236,7 @@ public class ESODocumentationService : IESODocumentationService
     {
         if (LineStartsWith("h1. "))
         {
-            Data.ApiVersion = int.Parse(GetFirstMatch(_RegexService.ApiVersionMatcher()));
+            Documentation.ApiVersion = int.Parse(GetFirstMatch(_RegexService.ApiVersionMatcher()));
 
             return true;
         }
@@ -247,10 +246,10 @@ public class ESODocumentationService : IESODocumentationService
 
     private ICollection<EsoUIEnumValue> GetOrCreateGlobal(string name)
     {
-        if (!Data.Globals.TryGetValue(name, out ICollection<EsoUIEnumValue> value))
+        if (!Documentation.Globals.TryGetValue(name, out ICollection<EsoUIEnumValue> value))
         {
             value = [];
-            Data.Globals[name] = value;
+            Documentation.Globals[name] = value;
         }
 
         return value;
@@ -301,7 +300,7 @@ public class ESODocumentationService : IESODocumentationService
             return true;
         }
 
-        ReadFunction(Data.Functions);
+        ReadFunction(Documentation.Functions);
 
         return false;
     }
@@ -341,10 +340,10 @@ public class ESODocumentationService : IESODocumentationService
 
     private EsoUIObject GetOrCreateObject(string name)
     {
-        if (!Data.Objects.TryGetValue(name, out EsoUIObject value))
+        if (!Documentation.Objects.TryGetValue(name, out EsoUIObject value))
         {
             value = new EsoUIObject(name);
-            Data.Objects[name] = value;
+            Documentation.Objects[name] = value;
         }
 
         return value;
@@ -352,9 +351,28 @@ public class ESODocumentationService : IESODocumentationService
 
     private bool ReadObjectApi()
     {
-        if (LineStartsWith("h2. "))
+        switch (true)
         {
-            return true;
+            case true when LineStartsWith("h2. "):
+                return true;
+            case true when LineStartsWith("h3. "):
+                string objectName = GetFirstMatch(_RegexService.ObjectNameMatcher());
+                CurrentObject = GetOrCreateObject(objectName);
+                break;
+            case true when LineStartsWith("* "):
+                ReadFunction(CurrentObject.Functions);
+                break;
+            case true when LineStartsWith("** _Uses variable returns"):
+                CurrentFunction.HasVariableReturns = true;
+                CurrentFunction.AddCode(CurrentLine);
+                break;
+            case true when LineStartsWith("** _Returns:_"):
+                string args = GetFirstMatch(_RegexService.FunctionReturnMatcher());
+                CurrentFunction.Returns = ParseArgs(args);
+                CurrentFunction.AddCode(CurrentLine);
+                break;
+            default:
+                break;
         }
 
         return false;
@@ -383,8 +401,8 @@ public class ESODocumentationService : IESODocumentationService
                     args = ParseArgs("*integer* _eventId_," + argsString);
                 }
 
-                Data.Events[name] = new EsoUIEvent(name, args);
-                Data.Events[name].AddCode(CurrentLine);
+                Documentation.Events[name] = new EsoUIEvent(name, args);
+                Documentation.Events[name].AddCode(CurrentLine);
 
                 return false;
             default:
@@ -392,90 +410,90 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    private bool ReadXmlAttributes()
-    {
-        if (LineStartsWith("h4. Attributes"))
-        {
-            // ignore the header
-            return false;
-        }
-        else if (!LineStartsWith("* "))
-        {
-            // section ended
-            return true;
-        }
+    //private bool ReadXmlAttributes()
+    //{
+    //    if (LineStartsWith("h4. Attributes"))
+    //    {
+    //        // ignore the header
+    //        return false;
+    //    }
+    //    else if (!LineStartsWith("* "))
+    //    {
+    //        // section ended
+    //        return true;
+    //    }
 
-        List<string> matches = GetMatches(_RegexService.XMLAttributeMatcher());
-        string name = matches[0];
-        string type = matches[1];
-        Data.XmlAttributes[name] = new EsoUIArgument(name, new EsoUIType(type), 1);
+    //    List<string> matches = GetMatches(_RegexService.XMLAttributeMatcher());
+    //    string name = matches[0];
+    //    string type = matches[1];
+    //    Documentation.XmlAttributes[name] = new EsoUIArgument(name, new EsoUIType(type), 1);
 
-        return false;
-    }
+    //    return false;
+    //}
 
     private EsoUIXMLElement GetOrCreateElement(string name)
     {
-        if (!Data.XmlLayout.TryGetValue(name, out EsoUIXMLElement value))
+        if (!Documentation.XmlLayout.TryGetValue(name, out EsoUIXMLElement value))
         {
             value = new EsoUIXMLElement(name);
-            Data.XmlLayout[name] = value;
+            Documentation.XmlLayout[name] = value;
         }
 
         return value;
     }
 
-    private bool ReadXmlLayout()
-    {
-        switch (true)
-        {
-            case true when LineStartsWith("h5. sentinel_element"):
-                // section ended
-                return true;
-            case true when LineStartsWith("h5. "):
-                string elementName = GetFirstMatch(_RegexService.XMLElementNameMatcher());
-                CurrentElement = GetOrCreateElement(elementName);
-                break;
-            case true when LineStartsWith("* _attr"):
-                string attribute = GetFirstMatch(_RegexService.XMLAttributeTypeMatcher());
-                Match match = _RegexService.XMLAttributeNameMatcher().Match(attribute);
-                string type = match.Groups[1].Value;
-                string name = match.Groups[2].Value;
-                CurrentElement.Attributes.Add(new EsoUIArgument(name, new EsoUIType(type), 1));
-                break;
-            case true when LineStartsWith("* ScriptArguments"):
-                CurrentElement.Documentation = GetFirstMatch(_RegexService.XMLScriptArgumentMatcher());
-                break;
-            case true when LineStartsWith("* ["):
-                {
-                    List<string> matches = GetMatches(_RegexService.XMLLineTypeMatcher());
-                    string lineType = matches[0];
-                    string lname = matches[1];
-                    string ltype = matches[2];
-                    switch (lineType)
-                    {
-                        case "Child":
-                            if (ltype == "Attributes")
-                            {
-                                CurrentElement.Attributes.Add(Data.XmlAttributes[lname]);
-                            }
-                            else
-                            {
-                                CurrentElement.Children.Add(new EsoUIType(lname, ltype));
-                            }
-                            break;
-                        case "Inherits":
-                            CurrentElement.Parent = new EsoUIType(ltype);
-                            break;
-                        default:
-                            Console.WriteLine("Unhandled prefix: " + lineType + " - " + CurrentLine);
-                            break;
-                    }
-                    break;
-                }
-        }
+    //private bool ReadXmlLayout()
+    //{
+    //    switch (true)
+    //    {
+    //        case true when LineStartsWith("h5. sentinel_element"):
+    //            // section ended
+    //            return true;
+    //        case true when LineStartsWith("h5. "):
+    //            string elementName = GetFirstMatch(_RegexService.XMLElementNameMatcher());
+    //            CurrentElement = GetOrCreateElement(elementName);
+    //            break;
+    //        case true when LineStartsWith("* _attr"):
+    //            string attribute = GetFirstMatch(_RegexService.XMLAttributeTypeMatcher());
+    //            Match match = _RegexService.XMLAttributeNameMatcher().Match(attribute);
+    //            string type = match.Groups[1].Value;
+    //            string name = match.Groups[2].Value;
+    //            CurrentElement.Attributes.Add(new EsoUIArgument(name, new EsoUIType(type), 1));
+    //            break;
+    //        case true when LineStartsWith("* ScriptArguments"):
+    //            CurrentElement.Documentation = GetFirstMatch(_RegexService.XMLScriptArgumentMatcher());
+    //            break;
+    //        case true when LineStartsWith("* ["):
+    //            {
+    //                List<string> matches = GetMatches(_RegexService.XMLLineTypeMatcher());
+    //                string lineType = matches[0];
+    //                string lname = matches[1];
+    //                string ltype = matches[2];
+    //                switch (lineType)
+    //                {
+    //                    case "Child":
+    //                        if (ltype == "Attributes")
+    //                        {
+    //                            CurrentElement.Attributes.Add(Documentation.XmlAttributes[lname]);
+    //                        }
+    //                        else
+    //                        {
+    //                            CurrentElement.Children.Add(new EsoUIType(lname, ltype));
+    //                        }
+    //                        break;
+    //                    case "Inherits":
+    //                        CurrentElement.Parent = new EsoUIType(ltype);
+    //                        break;
+    //                    default:
+    //                        Console.WriteLine("Unhandled prefix: " + lineType + " - " + CurrentLine);
+    //                        break;
+    //                }
+    //                break;
+    //            }
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     private void InjectCustomData()
     {
@@ -532,18 +550,18 @@ public class ESODocumentationService : IESODocumentationService
         EsoUIFunction getAddOnManager = new EsoUIFunction("GetAddOnManager");
         getAddOnManager.AddReturn("addOnManager", "AddOnManager");
 
-        Data.Objects["EventManager"] = eventManager;
-        Data.Functions["GetWindowManager"] = getWindowManager;
-        Data.Functions["GetAnimationManager"] = getAnimationManager;
-        Data.Functions["GetEventManager"] = getEventManager;
-        Data.Functions["GetAddOnManager"] = getAddOnManager;
+        Documentation.Objects["EventManager"] = eventManager;
+        Documentation.Functions["GetWindowManager"] = getWindowManager;
+        Documentation.Functions["GetAnimationManager"] = getAnimationManager;
+        Documentation.Functions["GetEventManager"] = getEventManager;
+        Documentation.Functions["GetAddOnManager"] = getAddOnManager;
     }
 
     private Task<EsoUIDocumentation> ParseFileAsync()
     {
         return Task.Run(() =>
         {
-            Data = new EsoUIDocumentation();
+            Documentation = new EsoUIDocumentation();
             InjectCustomData();
             State = ReaderState.UNDETERMINED;
 
@@ -559,7 +577,7 @@ public class ESODocumentationService : IESODocumentationService
                     }
                 }
 
-                return Data;
+                return Documentation;
             }
             else
             {
@@ -598,12 +616,12 @@ public class ESODocumentationService : IESODocumentationService
             case ReaderState.READ_EVENTS:
                 finished = ReadEvents();
                 break;
-            case ReaderState.READ_XML_ATTRIBUTES:
-                finished = ReadXmlAttributes();
-                break;
-            case ReaderState.READ_XML_LAYOUT:
-                finished = ReadXmlLayout();
-                break;
+            //case ReaderState.READ_XML_ATTRIBUTES:
+            //    finished = ReadXmlAttributes();
+            //    break;
+            //case ReaderState.READ_XML_LAYOUT:
+            //    finished = ReadXmlLayout();
+            //    break;
             case ReaderState.UNDETERMINED:
             default:
                 State = FindNextState();
@@ -616,7 +634,7 @@ public class ESODocumentationService : IESODocumentationService
             CurrentEnum = null;
             CurrentFunction = null;
             CurrentObject = null;
-            CurrentElement = null;
+            // CurrentElement = null;
         }
     }
 }

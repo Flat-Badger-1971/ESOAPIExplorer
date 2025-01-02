@@ -28,28 +28,28 @@ public static class CodeGenerator
         {
             string code = $" Code = \"{kvp.Key} = ";
 
-            sb.Append($"        _Values[\"{kvp.Key}\"] = new EsoUIGlobalValue ");
+            sb.Append($"        _Values.TryAdd(\"{kvp.Key}\", new EsoUIGlobalValue ");
             sb.Append("{ Name = \"");
             sb.Append($"{kvp.Key}\", ");
             
             if (kvp.Value.IntValue.HasValue)
             {
-                sb.Append($" IntValue = {kvp.Value.IntValue},");
+                sb.Append($"IntValue = {kvp.Value.IntValue},");
                 code = $"{code}{kvp.Value.IntValue}";
             }
             else if (kvp.Value.DoubleValue.HasValue)
             {
-                sb.Append($" DoubleValue = {kvp.Value.DoubleValue},");
+                sb.Append($"DoubleValue = {kvp.Value.DoubleValue},");
                 code = $"{code}{kvp.Value.DoubleValue}";
             }
             else if (!string.IsNullOrEmpty(kvp.Value.StringValue))
             {
-                sb.Append($" StringValue = \"{kvp.Value.StringValue}\",");
+                sb.Append($"StringValue = \"{kvp.Value.StringValue}\",");
                 code = $"{code}\\\"{kvp.Value.StringValue}\\\"";
             }
 
             sb.Append($" {code}\"");
-            sb.AppendLine("};");
+            sb.AppendLine("});");
         }
 
         sb.AppendLine("    }");

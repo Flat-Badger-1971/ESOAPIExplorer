@@ -13,40 +13,48 @@
     <Grid Grid.Row="1" Grid.ColumnSpan="2" Background="Black" Height="30">
         <StackPanel Orientation="Horizontal">
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="API Version: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding APIVersion}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="API Version: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding APIVersion}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Total Items: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding APIItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Total Items: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding APIItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="C Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding CFunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="C Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding CFunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding FunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Functions: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding FunctionItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Enum Types: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding EnumTypes}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Enum Types: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding EnumTypes}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Enum Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding EnumConstants}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Enum Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding EnumConstants}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Events: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding EventItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Events: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding EventItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding ConstantItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-            <Run Text="Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-            <Run Text="{Binding GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Objects: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding ObjectItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+            </TextBlock>
+            <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                <Run Text="Methods: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding MethodItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+            </TextBlock>
+            <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                <Run Text="Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding ConstantItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
         </StackPanel>
     </Grid>
