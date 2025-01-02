@@ -316,6 +316,7 @@
                         Grid.Row="1"
                         Style="{StaticResource InvisibleListViewStyle}"
                         ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
+                        SelectedItem="{Binding SelectedUsedByItem, Mode=TwoWay}"
                         Margin="10" BorderThickness="0"
                         Visibility="{Binding SelectedObjectDetails.FunctionList, Converter={StaticResource EmptyListToVisibilityConverter}}"
                         ItemTemplate="{StaticResource UsedByItemTemplate}"/>

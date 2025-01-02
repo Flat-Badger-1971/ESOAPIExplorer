@@ -15,6 +15,7 @@ public class EsoUIObject(string name)
     public IEnumerable<string> FunctionList {
         get
         {
+#pragma warning disable IDE0305
             _FunctionList ??= Functions
                 .Select(f => f.Value.Name)
                 .Order()
@@ -36,7 +37,7 @@ public class EsoUIObject(string name)
 
     public void AddCode(string code)
     {
-        if (Functions.Count > 0 && code.StartsWith("* "))
+        if (!Functions.IsEmpty && code.StartsWith("* "))
         {
             Code.Add(string.Empty);
         }

@@ -13,7 +13,7 @@ using System.Windows.Input;
 using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
-// TODO: view elements for objects and methods
+// TODO: view elements for objects methods
 // TODO: add english lookup value for SI_ globals
 // TODO: diagnose enum list delay
 // TODO: IDE formatters
@@ -175,7 +175,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
             if (value != null)
             {
-                SelectElement(value);
+                string selected = value;
+
+                if (_SelectedElement.ElementType == APIElementType.OBJECT_TYPE)
+                {
+                    selected = $"{SelectedObjectDetails.Name}:{value}";
+                }
+
+                SelectElement(selected);
             }
         }
     }
