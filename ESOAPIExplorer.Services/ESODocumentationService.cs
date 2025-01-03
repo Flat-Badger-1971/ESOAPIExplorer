@@ -4,9 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -99,10 +97,90 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
+    private ConcurrentDictionary<string, string> GetEsoStrings(string path)
+    {
+        ConcurrentDictionary<string, string> lookup = [];
+        BlockingCollection<string> lines = [];
+
+        Task readLines = Task.Run(() =>
+        {
+            using (StreamReader reader = new StreamReader(path))
+            {
+                string line;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    lines.Add(line);
+                }
+            }
+
+            lines.CompleteAdding();
+        });
+
+
+        Task processLines = Task.Run(() =>
+        {
+            Parallel.ForEach(lines.GetConsumingEnumerable(), line =>
+            {
+                Match matches = _RegexService.EsoStringMatcher().Match(line);
+
+                if (matches.Success)
+                {
+                    lookup.TryAdd(matches.Groups[2].Value, matches.Groups[1].Value);
+                }
+            });
+        });
+
+        Task.WaitAll(readLines, processLines);
+
+        return lookup;
+    }
+
+    private ConcurrentDictionary<string, string> GetLocaleStrings(string path)
+    {
+        BlockingCollection<string> lines = [];
+        ConcurrentDictionary<string, string> lookup = [];
+
+        Task readLines = Task.Run(() =>
+        {
+            using (StreamReader reader = new StreamReader(path))
+            {
+                string line;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    lines.Add(line);
+                }
+            }
+
+            lines.CompleteAdding();
+        });
+
+
+        Task processLines = Task.Run(() =>
+        {
+            Parallel.ForEach(lines.GetConsumingEnumerable(), line =>
+            {
+                Match matches = _RegexService.LocaleStringMatcher().Match(line);
+
+                if (matches.Success)
+                {
+                    lookup.TryAdd(matches.Groups[1].Value, matches.Groups[2].Value);
+                }
+            });
+        });
+
+        Task.WaitAll(readLines, processLines);
+
+        return lookup;
+    }
+
     private async Task<EsoUIDocumentation> GetDocumentationAsync()
     {
         string path = await GetPathAsync();
         string directoryPath = Path.GetDirectoryName(path);
+        string ingamePath = $"{directoryPath}\\esoui\\ingamelocalization\\LocalizeGeneratedStrings.lua";
+        string localePath = $"{directoryPath}\\esoui\\lang\\en_client.lua";
 
         EsoUIDocumentation documentation = await ParseAsync(path);
         _LuaObjectScanner.FolderPath = directoryPath;
@@ -112,6 +190,18 @@ public class ESODocumentationService : IESODocumentationService
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
         Parallel.ForEach(luaobjects.Globals, global => documentation.Globals.TryAdd(global.Name, [new EsoUIEnumValue(global.Name, null)]));
         Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
+
+        // lookups
+        ConcurrentDictionary<string, string> esoStrings = GetEsoStrings(ingamePath);
+        ConcurrentDictionary<string, string> localeStrings = GetLocaleStrings(localePath);
+
+        documentation.SI_Lookup = esoStrings
+            .Concat(localeStrings)
+            .GroupBy(kvp  => kvp.Key)
+            .ToDictionary(global => global.Key, global => global.First().Value);
+
+        esoStrings.Clear();
+        localeStrings.Clear();
 
         // find constants
         ConcurrentDictionary<string, EsoUIEnumValue> otherGlobals = [];
@@ -141,6 +231,7 @@ public class ESODocumentationService : IESODocumentationService
                         if (int.TryParse(global.Value, out int intValue)) { value.IntValue = intValue; }
                         break;
                     default:
+
                         value.StringValue = global.Value;
                         break;
                 }
@@ -342,7 +433,7 @@ public class ESODocumentationService : IESODocumentationService
     {
         if (!Documentation.Objects.TryGetValue(name, out EsoUIObject value))
         {
-            value = new EsoUIObject(name);
+            value = new EsoUIObject(name, true);
             value.AddCode(CurrentLine);
             Documentation.Objects[name] = value;
         }
@@ -363,6 +454,7 @@ public class ESODocumentationService : IESODocumentationService
             case true when LineStartsWith("* "):
                 CurrentObject.AddCode(CurrentLine);
                 ReadFunction(CurrentObject.Functions);
+                CurrentFunction.Parent = CurrentObject.Name;
                 break;
             case true when LineStartsWith("** _Uses variable returns"):
                 CurrentObject.AddCode(CurrentLine);
@@ -566,7 +658,7 @@ public class ESODocumentationService : IESODocumentationService
         return Task.Run(() =>
         {
             Documentation = new EsoUIDocumentation();
-            InjectCustomData();
+            // 5555555555555555555555555555555555555555InjectCustomData();
             State = ReaderState.UNDETERMINED;
 
             if (!string.IsNullOrEmpty(FileName))

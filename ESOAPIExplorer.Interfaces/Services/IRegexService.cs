@@ -11,6 +11,7 @@ namespace ESOAPIExplorer.Services
         public Regex EndKeywordMatcher();
         public Regex EnumMatcher();
         public Regex EnumNameMatcher();
+        public Regex EsoStringMatcher();
         public Regex EventMatcher();
         public Regex FunctionAccessMatcher();
         public Regex FunctionKeywordMatcher();
@@ -19,6 +20,7 @@ namespace ESOAPIExplorer.Services
         public Regex FunctionReturnMatcher();
         public Regex GlobalMatcher();
         public Regex IfKeywordMatcher();
+        public Regex LocaleStringMatcher();
         public Regex ObjectNameMatcher();
         public Regex ObjectTypeMatcher();
         public Regex SectionMatcher();

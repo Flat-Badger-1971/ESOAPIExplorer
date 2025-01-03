@@ -25,6 +25,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"h5\. (.+)$")]
     private static partial Regex _EnumNameMatcher();
 
+    [GeneratedRegex(@"^\s+\""(.+)\"",\s\-\-\s(.+)$")]
+    private static partial Regex _EsoStringMatcher();
+
     [GeneratedRegex(@"^\*\ ([^\s]+)(\s\((.+)\))?")]
     private static partial Regex _EventMatcher();
 
@@ -48,6 +51,10 @@ public partial class RegexService : IRegexService
 
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
+
+    // [GeneratedRegex(@"^SafeAddString\((.+?),\s""(.+)""")]
+    [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]
+    private static partial Regex _LocaleStringMatcher();
 
     [GeneratedRegex(@"h3\. (.+)$")]
     private static partial Regex _ObjectNameMatcher();
@@ -83,6 +90,7 @@ public partial class RegexService : IRegexService
     public Regex EndKeywordMatcher() => _EndKeywordMatcher();
     public Regex EnumMatcher() => _EnumMatcher();
     public Regex EnumNameMatcher() => _EnumNameMatcher();
+    public Regex EsoStringMatcher() => _EsoStringMatcher();
     public Regex EventMatcher() => _EventMatcher();
     public Regex FunctionAccessMatcher() => _FunctionAccessMatcher();
     public Regex FunctionKeywordMatcher() => _FunctionKeywordMatcher();
@@ -91,6 +99,7 @@ public partial class RegexService : IRegexService
     public Regex FunctionReturnMatcher() => _FunctionReturnMatcher();
     public Regex GlobalMatcher() => _GlobalMatcher();
     public Regex IfKeywordMatcher() => _IfKeywordMatcher();
+    public Regex LocaleStringMatcher() => _LocaleStringMatcher();
     public Regex ObjectNameMatcher() => _ObjectNameMatcher();
     public Regex ObjectTypeMatcher() => _ObjectTypeMatcher();
     public Regex SectionMatcher() => _SectionMatcher();

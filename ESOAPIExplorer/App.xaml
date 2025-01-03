@@ -85,9 +85,12 @@
                     <SolidColorBrush Color="#FF004864" x:Key="EVENT"/>
                     <SolidColorBrush Color="#FF6E7A07" x:Key="ENUM_CONSTANT"/>
                     <SolidColorBrush Color="#FFB86D0B" x:Key="C_FUNCTION"/>
+                    <SolidColorBrush Color="#FFCA6DAB" x:Key="C_OBJECT_METHOD"/>
+                    <SolidColorBrush Color="#FFE533FF" x:Key="C_OBJECT_TYPE"/>
                     <SolidColorBrush Color="#FF7A4207" x:Key="CONSTANT"/>
                     <SolidColorBrush Color="#FF077A38" x:Key="ENUM_TYPE"/>
                     <SolidColorBrush Color="#FF464646" x:Key="GLOBAL"/>
+                    <SolidColorBrush Color="#FF999999" x:Key="SI_GLOBAL"/>
                     <SolidColorBrush Color="#FFB8500B" x:Key="FUNCTION"/>
                     <SolidColorBrush Color="#FF46077A" x:Key="OBJECT_TYPE"/>
                     <SolidColorBrush Color="#FF7A0754" x:Key="OBJECT_METHOD"/>
@@ -180,6 +183,22 @@
                         </Viewbox>
                         <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="1"/>
                         <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2"/>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="SIGlobalConstantTemplate">
+                <Grid Height="20" Background="{ThemeResource SystemListMediumColor}">
+                    <Grid Margin="10,0,10,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" />
+                        </Viewbox>
+                        <TextBlock Text="string"  Margin="0" Grid.Column="1"/>
+                        <TextBlock Text="{Binding StringValue}"  Margin="0" Grid.Column="2"/>
                     </Grid>
                 </Grid>
             </DataTemplate>

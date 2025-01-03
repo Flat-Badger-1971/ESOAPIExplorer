@@ -45,11 +45,23 @@
                 <Run Text="{Binding GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                <Run Text="SI Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding SIGlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+            </TextBlock>
+            <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
                 <Run Text="Objects: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
                 <Run Text="{Binding ObjectItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                <Run Text="Methods: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="Object Methods: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding MethodItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+            </TextBlock>
+            <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                <Run Text="C Objects: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding ObjectItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+            </TextBlock>
+            <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
+                <Run Text="C Object Methods: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
                 <Run Text="{Binding MethodItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">

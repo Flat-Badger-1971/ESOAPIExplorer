@@ -13,4 +13,5 @@ public class EsoUIDocumentation
     public ConcurrentDictionary<string, EsoUIEvent> Events { get; set; } = [];
     public ConcurrentDictionary<string, EsoUIArgument> XmlAttributes { get; set; } = [];
     public ConcurrentDictionary<string, EsoUIXMLElement> XmlLayout { get; set; } = [];
+    public Dictionary<string, string> SI_Lookup { get; set; } = [];
 }

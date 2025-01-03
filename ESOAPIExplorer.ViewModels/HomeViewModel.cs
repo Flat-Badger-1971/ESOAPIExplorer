@@ -13,12 +13,11 @@ using System.Windows.Input;
 using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
-// TODO: view elements for objects methods
-// TODO: add english lookup value for SI_ globals
 // TODO: diagnose enum list delay
 // TODO: IDE formatters
 // TODO: remaining settings and settings style
 // TODO: fix scrollable text block padding
+// TODO: change icon to Hermaeus Mora
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     // SelectedElement
@@ -177,7 +176,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             {
                 string selected = value;
 
-                if (_SelectedElement.ElementType == APIElementType.OBJECT_TYPE)
+                if (_SelectedElement.ElementType == APIElementType.OBJECT_TYPE || _SelectedElement.ElementType == APIElementType.C_OBJECT_TYPE)
                 {
                     selected = $"{SelectedObjectDetails.Name}:{value}";
                 }
@@ -293,7 +292,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     {
                         Id = item.Key,
                         Name = item.Value.Name,
-                        ElementType = item.Value.Name.StartsWith("SI_") ? APIElementType.GLOBAL : APIElementType.CONSTANT,
+                        ElementType = item.Value.Name.StartsWith("SI_") ? APIElementType.SI_GLOBAL : APIElementType.CONSTANT,
                         Code = [$"{item.Value.Name} = {item.Value.Value}"]
                     })
                 .Concat(esoDocumentationService.Documentation.Globals
@@ -316,7 +315,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     {
                         Id = item.Key,
                         Name = item.Value.Name,
-                        ElementType = APIElementType.OBJECT_TYPE,
+                        ElementType = item.Value.FromAPI ? APIElementType.C_OBJECT_TYPE : APIElementType.OBJECT_TYPE,
                         Code = item.Value.Code
                     }
                 ));
@@ -331,8 +330,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     {
                         Id = func.Key,
                         Name = $"{item.Key}:{func.Value.Name}",
-                        ElementType = APIElementType.OBJECT_METHOD,
-                        Code = func.Value.Code
+                        ElementType = item.Value.FromAPI ? APIElementType.C_OBJECT_METHOD : APIElementType.OBJECT_METHOD,
+                        Code = func.Value.Code,
+                        Parent = item.Value.Name
                     }
                 )));
 
@@ -378,7 +378,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     private void UpdateSelectedElementDetails()
     {
-
         if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
         {
             _SelectedElementTokenSource.Cancel();
@@ -390,13 +389,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             APIElement element = _SelectedElement;
             List<Action> actions = [];
+            EsoUIDocumentation doc = esoDocumentationService.Documentation;
 
             if (element != null)
             {
                 switch (element.ElementType)
                 {
                     case APIElementType.EVENT:
-                        if (esoDocumentationService.Documentation.Events.TryGetValue(element.Id, out EsoUIEvent eventInfo))
+                        if (doc.Events.TryGetValue(element.Id, out EsoUIEvent eventInfo))
                         {
                             actions.Add(() =>
                             {
@@ -407,7 +407,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         break;
                     case APIElementType.FUNCTION:
                     case APIElementType.C_FUNCTION:
-                        if (esoDocumentationService.Documentation.Functions.TryGetValue(element.Id, out EsoUIFunction func))
+                        if (doc.Functions.TryGetValue(element.Id, out EsoUIFunction func))
                         {
                             actions.Add(() =>
                             {
@@ -422,7 +422,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
                         IEnumerable<string> usedBy = GetUsedByParallel(element.Parent);
 
-                        if (esoDocumentationService.Documentation.Globals.TryGetValue(element.Parent, out ICollection<EsoUIEnumValue> enumValues))
+                        if (doc.Globals.TryGetValue(element.Parent, out ICollection<EsoUIEnumValue> enumValues))
                         {
                             actions.Add(() => SelectedGlobalEnum = new EsoUIEnum { Values = enumValues, Name = element.Name, UsedBy = usedBy });
                         }
@@ -433,18 +433,18 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
                         IEnumerable<string> eusedBy = GetUsedByParallel(element.Id);
 
-                        if (esoDocumentationService.Documentation.Globals.TryGetValue(element.Id, out ICollection<EsoUIEnumValue> enumTypes))
+                        if (doc.Globals.TryGetValue(element.Id, out ICollection<EsoUIEnumValue> enumTypes))
                         {
                             actions.Add(() => { SelectedGlobalEnum = new EsoUIEnum { Values = enumTypes, Name = element.Name, UsedBy = eusedBy }; });
                         }
 
                         break;
                     case APIElementType.CONSTANT:
-                        if (esoDocumentationService.Documentation.Constants.TryGetValue(element.Id, out EsoUIConstantValue constantValue))
+                        if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue constantValue))
                         {
                             actions.Add(() => SelectedConstantDetails = constantValue);
                         }
-                        else if (esoDocumentationService.Documentation.Globals.TryGetValue("Globals", out ICollection<EsoUIEnumValue> globalList))
+                        else if (doc.Globals.TryGetValue("Globals", out ICollection<EsoUIEnumValue> globalList))
                         {
                             EsoUIEnumValue constant = globalList.SingleOrDefault(g => g.Name == element.Id);
 
@@ -455,20 +455,34 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             }
                         }
                         break;
+                    case APIElementType.SI_GLOBAL:
                     case APIElementType.GLOBAL:
-                        if (esoDocumentationService.Documentation.Constants.TryGetValue(element.Id, out EsoUIConstantValue globalValue))
+                        if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue globalValue))
                         {
+                            if(element.ElementType == APIElementType.SI_GLOBAL && doc.SI_Lookup.TryGetValue(element.Id, out string stringValue))
+                            {
+                                globalValue.StringValue = stringValue;
+                            }
+
                             actions.Add(() => SelectedConstantDetails = globalValue);
                         }
                         break;
+                    case APIElementType.C_OBJECT_TYPE:
                     case APIElementType.OBJECT_TYPE:
-                        if (esoDocumentationService.Documentation.Objects.TryGetValue(element.Id, out EsoUIObject esoUIObject))
+                        if (doc.Objects.TryGetValue(element.Id, out EsoUIObject esoUIObject))
                         {
                             actions.Add(() => SelectedObjectDetails = esoUIObject);
                         }
                         break;
+                    case APIElementType.C_OBJECT_METHOD:
                     case APIElementType.OBJECT_METHOD:
-                        // TODO: object method
+                        if (doc.Objects.TryGetValue(element.Parent, out EsoUIObject parent))
+                        {
+                            if (parent.Functions.TryGetValue(element.Id, out EsoUIFunction function))
+                            {
+                                actions.Add(() => SelectedMethodDetails = function);
+                            }
+                        }
                         break;
                 }
 
@@ -536,6 +550,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             APIItems = _FilteredItems.Count,
                             APIVersion = esoDocumentationService.Documentation.ApiVersion,
                             CFunctionItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_FUNCTION).Count(),
+                            CMethodItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_METHOD).Count(),
+                            CObjectItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_TYPE).Count(),
                             ConstantItems = _FilteredItems.Where(f => f.ElementType == APIElementType.CONSTANT).Count(),
                             EnumConstants = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_CONSTANT).Count(),
                             EnumTypes = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_TYPE).Count(),
@@ -544,6 +560,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             GlobalItems = _FilteredItems.Where(f => f.ElementType == APIElementType.GLOBAL).Count(),
                             MethodItems = _FilteredItems.Where(f => f.ElementType == APIElementType.OBJECT_METHOD).Count(),
                             ObjectItems = _FilteredItems.Where(f => f.ElementType == APIElementType.OBJECT_TYPE).Count(),
+                            SIGlobalItems = _FilteredItems.Where(f => f.ElementType == APIElementType.SI_GLOBAL).Count(),
                         };
                     });
                 }
@@ -564,8 +581,9 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             case APIElementType.OBJECT_TYPE:
                 subpath = "Controls#";
                 break;
+            case APIElementType.SI_GLOBAL:
             case APIElementType.GLOBAL:
-                subpath = _SelectedElement.Name.StartsWith("SI_") ? "Constant_Values_SI*" : "Constant_Values#";
+                subpath = _SelectedElement.ElementType == APIElementType.SI_GLOBAL ? "Constant_Values_SI*" : "Constant_Values#";
                 break;
             case APIElementType.CONSTANT:
                 subpath = "Constant_Values#";

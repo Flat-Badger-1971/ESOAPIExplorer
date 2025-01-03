@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ESOAPIExplorer.Models;
 
-public class EsoUIObject(string name)
+public class EsoUIObject(string name, bool fromAPI = false)
 {
     private IEnumerable<string> _FunctionList;
 
@@ -12,6 +12,8 @@ public class EsoUIObject(string name)
     public ConcurrentDictionary<string, EsoUIFunction> Functions { get; set; } = [];
     public ICollection<string> Code { get; set; } = [];
     public string InstanceName { get; set; } = string.Empty;
+    public bool FromAPI { get; set; } = fromAPI;
+
     public IEnumerable<string> FunctionList {
         get
         {

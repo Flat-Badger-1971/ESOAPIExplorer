@@ -9,6 +9,7 @@ public class EsoUIGlobalValue
     public double? DoubleValue { get; set; }
     public string StringValue {  get; set; }
     public string Code { get; set; }
+    public string DisplayString { get; set; }
 
     public string ValueType()
     {
