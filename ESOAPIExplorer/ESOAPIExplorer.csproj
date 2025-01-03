@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -13,11 +13,15 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageIcon>DSAPP.png</PackageIcon>
-    <ApplicationIcon>Assets\Logo.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\Images\win32Icon.ico</ApplicationIcon>
     <DefaultLanguage>en-GB</DefaultLanguage>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="Assets\Logo.ico" />
+    <Content Remove="Assets\Images\StoreLogo.scale-100.png" />
+    <Content Remove="Assets\Images\StoreLogo.scale-125.png" />
+    <Content Remove="Assets\Images\StoreLogo.scale-150.png" />
+    <Content Remove="Assets\Images\StoreLogo.scale-200.png" />
+    <Content Remove="Assets\Images\StoreLogo.scale-400.png" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
@@ -26,16 +30,6 @@
   <ItemGroup>
     <Page Remove="Assets\Fonts\segoeMDL.xaml" />
     <Page Remove="Assets\Styles\BaseStyles.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,16 +70,8 @@
     <ProjectReference Include="..\ESOAPIExplorer.Views\ESOAPIExplorer.Views.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Logo.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Content Update="Assets\Fonts\segoeMDL.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Update="Assets\SplashScreen.scale-200.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\Styles\BaseStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
