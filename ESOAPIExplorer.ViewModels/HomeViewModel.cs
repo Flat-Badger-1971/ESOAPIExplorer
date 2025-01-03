@@ -4,12 +4,10 @@ using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,18 +19,8 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: IDE formatters
 // TODO: remaining settings and settings style
 // TODO: fix scrollable text block padding
-// TODO: change icon to Hermaeus Mora
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
-    // SelectedElement
-    // SelectedEventDetails
-    // SelectedObjectDetails
-    // SelectedMethodDetails
-    // SelectedFunctionDetails
-    // SelectedEnumName
-    // SelectedGlobalDetails
-    // SelectedConstantDetails
-
     #region Properties
     private APIElement _SelectedElement;
     public APIElement SelectedElement
@@ -371,7 +359,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         Window MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);       
         MainWindow.AppWindow.TitleBar.BackgroundColor = Colors.Gray;
     }
-
 
     private void UpdateObjects(List<EsoUIArgument> arguments)
     {
