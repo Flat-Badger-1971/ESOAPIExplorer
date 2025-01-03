@@ -3,11 +3,11 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace ESOAPIExplorer.ViewModels;
 
-public class MainViewModel(INavigationService navigationService) :ViewModelBase
+public class MainViewModel(INavigationService navigationService) : ViewModelBase
 {
     private NavigationViewItem _SelectedNavigationItem;
-    public NavigationViewItem SelectedNavigationItem 
-    { 
+    public NavigationViewItem SelectedNavigationItem
+    {
         get => _SelectedNavigationItem;
         set
         {

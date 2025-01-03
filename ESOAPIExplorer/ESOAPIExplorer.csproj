@@ -12,7 +12,7 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PackageIcon>DSAPP.png</PackageIcon>
+    <PackageIcon>Square44x44Logo.targetsize-256.png</PackageIcon>
     <ApplicationIcon>Assets\Images\win32Icon.ico</ApplicationIcon>
     <DefaultLanguage>en-GB</DefaultLanguage>
   </PropertyGroup>
@@ -76,6 +76,12 @@
     <Content Update="Assets\Styles\BaseStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\Images\Square44x44Logo.targetsize-256.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <!--

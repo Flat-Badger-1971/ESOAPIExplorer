@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 

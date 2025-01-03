@@ -3,6 +3,7 @@ using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using System;
 using Windows.ApplicationModel;
@@ -34,7 +35,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainWindow = new MainWindow();
-        MainWindow.AppWindow.SetIcon("Assets/Logo.ico");
+        MainWindow.AppWindow.SetIcon("Assets/Images/win32Icon.ico");
         Container = RegisterDependencyInjection;
 
         INavigationService navigation = Container.GetRequiredService<INavigationService>();

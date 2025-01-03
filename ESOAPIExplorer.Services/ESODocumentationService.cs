@@ -4,7 +4,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -56,40 +58,40 @@ public class ESODocumentationService : IESODocumentationService
         try
         {
             // do we have cached data
-            //if (File.Exists(path))
-            //{
-            //    using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
-            //    {
-            //        using (MemoryStream data = new MemoryStream())
-            //        {
-            //            using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
-            //            {
-            //                decompressor.CopyTo(data);
-            //            }
+            if (File.Exists(path))
+            {
+                using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    using (MemoryStream data = new MemoryStream())
+                    {
+                        using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
+                        {
+                            decompressor.CopyTo(data);
+                        }
 
-            //            byte[] byteData = data.ToArray();
-            //            Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
-            //        };
-            //    };
-            //}
-            //else
-            //{
-            Documentation = await GetDocumentationAsync();
+                        byte[] byteData = data.ToArray();
+                        Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
+                    };
+                };
+            }
+            else
+            {
+                Documentation = await GetDocumentationAsync();
 
-            //    if (Documentation != null)
-            //    {
-            //        // cache the documentation
-            //        byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
+                if (Documentation != null)
+                {
+                    // cache the documentation
+                    byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
 
-            //        using (FileStream cacheFile = new FileStream(path, FileMode.Create))
-            //        {
-            //            using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
-            //            {
-            //                compressor.Write(data, 0, data.Length);
-            //            }
-            //        }
-            //    }
-            //}
+                    using (FileStream cacheFile = new FileStream(path, FileMode.Create))
+                    {
+                        using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
+                        {
+                            compressor.Write(data, 0, data.Length);
+                        }
+                    }
+                }
+            }
         }
         catch (Exception e)
         {

@@ -2,10 +2,14 @@ using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -225,6 +229,8 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         await base.InitializeAsync(data);
 
+        SetTaskbarColour();
+
         // intialise the constants dictionary
         ConstantValues.InitialiseConstants();
 
@@ -360,6 +366,13 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         SetProperty(ref _SelectedMethodDetails, propertyName == nameof(SelectedMethodDetails) ? value as EsoUIFunction : default, nameof(SelectedMethodDetails));
     }
 
+    private static void SetTaskbarColour()
+    {
+        Window MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);       
+        MainWindow.AppWindow.TitleBar.BackgroundColor = Colors.Gray;
+    }
+
+
     private void UpdateObjects(List<EsoUIArgument> arguments)
     {
         foreach (EsoUIArgument e in arguments)
@@ -459,7 +472,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     case APIElementType.GLOBAL:
                         if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue globalValue))
                         {
-                            if(element.ElementType == APIElementType.SI_GLOBAL && doc.SI_Lookup.TryGetValue(element.Id, out string stringValue))
+                            if (element.ElementType == APIElementType.SI_GLOBAL && doc.SI_Lookup.TryGetValue(element.Id, out string stringValue))
                             {
                                 globalValue.StringValue = stringValue;
                             }
