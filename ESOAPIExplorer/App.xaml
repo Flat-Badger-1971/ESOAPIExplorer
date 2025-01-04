@@ -58,6 +58,14 @@
                     <Visibility>Collapsed</Visibility>
                 </converters:NullToValueConverter.NotNullValue>
             </converters:NullToValueConverter>
+            <converters:SIStringToVisibilityConverter x:Key="SIStringToVisibilityConverter" ReturnType="Visibility">
+                <converters:SIStringToVisibilityConverter.NullValue>
+                    <Visibility>Collapsed</Visibility>
+                </converters:SIStringToVisibilityConverter.NullValue>
+                <converters:SIStringToVisibilityConverter.NotNullValue>
+                    <Visibility>Visible</Visibility>
+                </converters:SIStringToVisibilityConverter.NotNullValue>
+            </converters:SIStringToVisibilityConverter>
             <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
                 <converters:OddEvenToValueConverter.EvenValue>
                     <SolidColorBrush Color="{ThemeResource SystemListMediumColor}"/>

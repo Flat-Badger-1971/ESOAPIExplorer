@@ -375,7 +375,7 @@
             </Grid>
 
             <!-- SI_ string Value -->
-            <Grid Grid.Row="11" Visibility="{Binding SelectedConstantDetails.StringValue, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <Grid Grid.Row="11" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
                 <StackPanel>
                 <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="WrapWholeWords"/>

@@ -23,6 +23,8 @@ public class ESODocumentationService : IESODocumentationService
     private EsoUIObject CurrentObject { get; set; }
     // private EsoUIXMLElement CurrentElement { get; set; }
     private ReaderState State { get; set; }
+    public bool UseCache { get; set; } = true;
+
     private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
     private readonly FileOpenPicker _FilePicker;
     private readonly ILuaObjectScanner _LuaObjectScanner;
@@ -55,10 +57,13 @@ public class ESODocumentationService : IESODocumentationService
     {
         string path = $"{ApplicationData.Current.LocalFolder.Path}\\apiCache.br";
 
+#if DEBUG
+        UseCache = false ;
+#endif
         try
         {
             // do we have cached data
-            if (File.Exists(path))
+            if (UseCache && File.Exists(path))
             {
                 using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
                 {
@@ -81,13 +86,16 @@ public class ESODocumentationService : IESODocumentationService
                 if (Documentation != null)
                 {
                     // cache the documentation
-                    byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
-
-                    using (FileStream cacheFile = new FileStream(path, FileMode.Create))
+                    if (UseCache)
                     {
-                        using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
+                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
+
+                        using (FileStream cacheFile = new FileStream(path, FileMode.Create))
                         {
-                            compressor.Write(data, 0, data.Length);
+                            using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
+                            {
+                                compressor.Write(data, 0, data.Length);
+                            }
                         }
                     }
                 }
@@ -199,7 +207,7 @@ public class ESODocumentationService : IESODocumentationService
 
         documentation.SI_Lookup = esoStrings
             .Concat(localeStrings)
-            .GroupBy(kvp  => kvp.Key)
+            .GroupBy(kvp => kvp.Key)
             .ToDictionary(global => global.Key, global => global.First().Value);
 
         esoStrings.Clear();

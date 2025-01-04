@@ -19,6 +19,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: IDE formatters
 // TODO: remaining settings and settings style
 // TODO: fix scrollable text block padding
+// TODO: @var and $string searches
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties
