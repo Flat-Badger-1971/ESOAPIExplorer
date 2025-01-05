@@ -12,7 +12,7 @@ public class StatusInformation
     public int EnumTypes { get; set; }
     public int EventItems { get; set; }
     public int FunctionItems { get; set; }
-    public int GlobalItems { get; set; }
+    public int GlobalInstanceItems { get; set; }
     public int MethodItems { get; set; }
     public int ObjectItems { get; set; }
     public int SIGlobalItems { get; set; }

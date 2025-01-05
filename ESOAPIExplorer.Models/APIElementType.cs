@@ -11,6 +11,7 @@ public enum APIElementType
     EVENT,
     FUNCTION,
     GLOBAL,
+    INSTANCE_NAME,
     OBJECT_METHOD,
     OBJECT_TYPE,
     SI_GLOBAL

@@ -197,8 +197,11 @@ public class ESODocumentationService : IESODocumentationService
         _LuaObjectScanner.ScanFolderForLuaFunctions();
         LuaScanResults luaobjects = _LuaObjectScanner.Results;
 
+        var dpet = luaobjects.Objects.Where(o => o.InstanceName.StartsWith("PROMOTIONAL")).FirstOrDefault();
+        var dpeto = luaobjects.Objects.Where(o => o.Name.Contains("Promotional")).FirstOrDefault();
+
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
-        Parallel.ForEach(luaobjects.Globals, global => documentation.Globals.TryAdd(global.Name, [new EsoUIEnumValue(global.Name, null)]));
+        Parallel.ForEach(luaobjects.InstanceNames, name => documentation.InstanceNames.TryAdd(name.Name, name));
         Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
 
         // lookups

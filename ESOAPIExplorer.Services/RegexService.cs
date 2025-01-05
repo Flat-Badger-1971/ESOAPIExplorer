@@ -4,6 +4,9 @@ namespace ESOAPIExplorer.Services;
 
 public partial class RegexService : IRegexService
 {
+    [GeneratedRegex(@"^\s+([A-Z_]*)\s=\s(.+):New\(.*\)")]
+    private static partial Regex _AliasMatcher();
+
     [GeneratedRegex(@"(\d+)$")]
     private static partial Regex _ApiVersionMatcher();
 
@@ -59,7 +62,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"h3\. (.+)$")]
     private static partial Regex _ObjectNameMatcher();
 
-    [GeneratedRegex(@"^function (.+):(.+)\(([.\.]+)\)")]
+    [GeneratedRegex(@"^function (.+):(.+)\((.*)\)")]
     private static partial Regex _ObjectTypeMatcher();
 
     [GeneratedRegex(@"\[""(Constants|SI_String_Constants)""\]\s*=\s*{\s*((?:.*?,\s*)+)\s*}", RegexOptions.Multiline)]
@@ -83,6 +86,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\* ScriptArguments: (.+)$")]
     private static partial Regex _XMLScriptArgumentMatcher();
 
+    public Regex AliasMatcher() => _AliasMatcher();
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
     public Regex ConstantMatcher() => _ConstantMatcher();

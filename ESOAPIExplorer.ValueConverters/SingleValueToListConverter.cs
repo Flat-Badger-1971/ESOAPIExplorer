@@ -24,6 +24,11 @@ public class SingleValueToListConverter : IValueConverter
             return new List<EsoUIConstantValue> { esoconstant };
         }
 
+        if (value is string esostring)
+        {
+            return new List<string> { esostring };
+        }
+
         return null;
     }
 

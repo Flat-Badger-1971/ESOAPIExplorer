@@ -3,7 +3,6 @@ using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using System;
 using Windows.ApplicationModel;
@@ -13,6 +12,7 @@ namespace ESOAPIExplorer;
 /// <summary>
 /// Provides application-specific behaviour to supplement the default Application class.
 /// </summary>
+#pragma warning disable CA1416
 public partial class App : Application
 {
     public static Window MainWindow { get; private set; }
@@ -81,7 +81,7 @@ public partial class App : Application
         services.AddSingleton<IEventService, EventService>();
         services.AddTransient<IDialogService, DialogService>();
         services.AddTransient<IESODocumentationService, ESODocumentationService>();
-        services.AddTransient<ILuaObjectScanner, LuaObjectScanneService>();
+        services.AddTransient<ILuaObjectScanner, LuaObjectScannerService>();
         services.AddSingleton<IRegexService, RegexService>();
         services.AddTransient<ILuaParserService, LuaParserService>();
     }

@@ -41,8 +41,8 @@
                 <Run Text="{Binding EventItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
-                <Run Text="Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                <Run Text="{Binding GlobalItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="Global Instances: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
+                <Run Text="{Binding GlobalInstanceItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
                 <Run Text="SI Globals: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />

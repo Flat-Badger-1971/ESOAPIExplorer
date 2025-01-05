@@ -68,6 +68,16 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
+    private EsoUIInstance _SelectedInstanceDetails;
+    public EsoUIInstance SelectedInstanceDetails
+    {
+        get => _SelectedInstanceDetails;
+        set
+        {
+            UpdateProperties(nameof(SelectedInstanceDetails), value);
+        }
+    }
+
     private EsoUIObject _SelectedObjectDetails;
     public EsoUIObject SelectedObjectDetails
     {
@@ -169,9 +179,15 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             {
                 string selected = value;
 
-                if (_SelectedElement.ElementType == APIElementType.OBJECT_TYPE || _SelectedElement.ElementType == APIElementType.C_OBJECT_TYPE)
+                switch (_SelectedElement.ElementType)
                 {
-                    selected = $"{SelectedObjectDetails.Name}:{value}";
+                    case APIElementType.OBJECT_TYPE:
+                    case APIElementType.C_OBJECT_TYPE:
+                        selected = $"{SelectedObjectDetails.Name}:{value}";
+                        break;
+                    case APIElementType.INSTANCE_NAME:
+                        selected = SelectedInstanceDetails.InstanceOf;
+                        break;
                 }
 
                 SelectElement(selected);
@@ -331,13 +347,24 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     }
                 )));
 
+            // InstanceNames
+            ObservableCollection<APIElement> instanceNames = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.InstanceNames
+                .Select(n => new APIElement
+                {
+                    Id = n.Key,
+                    Name = n.Value.Name,
+                    ElementType = APIElementType.INSTANCE_NAME,
+                    Code = [n.Value.Code]
+                }));
+
             AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
                 events.Select(e => new DisplayModelBase<APIElement> { Value = e })
                 .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
                 .Concat(enums.Select(c => new DisplayModelBase<APIElement> { Value = c }))
                 .Concat(constants.Select(c => new DisplayModelBase<APIElement> { Value = c }))
                 .Concat(objects.Select(o => new DisplayModelBase<APIElement> { Value = o }))
-                .Concat(methods.Select(m => new DisplayModelBase<APIElement> { Value = m })));
+                .Concat(methods.Select(m => new DisplayModelBase<APIElement> { Value = m }))
+                .Concat(instanceNames.Select(n => new DisplayModelBase<APIElement> { Value = n })));
 
             await FilterItemsAsync();
         }
@@ -351,13 +378,14 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         SetProperty(ref _SelectedFunctionDetails, propertyName == nameof(SelectedFunctionDetails) ? value as EsoUIFunction : default, nameof(SelectedFunctionDetails));
         SetProperty(ref _SelectedGlobalDetails, propertyName == nameof(SelectedGlobalDetails) ? value as EsoUIGlobal : default, nameof(SelectedGlobalDetails));
         SetProperty(ref _SelectedGlobalEnum, propertyName == nameof(SelectedGlobalEnum) ? value as EsoUIEnum : default, nameof(SelectedGlobalEnum));
+        SetProperty(ref _SelectedInstanceDetails, propertyName == nameof(SelectedInstanceDetails) ? value as EsoUIInstance : default, nameof(SelectedInstanceDetails));
         SetProperty(ref _SelectedObjectDetails, propertyName == nameof(SelectedObjectDetails) ? value as EsoUIObject : default, nameof(SelectedObjectDetails));
         SetProperty(ref _SelectedMethodDetails, propertyName == nameof(SelectedMethodDetails) ? value as EsoUIFunction : default, nameof(SelectedMethodDetails));
     }
 
     private static void SetTaskbarColour()
     {
-        Window MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);       
+        Window MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
         MainWindow.AppWindow.TitleBar.BackgroundColor = Colors.Gray;
     }
 
@@ -485,6 +513,12 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             }
                         }
                         break;
+                    case APIElementType.INSTANCE_NAME:
+                        if (doc.InstanceNames.TryGetValue(element.Id, out EsoUIInstance instanceName))
+                        {
+                            actions.Add(() => SelectedInstanceDetails = instanceName);
+                        }
+                        break;
                 }
 
                 if (actions.Count > 0)
@@ -558,7 +592,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             EnumTypes = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_TYPE).Count(),
                             EventItems = _FilteredItems.Where(e => e.ElementType == APIElementType.EVENT).Count(),
                             FunctionItems = _FilteredItems.Where(f => f.ElementType == APIElementType.FUNCTION).Count(),
-                            GlobalItems = _FilteredItems.Where(f => f.ElementType == APIElementType.GLOBAL).Count(),
+                            GlobalInstanceItems = _FilteredItems.Where(f => f.ElementType == APIElementType.INSTANCE_NAME).Count(),
                             MethodItems = _FilteredItems.Where(f => f.ElementType == APIElementType.OBJECT_METHOD).Count(),
                             ObjectItems = _FilteredItems.Where(f => f.ElementType == APIElementType.OBJECT_TYPE).Count(),
                             SIGlobalItems = _FilteredItems.Where(f => f.ElementType == APIElementType.SI_GLOBAL).Count(),

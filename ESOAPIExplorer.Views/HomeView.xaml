@@ -161,6 +161,28 @@
                 <TextBlock Text="{Binding SelectedMethodDetails.Parent}" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}"/>
             </StackPanel>
 
+            <!-- file path -->
+            <StackPanel Grid.Row="3" Visibility="{Binding SelectedInstanceDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="file path" FontWeight="Bold" FontSize="26" Margin="10"/>
+                <TextBlock Text="{Binding SelectedInstanceDetails.File}" Margin="10" Foreground="BurlyWood"/>
+                <Grid DataContext="{Binding SelectedInstanceDetails}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="instance of" FontWeight="Bold" FontSize="26" Margin="10"/>
+                    <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding InstanceOf, Converter={StaticResource ListToVisibilityConverter}}"/>
+                    <ListView
+                          ItemsSource="{Binding InstanceOf, Converter={StaticResource SingleValueToListConverter}}"
+                          Grid.Row="1"
+                          Style="{StaticResource InvisibleListViewStyle}"
+                          ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
+                          SelectedItem="{Binding Path=DataContext.SelectedUsedByItem, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="10" BorderThickness="0"
+                          ItemTemplate="{StaticResource UsedByItemTemplate}"/>
+                </Grid>
+            </StackPanel>
+            
             <!-- access -->
             <StackPanel Grid.Row="4">
                 <!-- Function details -->

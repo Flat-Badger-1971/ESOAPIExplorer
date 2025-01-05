@@ -90,18 +90,19 @@
             <converters:ConstantToNumberConverter x:Key="ConstantToValueConverter"/>
             <converters:StringToValueConverter x:Key="APITypeToColourConverter" ReturnType="SolidColorBrush">
                 <converters:StringToValueConverter.Values>
-                    <SolidColorBrush Color="#FF004864" x:Key="EVENT"/>
-                    <SolidColorBrush Color="#FF6E7A07" x:Key="ENUM_CONSTANT"/>
                     <SolidColorBrush Color="#FFB86D0B" x:Key="C_FUNCTION"/>
                     <SolidColorBrush Color="#FFCA6DAB" x:Key="C_OBJECT_METHOD"/>
                     <SolidColorBrush Color="#FFE533FF" x:Key="C_OBJECT_TYPE"/>
                     <SolidColorBrush Color="#FF7A4207" x:Key="CONSTANT"/>
+                    <SolidColorBrush Color="#FF6E7A07" x:Key="ENUM_CONSTANT"/>
                     <SolidColorBrush Color="#FF077A38" x:Key="ENUM_TYPE"/>
-                    <SolidColorBrush Color="#FF464646" x:Key="GLOBAL"/>
-                    <SolidColorBrush Color="#FF999999" x:Key="SI_GLOBAL"/>
+                    <SolidColorBrush Color="#FF004864" x:Key="EVENT"/>
                     <SolidColorBrush Color="#FFB8500B" x:Key="FUNCTION"/>
-                    <SolidColorBrush Color="#FF46077A" x:Key="OBJECT_TYPE"/>
+                    <SolidColorBrush Color="#FF464646" x:Key="GLOBAL"/>
+                    <SolidColorBrush Color="#FF2D492F" x:Key="INSTANCE_NAME"/>
                     <SolidColorBrush Color="#FF7A0754" x:Key="OBJECT_METHOD"/>
+                    <SolidColorBrush Color="#FF46077A" x:Key="OBJECT_TYPE"/>
+                    <SolidColorBrush Color="#FF999999" x:Key="SI_GLOBAL"/>
                 </converters:StringToValueConverter.Values>
             </converters:StringToValueConverter>
             <converters:EnumToSortedEnumConverter x:Key="EnumToSortedEnumConverter" />
