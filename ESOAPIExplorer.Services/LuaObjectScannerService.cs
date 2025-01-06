@@ -16,62 +16,85 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
     public void ScanFolderForLuaFunctions()
     {
-        Parallel.ForEach(Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories), file =>
+        foreach (var file in Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories))
+        //Parallel.ForEach(Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories), file =>
         {
             string content = File.ReadAllText(file);
             ScanFile(content, file);
-        });
+        }; //);
     }
 
     private void ScanFile(string fileContent, string filepath)
     {
         string[] lines = fileContent.Split('\n');
         Dictionary<string, EsoUIObject> objects = [];
+        bool insideComment = false;
 
         for (int i = 0; i < lines.Length; i++)
         {
             string line = lines[i].Replace("\r", "");
+            bool comment = false;
 
-            // Match functions
-            Match functionMatch = regexService.FunctionMatcher().Match(line);
-
-            if (functionMatch.Success)
+            if (line.StartsWith("--[["))
             {
-                AddFunction(lines, functionMatch, i);
-                continue;
+                insideComment = true;
+            }
+            else if (line.StartsWith("--"))
+            {
+                comment = true;
             }
 
-            // Match objects
-            Match objectMatch = regexService.ObjectTypeMatcher().Match(line);
-
-            if (objectMatch.Success)
+            if (!comment && !insideComment)
             {
-                int endOfFunction = FindEndOfFunction(lines, i);
-                AddObject(objects, objectMatch, lines, i, endOfFunction);
-                i = endOfFunction + 1;
-                continue;
-            }
-
-            // Match alias
-            Match aliasMatch = regexService.AliasMatcher().Match(line);
-
-            if (aliasMatch.Success)
-            {
-                if (objects.TryGetValue(aliasMatch.Groups[2].Value, out EsoUIObject obj))
                 {
-                    string name = aliasMatch.Groups[1].Value;
 
-                    obj.AddInstanceName(name);
+                    // Match functions
+                    Match functionMatch = regexService.FunctionMatcher().Match(line);
 
-                    int esouiIndex = filepath.LastIndexOf("esoui", StringComparison.OrdinalIgnoreCase);
-                    string path = string.Empty;
-
-                    if (esouiIndex != -1)
+                    if (functionMatch.Success)
                     {
-                        path = filepath.Substring(esouiIndex);
+                        AddFunction(lines, functionMatch, i);
+                        continue;
                     }
 
-                    Results.InstanceNames.Add(new EsoUIInstance(name, obj.Name, aliasMatch.Groups[0].Value, path));
+                    // Match objects
+                    Match objectMatch = regexService.ObjectTypeMatcher().Match(line);
+
+                    if (objectMatch.Success)
+                    {
+                        int endOfFunction = FindEndOfFunction(lines, i);
+                        AddObject(objects, objectMatch, lines, i, endOfFunction);
+                        i = endOfFunction + 1;
+                        continue;
+                    }
+
+                    // Match alias
+                    Match aliasMatch = regexService.AliasMatcher().Match(line);
+
+                    if (aliasMatch.Success)
+                    {
+                        if (objects.TryGetValue(aliasMatch.Groups[2].Value, out EsoUIObject obj))
+                        {
+                            string name = aliasMatch.Groups[1].Value;
+
+                            obj.AddInstanceName(name);
+
+                            int esouiIndex = filepath.LastIndexOf("esoui", StringComparison.OrdinalIgnoreCase);
+                            string path = string.Empty;
+
+                            if (esouiIndex != -1)
+                            {
+                                path = filepath.Substring(esouiIndex);
+                            }
+
+                            Results.InstanceNames.Add(new EsoUIInstance(name, obj.Name, aliasMatch.Groups[0].Value, path));
+                        }
+                    }
+                }
+
+                if (line.StartsWith("]]--"))
+                {
+                    insideComment = false;
                 }
             }
         }
@@ -87,7 +110,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
     private void AddFunction(string[] lines, Match match, int startIndex)
     {
-        string functionName = match.Groups[1].Value;
+        string functionName = match.Groups[1].Value.Trim();
         string parameters = match.Groups[3].Value;
 
         EsoUIFunction func = new(functionName);
@@ -115,7 +138,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
     private static void AddObject(Dictionary<string, EsoUIObject> objects, Match match, string[] lines, int startOfFunction, int endOfFunction)
     {
-        string objectName = match.Groups[1].Value;
+        string objectName = match.Groups[1].Value.Trim();
         string objectMethod = match.Groups[2].Value;
         string[] objectParameters = match.Groups[3].Value.Split(',');
 

@@ -55,7 +55,6 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
 
-    // [GeneratedRegex(@"^SafeAddString\((.+?),\s""(.+)""")]
     [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]
     private static partial Regex _LocaleStringMatcher();
 

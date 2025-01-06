@@ -31,7 +31,6 @@ public class ESODocumentationService : IESODocumentationService
     private readonly IRegexService _RegexService;
 
     public EsoUIDocumentation Documentation { get; set; }
-    // public EsoUIDocumentation Data { get; set; }
 
     public ESODocumentationService(ILuaObjectScanner luaObjectScanner, IRegexService regexService)
     {
