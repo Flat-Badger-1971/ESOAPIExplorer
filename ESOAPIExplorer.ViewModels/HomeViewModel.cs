@@ -15,11 +15,10 @@ using System.Windows.Input;
 using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
-// TODO: diagnose enum list delay
 // TODO: IDE formatters
-// TODO: remaining settings and settings style
+// TODO: remaining settings and settings styling
+// TODO: diagnose enum list delay
 // TODO: fix scrollable text block padding
-// TODO: @var and $string searches
 // TODO: implement decent theme colours
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {

@@ -54,10 +54,10 @@ public class ESODocumentationService : IESODocumentationService
 
     public async Task InitialiseAsync()
     {
-        string path = $"{ApplicationData.Current.LocalFolder.Path}\\apiCache.br";
+        string path = $"{ApplicationData.Current.LocalCacheFolder.Path}\\apiCache.br";
 
 #if DEBUG
-        UseCache = false ;
+        // UseCache = false ;
 #endif
         try
         {
