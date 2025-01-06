@@ -14,6 +14,11 @@ public class EmptyListToTextConverter : IValueConverter
             return Visibility.Visible;
         }
 
+        if (value == null)
+        {
+            return Visibility.Visible;
+        }
+
         return Visibility.Collapsed;
     }
 

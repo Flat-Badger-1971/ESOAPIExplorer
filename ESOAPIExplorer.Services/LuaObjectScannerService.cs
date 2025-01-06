@@ -119,7 +119,13 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         int endPosition = FindEndOfFunction(lines, startIndex);
 
         // Extract return statement if any
-        string returnType = ExtractReturnType(lines, startIndex, endPosition);
+        List<string> returnTypes = ExtractReturnTypes(lines, startIndex, endPosition);
+        string returnType = null;
+
+        if (returnTypes.Count > 0)
+        {
+            returnType = string.Join(" /// ", returnTypes);
+        }
 
         foreach (string p in parameters.Split(','))
         {
@@ -143,7 +149,13 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         string[] objectParameters = match.Groups[3].Value.Split(',');
 
         // Extract return statement if any
-        string returnType = ExtractReturnType(lines, startOfFunction, endOfFunction);
+        List<string> returnTypes = ExtractReturnTypes(lines, startOfFunction, endOfFunction);
+        string returnType = null;
+
+        if (returnTypes.Count > 0)
+        {
+            returnType = string.Join(" /// ", returnTypes);
+        }
 
         if (!objects.TryGetValue(objectName, out EsoUIObject obj))
         {
@@ -154,7 +166,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         EsoUIFunction func = new(objectMethod)
         {
             Parent = objectName,
-            Returns = [new EsoUIArgument(returnType, new EsoUIType("Unknown"), 1)]
+            Returns = returnType == null ? null : [new EsoUIArgument(returnType, new EsoUIType("Unknown"), 1)]
         };
 
         foreach (string codeline in lines.Skip(startOfFunction).Take(endOfFunction - startOfFunction + 1))
@@ -162,20 +174,15 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
             func.AddCode(codeline);
         }
 
-        foreach (string p in objectParameters)
+        if (!string.IsNullOrWhiteSpace(objectParameters[0]))
         {
-            func.AddArgument(p.Trim());
+            foreach (string p in objectParameters)
+            {
+                func.AddArgument(p.Trim());
+            }
         }
 
         obj.AddFunction(func);
-    }
-
-    private static void AddAlias(Dictionary<string, EsoUIObject> objects, string objectName, string alias)
-    {
-        if (objects.TryGetValue(objectName, out EsoUIObject obj))
-        {
-            obj.AddInstanceName(alias);
-        }
     }
 
     private int FindEndOfFunction(string[] lines, int startPosition)
@@ -204,18 +211,20 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         return lines.Length - 1;
     }
 
-    private static string ExtractReturnType(string[] lines, int startPosition, int endPosition)
+    private static List<string> ExtractReturnTypes(string[] lines, int startPosition, int endPosition)
     {
+        List<string> returnTypes = [];
+
         for (int i = startPosition; i <= endPosition; i++)
         {
             string line = lines[i].Trim();
 
             if (line.StartsWith("return "))
             {
-                return line.Substring(7);
+                returnTypes.Add(line.Substring(7));
             }
         }
 
-        return null;
+        return returnTypes;
     }
 }
