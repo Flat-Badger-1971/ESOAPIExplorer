@@ -20,6 +20,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: remaining settings and settings style
 // TODO: fix scrollable text block padding
 // TODO: @var and $string searches
+// TODO: implement decent theme colours
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties
@@ -331,7 +332,6 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     }
                 ));
 
-            // TODO: most methods being missed from lua scan
             // Object methods
             ObservableCollection<APIElement> methods = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Objects
                 .SelectMany(item =>
@@ -544,6 +544,40 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         }
     }
 
+    private bool HasMatchingArgument(APIElement element, string value)
+    {
+        EsoUIDocumentation docs = esoDocumentationService.Documentation;
+
+        switch (element.ElementType)
+        {
+            case APIElementType.C_FUNCTION:
+            case APIElementType.FUNCTION:
+                if (docs.Functions.TryGetValue(element.Name, out EsoUIFunction esofunction))
+                {
+                    return (esofunction.Args != null && esofunction.Args.Any(a => a.Name.StartsWith(value, StringComparison.OrdinalIgnoreCase)));
+                }
+                break;
+            case APIElementType.C_OBJECT_METHOD:
+            case APIElementType.OBJECT_METHOD:
+                if (docs.Objects.TryGetValue(element.Parent, out EsoUIObject esoobject))
+                {
+                    if (esoobject != null && !esoobject.Functions.IsEmpty)
+                    {
+                        return esoobject.Functions.Any(f => f.Value.Args.Any(a => a.Name.StartsWith(value, StringComparison.OrdinalIgnoreCase)));
+                    }
+                }
+                break;
+            case APIElementType.EVENT:
+                if (docs.Events.TryGetValue(element.Name, out EsoUIEvent esoevent))
+                {
+                    return (esoevent.Args != null && esoevent.Args.Any(a => a.Name.StartsWith(value, StringComparison.OrdinalIgnoreCase)));
+                }
+                break;
+        }
+
+        return false;
+    }
+
     private IOrderedEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
     {
         if (string.IsNullOrWhiteSpace(filter))
@@ -553,6 +587,34 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
         SetSearchAlgorithm();
 
+        if (filter.StartsWith('@'))
+        {
+            // look for any functions/events that accept the filter as an argument
+            return AllItems
+                .Where(d =>
+                    d.Value.ElementType == APIElementType.C_FUNCTION ||
+                    d.Value.ElementType == APIElementType.C_OBJECT_METHOD ||
+                    d.Value.ElementType == APIElementType.EVENT ||
+                    d.Value.ElementType == APIElementType.FUNCTION ||
+                    d.Value.ElementType == APIElementType.OBJECT_METHOD)
+                .Select(d => d.Value)
+                .Where(v => HasMatchingArgument(v, filter.Substring(1)))
+                .OrderBy(v => v.Name);
+        }
+        else if (filter.StartsWith('$'))
+        {
+            // look for any SI global value that contains the text following $
+            return AllItems
+                .Where(d =>
+                    d.Value.ElementType == APIElementType.SI_GLOBAL &&
+                        esoDocumentationService.Documentation.SI_Lookup.TryGetValue(d.Value.Name, out string value) &&
+                        value.Contains(filter.Substring(1), StringComparison.OrdinalIgnoreCase)
+                )
+                .Select(s => s.Value)
+                .OrderBy(v => v.Name);
+        }
+
+        // normal search
         return _SearchAlgorithm.Search(filter, keywordList);
     }
 
