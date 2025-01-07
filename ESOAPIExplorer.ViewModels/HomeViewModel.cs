@@ -16,7 +16,7 @@ using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
 // TODO: IDE formatters
-// TODO: remaining settings and settings styling
+// TODO: fix settings bindings
 // TODO: diagnose enum list delay
 // TODO: fix scrollable text block padding
 // TODO: implement decent theme colours

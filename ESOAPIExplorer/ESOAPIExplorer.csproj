@@ -15,6 +15,8 @@
     <PackageIcon>Square44x44Logo.targetsize-256.png</PackageIcon>
     <ApplicationIcon>Assets\Images\win32Icon.ico</ApplicationIcon>
     <DefaultLanguage>en-GB</DefaultLanguage>
+    <PackageCertificateThumbprint>9B58D49DC3BF6FC6879551F6E5ED3B2627E92A7A</PackageCertificateThumbprint>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\Images\StoreLogo.scale-100.png" />

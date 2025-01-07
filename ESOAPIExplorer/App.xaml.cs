@@ -84,6 +84,7 @@ public partial class App : Application
         services.AddTransient<ILuaObjectScanner, LuaObjectScannerService>();
         services.AddSingleton<IRegexService, RegexService>();
         services.AddTransient<ILuaParserService, LuaParserService>();
+        services.AddSingleton<IThemeService, ThemeService>();
     }
 
     private void ConfigureServices(IServiceCollection services)

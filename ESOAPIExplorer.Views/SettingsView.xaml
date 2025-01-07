@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="ESOAPIExplorer.Views.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -13,32 +12,71 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}">
-    <Grid x:Name="RootGrid" Margin="10">
+
+    <Grid x:Name="RootGrid" Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
-        <!-- Algorithm -->
-        <TextBlock Text="Settings" FontSize="32" Grid.Row="0" Grid.Column="0" Margin="0,10,10,10"/>
-        <TextBlock Text="Filter Algorithm" Grid.Row="1" Grid.Column="0" Margin="0,0,0,10"/>
-        <ComboBox Name="themeMode" Grid.Row="1" Grid.Column="1" Margin="10,0,0,10"
-                  ItemsSource="{Binding SearchAlgorithmItemSource}"
-                  SelectedIndex="{Binding Path=DataContext.SelectedAlgorithmIndex, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <!-- Generated constants class -->
-        <TextBlock Text="Generate New ConstantValues class" Grid.Row="2" Grid.Column="0" Margin="0,0,0,10"/>
-        <Button Content="Generate" Grid.Row="2" Grid.Column="1" Command="{Binding Generate}" Margin="10, 0,0,0" Height="40" FontSize="14" Padding="5,0,5,0" />
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+            <TextBlock Text="Settings" FontSize="32" Margin="0,10,0,20" />
+        </StackPanel>
+
+        <Image Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+               Source="ms-appx:///Assets/Images/LargeTile.scale-150.png" 
+               Width="400" Height="400" Margin="10,0,0,10" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+            <!-- Algorithm -->
+            <TextBlock Text="Filter Algorithm" Margin="0,0,0,10" />
+            <ComboBox
+                ItemsSource="{Binding SearchAlgorithmItemSource}"
+                SelectedIndex="{Binding Path=SelectedAlgorithmIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="0,0,0,20" />
+
+            <!-- Generate Constants Class -->
+            <TextBlock Text="Generate New ConstantValues class" Margin="0,0,0,10" />
+            <Button Content="Generate"
+                    Command="{Binding Generate}"
+                    Margin="0,0,0,20"
+                    HorizontalAlignment="Left"
+                    Height="40"
+                    FontSize="14"
+                    Padding="10" />
+
+            <!-- Rescan API -->
+            <TextBlock Text="Rescan API" Margin="0,0,0,10" />
+            <Button Content="Rescan"
+                    Command="{Binding Rescan}"
+                    Margin="0,0,0,20"
+                    HorizontalAlignment="Left"
+                    Height="40"
+                    FontSize="14"
+                    Padding="10" />
+
+            <!-- Last Scan -->
+            <TextBlock Text="Last Scan" Margin="0,0,0,10" />
+            <TextBlock Text="{Binding LastScanDateTime}" Margin="0,0,0,20" />
+
+            <!-- Theme -->
+            <TextBlock Text="Theme" Margin="0,0,0,10" />
+            <ComboBox
+                ItemsSource="{Binding Themes}"
+                SelectedItem="{Binding SelectedThemeName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="0,0,0,20">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
     </Grid>
 </Page>

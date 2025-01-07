@@ -134,11 +134,6 @@
                            FontSize="32" 
                            FontWeight="Bold" 
                            TextAlignment="Left" />
-                <ComboBox Name="themeMode" SelectionChanged="Themes_SelectionChanged">
-                    <ComboBoxItem>Light</ComboBoxItem>
-                    <ComboBoxItem>Dark</ComboBoxItem>
-                    <ComboBoxItem>Default</ComboBoxItem>
-                </ComboBox>
             </StackPanel>
 
             <!-- code -->

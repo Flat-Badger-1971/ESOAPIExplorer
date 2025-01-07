@@ -1,5 +1,6 @@
 ﻿using ESOAPIExplorer.Services;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,12 +14,15 @@ using Windows.Storage.Pickers;
 namespace ESOAPIExplorer.ViewModels;
 
 #pragma warning disable CA1416, CsWinRT1028
-public class SettingsViewModel(ILuaParserService luaParserService) : ViewModelBase
+public class SettingsViewModel(ILuaParserService luaParserService, IThemeService themeService) : ViewModelBase
 {
+    private readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
     private FileOpenPicker _FileOpenPicker;
     private FileSavePicker _FileSavePicker;
-    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
+    private ComboBoxItem _SelectedThemeName;
     private int _SelectedAlgorithmIndex;
+    private DateTime _LastScanDateTime;
 
     public int SelectedAlgorithmIndex
     {
@@ -33,6 +37,35 @@ public class SettingsViewModel(ILuaParserService luaParserService) : ViewModelBa
         }
     }
 
+    public string SelectedThemeName
+    {
+        get => _SelectedThemeName?.Content.ToString();
+        set
+        {
+            if (value != null)
+            {
+                _Settings.Values["ThemeName"] = value;
+                SetProperty(ref _SelectedThemeName, new ComboBoxItem { Content = value });
+
+                // change theme
+                if (Enum.TryParse(value, out ElementTheme theme))
+                {
+                    themeService.SetTheme(theme);
+                }
+            }
+        }
+    }
+
+    public DateTime LastScanDateTime
+    {
+        get => _LastScanDateTime;
+        set
+        {
+            _Settings.Values["LastScanDateTime"] = value;
+            SetProperty(ref _LastScanDateTime, value);
+        }
+    }
+
     private ObservableCollection<string> _SearchAlgorithmItemSource;
     public ObservableCollection<string> SearchAlgorithmItemSource
     {
@@ -40,10 +73,11 @@ public class SettingsViewModel(ILuaParserService luaParserService) : ViewModelBa
         set => SetProperty(ref _SearchAlgorithmItemSource, value);
     }
 
+    public ObservableCollection<string> Themes { get; set; }
+
     public override async Task InitializeAsync(object data)
     {
-        // Get the current window's HWND by passing in the Window object
-        Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+        // Get the current window's HWND by passing in the Window object        
         nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
 
         _FileOpenPicker = new FileOpenPicker
@@ -84,6 +118,22 @@ public class SettingsViewModel(ILuaParserService luaParserService) : ViewModelBa
             );
 
         SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values["SearchAlgorithm"].ToString());
+
+        Themes =
+        [
+            "Light",
+            "Dark",
+            "SystemDefault"
+        ];
+
+        string defaultTheme = _Settings.Values["ThemeName"] as string ?? "Dark";
+
+        SelectedThemeName = Themes.FirstOrDefault(t => t == defaultTheme) ?? Themes.First();
+
+        if (Enum.TryParse(defaultTheme, out ElementTheme theme))
+        {
+            themeService.SetTheme(theme);
+        }
     }
 
     public ICommand Generate => new RelayCommand(async () =>
@@ -98,5 +148,11 @@ public class SettingsViewModel(ILuaParserService luaParserService) : ViewModelBa
         // Generate and save the file
         StorageFile saveLocation = await _FileSavePicker.PickSaveFileAsync();
         CodeGenerator.GenerateClassFile(parsedData, saveLocation.Path);
+    });
+
+    public ICommand Rescan => new RelayCommand(() =>
+    {
+        // TODO: initiate rescan
+        LastScanDateTime = DateTime.Now;
     });
 }
