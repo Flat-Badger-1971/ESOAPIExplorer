@@ -67,6 +67,7 @@ public partial class App : Application
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<CustomMessageDialogViewModel>();
         services.AddTransient<InfoViewModel>();
+        services.AddTransient<ExportViewModel>();
     }
 
     private static void RegisterViews(ServiceCollection services)
@@ -81,11 +82,12 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IEventService, EventService>();
         services.AddTransient<IDialogService, DialogService>();
-        services.AddTransient<IESODocumentationService, ESODocumentationService>();
+        services.AddSingleton<IESODocumentationService, ESODocumentationService>();
         services.AddTransient<ILuaObjectScanner, LuaObjectScannerService>();
         services.AddSingleton<IRegexService, RegexService>();
         services.AddTransient<ILuaParserService, LuaParserService>();
         services.AddSingleton<IThemeService, ThemeService>();
+        services.AddTransient<ILuaCheckRcGeneratorService, LuaCheckRcGeneratorService>();
     }
 
     private void ConfigureServices(IServiceCollection services)

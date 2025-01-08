@@ -8,7 +8,5 @@ public enum ReaderState
     READ_GLOBALS,
     READ_OBJECT_API,
     READ_VM_FUNCTIONS,
-    READ_XML_ATTRIBUTES,
-    READ_XML_LAYOUT,
     UNDETERMINED
 }

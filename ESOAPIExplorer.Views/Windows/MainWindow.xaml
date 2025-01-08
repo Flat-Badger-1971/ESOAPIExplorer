@@ -25,7 +25,6 @@
             IsPaneOpen="False">
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="HomeViewModel" Content="Home" Icon="Home" />
-                <NavigationViewItem Tag="SearchViewModel" Content="Search" Icon="Find" />
                 <NavigationViewItem Tag="ExportViewModel" Content="Export">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="{StaticResource segoe-export}" />

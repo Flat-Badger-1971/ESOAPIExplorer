@@ -25,6 +25,9 @@ public class MainViewModel(INavigationService navigationService) : ViewModelBase
                 case nameof(InfoViewModel):
                     _ = navigationService.GoToAsync<InfoViewModel>();
                     break;
+                case nameof(ExportViewModel):
+                    _ = navigationService.GoToAsync<ExportViewModel>();
+                    break;
             }
         }
     }
