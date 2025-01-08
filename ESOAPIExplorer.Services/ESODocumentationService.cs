@@ -21,7 +21,7 @@ public class ESODocumentationService : IESODocumentationService
     private ICollection<EsoUIEnumValue> CurrentEnum { get; set; }
     private EsoUIFunction CurrentFunction { get; set; }
     private EsoUIObject CurrentObject { get; set; }
-    // private EsoUIXMLElement CurrentElement { get; set; }
+    private EsoUIXMLElement CurrentElement { get; set; }
     private ReaderState State { get; set; }
     public bool UseCache { get; set; } = true;
 
@@ -326,10 +326,10 @@ public class ESODocumentationService : IESODocumentationService
                 return ReaderState.READ_OBJECT_API;
             case true when LineStartsWith("h2. Events"):
                 return ReaderState.READ_EVENTS;
-            //case true when LineStartsWith("h2. UI XML Layout"):
-            //    return ReaderState.READ_XML_ATTRIBUTES;
-            //case true when (State == ReaderState.READ_XML_ATTRIBUTES):
-            //    return ReaderState.READ_XML_LAYOUT;
+            case true when LineStartsWith("h2. UI XML Layout"):
+                return ReaderState.READ_XML_ATTRIBUTES;
+            case true when (State == ReaderState.READ_XML_ATTRIBUTES):
+                return ReaderState.READ_XML_LAYOUT;
             default:
                 return ReaderState.UNDETERMINED;
         }
@@ -518,26 +518,26 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    //private bool ReadXmlAttributes()
-    //{
-    //    if (LineStartsWith("h4. Attributes"))
-    //    {
-    //        // ignore the header
-    //        return false;
-    //    }
-    //    else if (!LineStartsWith("* "))
-    //    {
-    //        // section ended
-    //        return true;
-    //    }
+    private bool ReadXmlAttributes()
+    {
+        if (LineStartsWith("h4. Attributes"))
+        {
+            // ignore the header
+            return false;
+        }
+        else if (!LineStartsWith("* "))
+        {
+            // section ended
+            return true;
+        }
 
-    //    List<string> matches = GetMatches(_RegexService.XMLAttributeMatcher());
-    //    string name = matches[0];
-    //    string type = matches[1];
-    //    Documentation.XmlAttributes[name] = new EsoUIArgument(name, new EsoUIType(type), 1);
+        List<string> matches = GetMatches(_RegexService.XMLAttributeMatcher());
+        string name = matches[0];
+        string type = matches[1];
+        Documentation.XmlAttributes[name] = new EsoUIArgument(name, new EsoUIType(type), 1);
 
-    //    return false;
-    //}
+        return false;
+    }
 
     private EsoUIXMLElement GetOrCreateElement(string name)
     {
@@ -550,58 +550,58 @@ public class ESODocumentationService : IESODocumentationService
         return value;
     }
 
-    //private bool ReadXmlLayout()
-    //{
-    //    switch (true)
-    //    {
-    //        case true when LineStartsWith("h5. sentinel_element"):
-    //            // section ended
-    //            return true;
-    //        case true when LineStartsWith("h5. "):
-    //            string elementName = GetFirstMatch(_RegexService.XMLElementNameMatcher());
-    //            CurrentElement = GetOrCreateElement(elementName);
-    //            break;
-    //        case true when LineStartsWith("* _attr"):
-    //            string attribute = GetFirstMatch(_RegexService.XMLAttributeTypeMatcher());
-    //            Match match = _RegexService.XMLAttributeNameMatcher().Match(attribute);
-    //            string type = match.Groups[1].Value;
-    //            string name = match.Groups[2].Value;
-    //            CurrentElement.Attributes.Add(new EsoUIArgument(name, new EsoUIType(type), 1));
-    //            break;
-    //        case true when LineStartsWith("* ScriptArguments"):
-    //            CurrentElement.Documentation = GetFirstMatch(_RegexService.XMLScriptArgumentMatcher());
-    //            break;
-    //        case true when LineStartsWith("* ["):
-    //            {
-    //                List<string> matches = GetMatches(_RegexService.XMLLineTypeMatcher());
-    //                string lineType = matches[0];
-    //                string lname = matches[1];
-    //                string ltype = matches[2];
-    //                switch (lineType)
-    //                {
-    //                    case "Child":
-    //                        if (ltype == "Attributes")
-    //                        {
-    //                            CurrentElement.Attributes.Add(Documentation.XmlAttributes[lname]);
-    //                        }
-    //                        else
-    //                        {
-    //                            CurrentElement.Children.Add(new EsoUIType(lname, ltype));
-    //                        }
-    //                        break;
-    //                    case "Inherits":
-    //                        CurrentElement.Parent = new EsoUIType(ltype);
-    //                        break;
-    //                    default:
-    //                        Console.WriteLine("Unhandled prefix: " + lineType + " - " + CurrentLine);
-    //                        break;
-    //                }
-    //                break;
-    //            }
-    //    }
+    private bool ReadXmlLayout()
+    {
+        switch (true)
+        {
+            case true when LineStartsWith("h5. sentinel_element"):
+                // section ended
+                return true;
+            case true when LineStartsWith("h5. "):
+                string elementName = GetFirstMatch(_RegexService.XMLElementNameMatcher());
+                CurrentElement = GetOrCreateElement(elementName);
+                break;
+            case true when LineStartsWith("* _attr"):
+                string attribute = GetFirstMatch(_RegexService.XMLAttributeTypeMatcher());
+                Match match = _RegexService.XMLAttributeNameMatcher().Match(attribute);
+                string type = match.Groups[1].Value;
+                string name = match.Groups[2].Value;
+                CurrentElement.Attributes.Add(new EsoUIArgument(name, new EsoUIType(type), 1));
+                break;
+            case true when LineStartsWith("* ScriptArguments"):
+                CurrentElement.Documentation = GetFirstMatch(_RegexService.XMLScriptArgumentMatcher());
+                break;
+            case true when LineStartsWith("* ["):
+                {
+                    List<string> matches = GetMatches(_RegexService.XMLLineTypeMatcher());
+                    string lineType = matches[0];
+                    string lname = matches[1];
+                    string ltype = matches[2];
+                    switch (lineType)
+                    {
+                        case "Child":
+                            if (ltype == "Attributes")
+                            {
+                                CurrentElement.Attributes.Add(Documentation.XmlAttributes[lname]);
+                            }
+                            else
+                            {
+                                CurrentElement.Children.Add(new EsoUIType(lname, ltype));
+                            }
+                            break;
+                        case "Inherits":
+                            CurrentElement.Parent = new EsoUIType(ltype);
+                            break;
+                        default:
+                            Console.WriteLine("Unhandled prefix: " + lineType + " - " + CurrentLine);
+                            break;
+                    }
+                    break;
+                }
+        }
 
-    //    return false;
-    //}
+        return false;
+    }
 
     private void InjectCustomData()
     {
@@ -670,7 +670,7 @@ public class ESODocumentationService : IESODocumentationService
         return Task.Run(() =>
         {
             Documentation = new EsoUIDocumentation();
-            // 5555555555555555555555555555555555555555InjectCustomData();
+            // InjectCustomData();
             State = ReaderState.UNDETERMINED;
 
             if (!string.IsNullOrEmpty(FileName))
@@ -724,12 +724,12 @@ public class ESODocumentationService : IESODocumentationService
             case ReaderState.READ_EVENTS:
                 finished = ReadEvents();
                 break;
-            //case ReaderState.READ_XML_ATTRIBUTES:
-            //    finished = ReadXmlAttributes();
-            //    break;
-            //case ReaderState.READ_XML_LAYOUT:
-            //    finished = ReadXmlLayout();
-            //    break;
+            case ReaderState.READ_XML_ATTRIBUTES:
+                finished = ReadXmlAttributes();
+                break;
+            case ReaderState.READ_XML_LAYOUT:
+                finished = ReadXmlLayout();
+                break;
             case ReaderState.UNDETERMINED:
             default:
                 State = FindNextState();
@@ -742,7 +742,7 @@ public class ESODocumentationService : IESODocumentationService
             CurrentEnum = null;
             CurrentFunction = null;
             CurrentObject = null;
-            // CurrentElement = null;
+            CurrentElement = null;
         }
     }
 }
