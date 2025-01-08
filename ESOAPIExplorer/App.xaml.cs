@@ -66,6 +66,7 @@ public partial class App : Application
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<CustomMessageDialogViewModel>();
+        services.AddTransient<InfoViewModel>();
     }
 
     private static void RegisterViews(ServiceCollection services)

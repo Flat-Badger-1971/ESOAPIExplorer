@@ -31,6 +31,11 @@
                         <FontIcon Glyph="{StaticResource segoe-export}" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Tag="InfoViewModel" Content="About">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="{StaticResource segoe-info}" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem Tag="SettingsViewModel" Content="Settings" Icon="Setting"/>

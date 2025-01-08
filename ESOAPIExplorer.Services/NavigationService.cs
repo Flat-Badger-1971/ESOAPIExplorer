@@ -87,6 +87,7 @@ public class NavigationService : INavigationService
         await ClearBackStack();
         await InternalNavigateToAsync(typeof(TViewModel), null);
     }
+
     public async Task GoToAsync<TViewModel>(object parameter) where TViewModel : class
     {
         if (typeof(TViewModel).BaseType != typeof(ViewModelBase))
