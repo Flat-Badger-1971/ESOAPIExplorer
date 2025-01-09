@@ -4,7 +4,6 @@ namespace ESOAPIExplorer.Services
 {
     public interface IRegexService
     {
-        public Regex AliasMatcher();
         public Regex ApiVersionMatcher();
         public Regex ArgumentMatcher();
         public Regex ConstantMatcher();
@@ -21,15 +20,11 @@ namespace ESOAPIExplorer.Services
         public Regex FunctionReturnMatcher();
         public Regex GlobalMatcher();
         public Regex IfKeywordMatcher();
+        public Regex InstanceMatcher();
         public Regex LocaleStringMatcher();
         public Regex ObjectNameMatcher();
         public Regex ObjectTypeMatcher();
         public Regex SectionMatcher();
-        public Regex XMLAttributeMatcher();
-        public Regex XMLAttributeNameMatcher();
-        public Regex XMLAttributeTypeMatcher();
-        public Regex XMLElementNameMatcher();
-        public Regex XMLLineTypeMatcher();
-        public Regex XMLScriptArgumentMatcher();
+        public Regex SubclassMatcher();
     }
 }

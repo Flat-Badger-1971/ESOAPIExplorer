@@ -4,8 +4,6 @@ namespace ESOAPIExplorer.Services;
 
 public partial class RegexService : IRegexService
 {
-    [GeneratedRegex(@"^\s+([A-Z_]*)\s=\s(.+):New\(.*\)")]
-    private static partial Regex _AliasMatcher();
 
     [GeneratedRegex(@"(\d+)$")]
     private static partial Regex _ApiVersionMatcher();
@@ -55,6 +53,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
 
+    [GeneratedRegex(@"^\s*([A-Z_]+)\s=\s(.+)[:\.]+New\(")]
+    private static partial Regex _InstanceMatcher();
+
     [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]
     private static partial Regex _LocaleStringMatcher();
 
@@ -67,25 +68,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\[""(Constants|SI_String_Constants)""\]\s*=\s*{\s*((?:.*?,\s*)+)\s*}", RegexOptions.Multiline)]
     private static partial Regex _SectionMatcher();
 
-    [GeneratedRegex(@"^\*\ (.+) \*(.+)\*$")]
-    private static partial Regex _XMLAttributeMatcher();
+    [GeneratedRegex(@"^\s*(?:local\s+)?(.+)\s+=\s+(.+):Subclass\(")]
+    private static partial Regex _SubclassMatcher();
 
-    [GeneratedRegex(@"\*(.+)\* _(.+)_")]
-    private static partial Regex _XMLAttributeNameMatcher();
-
-    [GeneratedRegex(@"\* _attribute:_ (.+)$")]
-    private static partial Regex _XMLAttributeTypeMatcher();
-
-    [GeneratedRegex(@"h5. (.+)$")]
-    private static partial Regex _XMLElementNameMatcher();
-
-    [GeneratedRegex(@"^\*\ \[(.+): (.+)\|#(.+)\]$")]
-    private static partial Regex _XMLLineTypeMatcher();
-
-    [GeneratedRegex(@"\* ScriptArguments: (.+)$")]
-    private static partial Regex _XMLScriptArgumentMatcher();
-
-    public Regex AliasMatcher() => _AliasMatcher();
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
     public Regex ConstantMatcher() => _ConstantMatcher();
@@ -102,14 +87,10 @@ public partial class RegexService : IRegexService
     public Regex FunctionReturnMatcher() => _FunctionReturnMatcher();
     public Regex GlobalMatcher() => _GlobalMatcher();
     public Regex IfKeywordMatcher() => _IfKeywordMatcher();
+    public Regex InstanceMatcher() => _InstanceMatcher();
     public Regex LocaleStringMatcher() => _LocaleStringMatcher();
     public Regex ObjectNameMatcher() => _ObjectNameMatcher();
     public Regex ObjectTypeMatcher() => _ObjectTypeMatcher();
     public Regex SectionMatcher() => _SectionMatcher();
-    public Regex XMLAttributeMatcher() => _XMLAttributeMatcher();
-    public Regex XMLAttributeNameMatcher() => _XMLAttributeNameMatcher();
-    public Regex XMLAttributeTypeMatcher() => _XMLAttributeTypeMatcher();
-    public Regex XMLElementNameMatcher() => _XMLElementNameMatcher();
-    public Regex XMLLineTypeMatcher() => _XMLLineTypeMatcher();
-    public Regex XMLScriptArgumentMatcher() => _XMLScriptArgumentMatcher();
+    public Regex SubclassMatcher() => _SubclassMatcher();
 }

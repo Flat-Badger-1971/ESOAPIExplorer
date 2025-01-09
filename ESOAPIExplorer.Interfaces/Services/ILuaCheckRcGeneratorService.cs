@@ -1,7 +1,9 @@
-﻿namespace ESOAPIExplorer.Services
+﻿using System.Text;
+
+namespace ESOAPIExplorer.Services
 {
     public interface ILuaCheckRcGeneratorService
     {
-        void Generate();
+        public StringBuilder Generate();
     }
 }

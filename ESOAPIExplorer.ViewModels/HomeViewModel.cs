@@ -20,6 +20,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: diagnose enum list delay
 // TODO: fix scrollable text block padding
 // TODO: implement decent theme colours
+// TODO: object_type code is missing
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties

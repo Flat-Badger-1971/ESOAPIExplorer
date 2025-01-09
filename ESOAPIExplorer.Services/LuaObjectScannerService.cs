@@ -1,6 +1,6 @@
 ﻿using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml.Shapes;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,118 +14,128 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
     public string FolderPath { get; set; }
     public LuaScanResults Results { get; set; } = new LuaScanResults();
 
+    private ConcurrentDictionary<string, string> _Subclasses = [];
+
     public void ScanFolderForLuaFunctions()
     {
-        foreach (var file in Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories))
-        //Parallel.ForEach(Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories), file =>
+        ConcurrentDictionary<string, bool> ignore = [];
+        ignore.TryAdd("internalingame_rewards_manager.lua", true);
+
+        // Parallel.ForEach(Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories), file =>
+        foreach (string file in Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories))
         {
-            string content = File.ReadAllText(file);
-            ScanFile(content, file);
-        }; //);
+            string filename = Path.GetFileName(file);
+
+            if (filename == "rewards_manager.lua")
+            {
+
+            }
+            if (!ignore.ContainsKey(filename))
+            {
+                string content = File.ReadAllText(file);
+                ScanFile(content, file);
+            }
+        };
+
+        // check for subclass methods
+        foreach (KeyValuePair<string, string> subclass in _Subclasses)
+        {
+            EsoUIObject obj = Results.Objects.FirstOrDefault(o => o.Name == subclass.Key);
+
+            if (obj != null)
+            {
+                EsoUIObject parent = Results.Objects.FirstOrDefault(o => o.Name == subclass.Value); ;
+
+                if (parent != null)
+                {
+                    foreach (KeyValuePair<string, EsoUIFunction> func in parent.Functions)
+                    {
+                        obj.AddFunction(func.Value);
+                    }
+                }
+            }
+        }
     }
 
     private void ScanFile(string fileContent, string filepath)
     {
         string[] lines = fileContent.Split('\n');
-        Dictionary<string, EsoUIObject> objects = [];
         bool insideComment = false;
+        Dictionary<string, EsoUIObject> objects = [];
 
         for (int i = 0; i < lines.Length; i++)
         {
-            string line = lines[i].Replace("\r", "");
-            bool comment = false;
+            string line = lines[i].Replace("\r", "").Trim();
+            bool comment = line.StartsWith("--");
 
-            if (line.StartsWith("--[["))
-            {
-                insideComment = true;
-            }
-            else if (line.StartsWith("--"))
-            {
-                comment = true;
-            }
+            if (line.StartsWith("--[[")) insideComment = true;
+            if (line.StartsWith("]]--")) insideComment = false;
 
             if (!comment && !insideComment)
             {
+                // Match functions
+                Match functionMatch = regexService.FunctionMatcher().Match(line);
+
+                if (functionMatch.Success)
                 {
+                    i += AddFunction(lines, functionMatch, i);
+                }
 
-                    // Match functions
-                    Match functionMatch = regexService.FunctionMatcher().Match(line);
+                // Match objects
+                Match objectMatch = regexService.ObjectTypeMatcher().Match(line);
 
-                    if (functionMatch.Success)
+                if (objectMatch.Success)
+                {
+                    int endOfFunction = FindEndOfFunction(lines, i);
+                    AddObject(objects, objectMatch, lines, i, endOfFunction);
+                    i = endOfFunction + 1;
+                }
+
+                // Match instance
+                Match instanceMatch = regexService.InstanceMatcher().Match(line);
+
+                if (instanceMatch.Success)
+                {
+                    if (objects.TryGetValue(instanceMatch.Groups[2].Value, out EsoUIObject obj))
                     {
-                        AddFunction(lines, functionMatch, i);
-                        continue;
-                    }
+                        string name = instanceMatch.Groups[1].Value;
+                        obj.AddInstanceName(name);
 
-                    // Match objects
-                    Match objectMatch = regexService.ObjectTypeMatcher().Match(line);
+                        int esouiIndex = filepath.LastIndexOf("esoui", StringComparison.OrdinalIgnoreCase);
+                        string path = esouiIndex != -1 ? filepath.Substring(esouiIndex) : string.Empty;
 
-                    if (objectMatch.Success)
-                    {
-                        int endOfFunction = FindEndOfFunction(lines, i);
-                        AddObject(objects, objectMatch, lines, i, endOfFunction);
-                        i = endOfFunction + 1;
-                        continue;
-                    }
-
-                    // Match alias
-                    Match aliasMatch = regexService.AliasMatcher().Match(line);
-
-                    if (aliasMatch.Success)
-                    {
-                        if (objects.TryGetValue(aliasMatch.Groups[2].Value, out EsoUIObject obj))
-                        {
-                            string name = aliasMatch.Groups[1].Value;
-
-                            obj.AddInstanceName(name);
-
-                            int esouiIndex = filepath.LastIndexOf("esoui", StringComparison.OrdinalIgnoreCase);
-                            string path = string.Empty;
-
-                            if (esouiIndex != -1)
-                            {
-                                path = filepath.Substring(esouiIndex);
-                            }
-
-                            Results.InstanceNames.Add(new EsoUIInstance(name, obj.Name, aliasMatch.Groups[0].Value, path));
-                        }
+                        Results.InstanceNames.Add(new EsoUIInstance(name, obj.Name, instanceMatch.Groups[0].Value, path));
                     }
                 }
 
-                if (line.StartsWith("]]--"))
+                // Match subclasses
+                Match subclassMatch = regexService.SubclassMatcher().Match(line);
+
+                if (subclassMatch.Success)
                 {
-                    insideComment = false;
+                    _Subclasses.TryAdd(subclassMatch.Groups[1].Value, subclassMatch.Groups[2].Value);
                 }
             }
         }
 
-        if (objects.Count > 0)
+        foreach (EsoUIObject obj in objects.Values)
         {
-            foreach (KeyValuePair<string, EsoUIObject> obj in objects)
-            {
-                Results.Objects.Add(obj.Value);
-            }
+            Results.Objects.Add(obj);
         }
     }
 
-    private void AddFunction(string[] lines, Match match, int startIndex)
+    private int AddFunction(string[] lines, Match match, int startIndex)
     {
         string functionName = match.Groups[1].Value.Trim();
         string parameters = match.Groups[3].Value;
-
-        EsoUIFunction func = new(functionName);
+        EsoUIFunction func = new EsoUIFunction(functionName);
 
         // Find end of function
         int endPosition = FindEndOfFunction(lines, startIndex);
 
         // Extract return statement if any
         List<string> returnTypes = ExtractReturnTypes(lines, startIndex, endPosition);
-        string returnType = null;
-
-        if (returnTypes.Count > 0)
-        {
-            returnType = string.Join(" /// ", returnTypes);
-        }
+        string returnType = returnTypes.Count > 0 ? string.Join(" /// ", returnTypes) : null;
 
         foreach (string p in parameters.Split(','))
         {
@@ -140,6 +150,8 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         }
 
         Results.Functions.Add(func);
+
+        return endPosition - startIndex;
     }
 
     private static void AddObject(Dictionary<string, EsoUIObject> objects, Match match, string[] lines, int startOfFunction, int endOfFunction)
@@ -150,12 +162,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
         // Extract return statement if any
         List<string> returnTypes = ExtractReturnTypes(lines, startOfFunction, endOfFunction);
-        string returnType = null;
-
-        if (returnTypes.Count > 0)
-        {
-            returnType = string.Join(" /// ", returnTypes);
-        }
+        string returnType = returnTypes.Count > 0 ? string.Join(" /// ", returnTypes) : null;
 
         if (!objects.TryGetValue(objectName, out EsoUIObject obj))
         {
@@ -163,7 +170,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
             objects.Add(objectName, obj);
         }
 
-        EsoUIFunction func = new(objectMethod)
+        EsoUIFunction func = new EsoUIFunction(objectMethod)
         {
             Parent = objectName,
             Returns = returnType == null ? null : [new EsoUIArgument(returnType, new EsoUIType("Unknown"), 1)]
@@ -193,17 +200,20 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         {
             string line = lines[i];
 
-            if (regexService.FunctionKeywordMatcher().IsMatch(line) || regexService.IfKeywordMatcher().IsMatch(line) || regexService.DoKeywordMatcher().IsMatch(line))
+            if (!line.Trim().StartsWith("--"))
             {
-                depth++;
-            }
-            else if (regexService.EndKeywordMatcher().IsMatch(line))
-            {
-                depth--;
-
-                if (depth == 0)
+                if (regexService.FunctionKeywordMatcher().IsMatch(line) || regexService.IfKeywordMatcher().IsMatch(line) || regexService.DoKeywordMatcher().IsMatch(line))
                 {
-                    return i;
+                    depth++;
+                }
+                else if (regexService.EndKeywordMatcher().IsMatch(line))
+                {
+                    depth--;
+
+                    if (depth == 0)
+                    {
+                        return i;
+                    }
                 }
             }
         }
