@@ -13,6 +13,7 @@ public class EsoUIObject(string name, bool fromAPI = false)
     public ICollection<string> Code { get; set; } = [];
     public string InstanceName { get; set; } = string.Empty;
     public bool FromAPI { get; set; } = fromAPI;
+    public APIElementType ElementType { get; set; } = APIElementType.C_OBJECT_TYPE;
 
     public IEnumerable<string> FunctionList {
         get

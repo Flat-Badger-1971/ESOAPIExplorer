@@ -17,4 +17,5 @@ public class EsoUIFunction(string name, EsoUIFunctionAccess access = EsoUIFuncti
     public void AddArgument(string name, string type = "Unknown") => Args.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ArgumentTotal));
     public void AddReturn(string name, string type = "Unknown") => Returns.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ReturnsTotal));
     public void AddCode(string line) => Code.Add(line);
+    public APIElementType ElementType { get; set; } = APIElementType.C_FUNCTION;
 }

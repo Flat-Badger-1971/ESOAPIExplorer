@@ -6,6 +6,7 @@ namespace ESOAPIExplorer.Services
     {
         public Regex ApiVersionMatcher();
         public Regex ArgumentMatcher();
+        public Regex CallbackObjectMatcher();
         public Regex ConstantMatcher();
         public Regex DoKeywordMatcher();
         public Regex EndKeywordMatcher();
@@ -25,6 +26,7 @@ namespace ESOAPIExplorer.Services
         public Regex ObjectNameMatcher();
         public Regex ObjectTypeMatcher();
         public Regex SectionMatcher();
+        public Regex SelfAssignmentMatcher();
         public Regex SubclassMatcher();
     }
 }

@@ -26,10 +26,6 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         {
             string filename = Path.GetFileName(file);
 
-            if (filename == "rewards_manager.lua")
-            {
-
-            }
             if (!ignore.ContainsKey(filename))
             {
                 string content = File.ReadAllText(file);
@@ -69,7 +65,9 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
             bool comment = line.StartsWith("--");
 
             if (line.StartsWith("--[[")) insideComment = true;
-            if (line.StartsWith("]]--")) insideComment = false;
+            if (line.StartsWith("]]")) insideComment = false;
+            // some files have incorrect comment endings
+            if (line.StartsWith("--]]")) insideComment = false;
 
             if (!comment && !insideComment)
             {
@@ -78,7 +76,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
                 if (functionMatch.Success)
                 {
-                    i += AddFunction(lines, functionMatch, i);
+                    AddFunction(lines, functionMatch, i);
                 }
 
                 // Match objects
@@ -88,7 +86,6 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 {
                     int endOfFunction = FindEndOfFunction(lines, i);
                     AddObject(objects, objectMatch, lines, i, endOfFunction);
-                    i = endOfFunction + 1;
                 }
 
                 // Match instance
@@ -149,12 +146,14 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
             func.AddCode(codeline);
         }
 
+        func.ElementType = APIElementType.FUNCTION;
+
         Results.Functions.Add(func);
 
         return endPosition - startIndex;
     }
 
-    private static void AddObject(Dictionary<string, EsoUIObject> objects, Match match, string[] lines, int startOfFunction, int endOfFunction)
+    private void AddObject(Dictionary<string, EsoUIObject> objects, Match match, string[] lines, int startOfFunction, int endOfFunction)
     {
         string objectName = match.Groups[1].Value.Trim();
         string objectMethod = match.Groups[2].Value;
@@ -166,7 +165,11 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
         if (!objects.TryGetValue(objectName, out EsoUIObject obj))
         {
-            obj = new EsoUIObject(objectName);
+            obj = new EsoUIObject(objectName)
+            {
+                ElementType = APIElementType.OBJECT_TYPE
+            };
+
             objects.Add(objectName, obj);
         }
 
@@ -179,6 +182,18 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         foreach (string codeline in lines.Skip(startOfFunction).Take(endOfFunction - startOfFunction + 1))
         {
             func.AddCode(codeline);
+
+            if (objectMethod == "New" || objectMethod == "Initialize")
+            {
+                Match callback = regexService.CallbackObjectMatcher().Match(codeline);
+                Match selfAssignment = regexService.SelfAssignmentMatcher().Match(codeline);
+                Match instance = callback.Success ? callback : selfAssignment;
+
+                if (instance.Success)
+                {
+                    obj.InstanceName = instance.Groups[1].Value;
+                }
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(objectParameters[0]))

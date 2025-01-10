@@ -11,6 +11,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\*(.+)\* _(.+)_")]
     private static partial Regex _ArgumentMatcher();
 
+    [GeneratedRegex(@"^\s*([A-Z_]+)\s+=\s+ZO_CallbackObject.New\(self\)")]
+    private static partial Regex _CallbackObjectMatcher();
+
     [GeneratedRegex(@"\[""(.*?)""\]\s*=\s*(.*?),")]
     private static partial Regex _ConstantMatcher();
 
@@ -38,7 +41,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bfunction\b")]
     private static partial Regex _FunctionKeywordMatcher();
 
-    [GeneratedRegex(@"function\s+((ZO_|zo_)\w+)\((.*)\)")]
+    [GeneratedRegex(@"^function\s+(\w+)\((.*)\)")]
     private static partial Regex _FunctionMatcher();
 
     [GeneratedRegex(@"^\* (.+)\((.*)\)$")]
@@ -68,11 +71,15 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\[""(Constants|SI_String_Constants)""\]\s*=\s*{\s*((?:.*?,\s*)+)\s*}", RegexOptions.Multiline)]
     private static partial Regex _SectionMatcher();
 
+    [GeneratedRegex(@"^\s*([A-Z_]+)\s+=\s+self")]
+    private static partial Regex _SelfAssignmentMatcher();
+
     [GeneratedRegex(@"^\s*(?:local\s+)?(.+)\s+=\s+(.+):Subclass\(")]
     private static partial Regex _SubclassMatcher();
 
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
+    public Regex CallbackObjectMatcher() => _CallbackObjectMatcher();
     public Regex ConstantMatcher() => _ConstantMatcher();
     public Regex DoKeywordMatcher() => _DoKeywordMatcher();
     public Regex EndKeywordMatcher() => _EndKeywordMatcher();
@@ -92,5 +99,6 @@ public partial class RegexService : IRegexService
     public Regex ObjectNameMatcher() => _ObjectNameMatcher();
     public Regex ObjectTypeMatcher() => _ObjectTypeMatcher();
     public Regex SectionMatcher() => _SectionMatcher();
+    public Regex SelfAssignmentMatcher() => _SelfAssignmentMatcher();
     public Regex SubclassMatcher() => _SubclassMatcher();
 }

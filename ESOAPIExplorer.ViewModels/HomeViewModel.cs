@@ -21,6 +21,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: fix scrollable text block padding
 // TODO: implement decent theme colours
 // TODO: object_type code is missing
+// TODO: change returns in multiple lists (see GetSkillLineInfo)
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties

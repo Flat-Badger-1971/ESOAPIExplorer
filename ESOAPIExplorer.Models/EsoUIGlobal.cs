@@ -10,4 +10,5 @@ public class EsoUIGlobal
     public string ParentName { get; set; }
     public List<EsoUIElement> Parent { get; set; }
     public string Type { get; set; } = "integer";
+    public APIElementType ElementType { get; set; } = APIElementType.GLOBAL;
 }
