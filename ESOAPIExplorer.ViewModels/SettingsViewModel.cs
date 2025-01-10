@@ -23,6 +23,7 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
     private ComboBoxItem _SelectedThemeName;
     private int _SelectedAlgorithmIndex;
     private DateTime _LastScanDateTime;
+    private ObservableCollection<string> _Themes;
 
     public int SelectedAlgorithmIndex
     {
@@ -73,7 +74,13 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
         set => SetProperty(ref _SearchAlgorithmItemSource, value);
     }
 
-    public ObservableCollection<string> Themes { get; set; }
+    public ObservableCollection<string> Themes
+    {
+        get => _Themes;
+        set {
+            SetProperty(ref _Themes, value);
+        }
+    }
 
     public override async Task InitializeAsync(object data)
     {
