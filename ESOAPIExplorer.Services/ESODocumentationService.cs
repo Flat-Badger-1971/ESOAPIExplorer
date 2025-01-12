@@ -514,8 +514,16 @@ public class ESODocumentationService : IESODocumentationService
         }
     }
 
-    private void InjectCustomData()
+    private void AddManagers()
     {
+        Documentation.Objects["WINDOW_MANAGER"] = Documentation.Objects["WindowManager"];
+        Documentation.Objects["ANIMATION_MANAGER"] = Documentation.Objects["AnimationManager"];
+        Documentation.Objects["EVENT_MANAGER"] = Documentation.Objects["EventManager"];
+    }
+
+    private void AddCustomData()
+    {
+        #region event manager
         EsoUIFunction registerForEvent = new EsoUIFunction("RegisterForEvent");
         registerForEvent.AddArgument("namespace", "string");
         registerForEvent.AddArgument("event", "integer");
@@ -549,26 +557,36 @@ public class ESODocumentationService : IESODocumentationService
         unregisterForUpdate.AddArgument("namespace", "string");
         unregisterForUpdate.AddReturn("success", "bool");
 
-        EsoUIObject eventManager = new EsoUIObject("EVENT_MANAGER");
+        EsoUIObject eventManager = new EsoUIObject("EventManager");
         eventManager.AddFunction(registerForEvent);
         eventManager.AddFunction(registerForAllEvents);
         eventManager.AddFunction(unregisterForEvent);
         eventManager.AddFunction(addFilterForEvent);
         eventManager.AddFunction(registerForUpdate);
         eventManager.AddFunction(unregisterForUpdate);
+        #endregion
 
         EsoUIFunction getWindowManager = new EsoUIFunction("GetWindowManager");
         getWindowManager.AddReturn("windowManager", "WindowManager");
+        getWindowManager.AddCode("* GetWindowManager()");
+        getWindowManager.AddCode("** _Returns:_ *object* _windowManager_");
 
         EsoUIFunction getAnimationManager = new EsoUIFunction("GetAnimationManager");
         getAnimationManager.AddReturn("animationManager", "AnimationManager");
+        getAnimationManager.AddCode("* GetAnimationManager()");
+        getAnimationManager.AddCode("** _Returns:_ *object* _apRetAnimationManager_");
 
         EsoUIFunction getEventManager = new EsoUIFunction("GetEventManager");
         getEventManager.AddReturn("eventManager", "EventManager");
+        getEventManager.AddCode("* GetEventManager()");
+        getEventManager.AddCode("** _Returns:_ *object* _eventManager_");
 
         EsoUIFunction getAddOnManager = new EsoUIFunction("GetAddOnManager");
         getAddOnManager.AddReturn("addOnManager", "AddOnManager");
+        getAddOnManager.AddCode("* GetAddOnManager()");
+        getAddOnManager.AddCode("** _Returns:_ *object* _addOnManager_");
 
+        #region callback manager
         EsoUIFunction registerCallback = new EsoUIFunction("RegisterCallback");
         registerCallback.AddArgument("eventName", "string");
         registerCallback.AddArgument("callback", "function");
@@ -618,7 +636,9 @@ public class ESODocumentationService : IESODocumentationService
         callbackObject.AddFunction(getFireCallbackDepth);
         callbackObject.AddFunction(getDirtyEvents);
         callbackObject.AddFunction(subclass);
+        #endregion
 
+        #region guiroot
         EsoUIFunction getbottom = new EsoUIFunction("GetBottom");
         getbottom.AddReturn("bottom", "number");
 
@@ -674,8 +694,9 @@ public class ESODocumentationService : IESODocumentationService
         guiroot.AddFunction(getscale);
         guiroot.AddFunction(gettop);
         guiroot.AddFunction(getwidth);
+        #endregion
 
-        Documentation.Objects["EVENT_MANAGER"] = eventManager;
+        Documentation.Objects["EventManager"] = eventManager;
         Documentation.Functions["GetWindowManager"] = getWindowManager;
         Documentation.Functions["GetAnimationManager"] = getAnimationManager;
         Documentation.Functions["GetEventManager"] = getEventManager;
@@ -690,7 +711,7 @@ public class ESODocumentationService : IESODocumentationService
         return Task.Run(() =>
         {
             Documentation = new EsoUIDocumentation();
-            InjectCustomData();
+            AddCustomData();
             State = ReaderState.UNDETERMINED;
 
             if (!string.IsNullOrEmpty(FileName))
@@ -711,6 +732,8 @@ public class ESODocumentationService : IESODocumentationService
             {
                 return null;
             }
+
+            AddManagers();
         });
     }
 
