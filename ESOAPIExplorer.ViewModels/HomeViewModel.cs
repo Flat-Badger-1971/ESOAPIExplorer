@@ -26,7 +26,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: add busy indicator
 // TODO: add proper export screen with options to control export content
 // TODO: utility.lua in BS
-
+// TODO: investigate GetGlobalUIScale/ZO_ObjectPool/ZO_ERROR_COLOR
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties

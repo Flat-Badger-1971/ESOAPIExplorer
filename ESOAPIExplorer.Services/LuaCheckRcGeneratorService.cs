@@ -7,6 +7,20 @@ namespace ESOAPIExplorer.Services;
 
 public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentationService) : ILuaCheckRcGeneratorService
 {
+    private static void AddObject(StringBuilder rc, string name, EsoUIObject obj)
+    {
+        rc.AppendLine($"    [\"{name}\"] = {{");
+        rc.AppendLine("        fields = {");
+
+        foreach (string func in obj.FunctionList)
+        {
+            rc.AppendLine($"            {func} = {{read_only = true}},");
+        }
+
+        rc.AppendLine("        }");
+        rc.AppendLine("    },");
+    }
+
     public StringBuilder Generate()
     {
         Dictionary<string, bool> Added = [];
@@ -22,22 +36,21 @@ public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentatio
 
         foreach (KeyValuePair<string, EsoUIObject> obj in docs.Objects.Where(o => o.Value.ElementType != APIElementType.ALIAS))
         {
-            string instanceName = !string.IsNullOrWhiteSpace(obj.Value.InstanceName) ? obj.Value.InstanceName : obj.Key;
+            string instanceName = obj.Value.InstanceName;
 
-            if (!Added.ContainsKey(instanceName))
+            if (!string.IsNullOrWhiteSpace(instanceName))
             {
-                rc.AppendLine($"    [\"{instanceName}\"] = {{");
-                rc.AppendLine("        fields = {");
-
-                foreach (string func in obj.Value.FunctionList)
+                if (!Added.ContainsKey(instanceName))
                 {
-                    rc.AppendLine($"            {func} = {{read_only = true}},");
+                    AddObject(rc, instanceName, obj.Value);
+                    Added[instanceName] = true;
                 }
+            }
 
-                rc.AppendLine("        }");
-                rc.AppendLine("    },");
-
-                Added[instanceName] = true;
+            if (!Added.ContainsKey(obj.Key))
+            {
+                AddObject(rc, obj.Key, obj.Value);
+                Added[obj.Key] = true;
             }
         }
 
