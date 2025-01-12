@@ -14,33 +14,35 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
     public string FolderPath { get; set; }
     public LuaScanResults Results { get; set; } = new LuaScanResults();
 
-    private ConcurrentDictionary<string, string> _Subclasses = [];
+    private readonly ConcurrentDictionary<string, string> _subclasses = new ConcurrentDictionary<string, string>();
+    private readonly ConcurrentDictionary<string, string> _instanceNames = new ConcurrentDictionary<string, string>();
 
-    public void ScanFolderForLuaFunctions()
+    public void ScanFolderForLuaFunctions(EsoUIObject callbackObject)
     {
-        ConcurrentDictionary<string, bool> ignore = [];
-        ignore.TryAdd("internalingame_rewards_manager.lua", true);
+        ConcurrentDictionary<string, bool> ignore = new ConcurrentDictionary<string, bool>
+        {
+            ["internalingame_rewards_manager.lua"] = true
+        };
 
-        // Parallel.ForEach(Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories), file =>
-        foreach (string file in Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories))
+        Parallel.ForEach(Directory.EnumerateFiles(FolderPath, "*.lua", SearchOption.AllDirectories), file =>
         {
             string filename = Path.GetFileName(file);
 
             if (!ignore.ContainsKey(filename))
             {
                 string content = File.ReadAllText(file);
-                ScanFile(content, file);
+                ScanFile(content, file, filename);
             }
-        };
+        });
 
-        // check for subclass methods
-        foreach (KeyValuePair<string, string> subclass in _Subclasses)
+        // Check for subclass methods
+        foreach (KeyValuePair<string, string> subclass in _subclasses)
         {
             EsoUIObject obj = Results.Objects.FirstOrDefault(o => o.Name == subclass.Key);
 
             if (obj != null)
             {
-                EsoUIObject parent = Results.Objects.FirstOrDefault(o => o.Name == subclass.Value); ;
+                EsoUIObject parent = subclass.Value == "ZO_CallbackObject" ? callbackObject : Results.Objects.FirstOrDefault(o => o.Name == subclass.Value);
 
                 if (parent != null)
                 {
@@ -51,9 +53,20 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 }
             }
         }
+
+        // Check for instances defined in functions
+        foreach (KeyValuePair<string, string> instanceName in _instanceNames)
+        {
+            EsoUIObject obj = Results.Objects.FirstOrDefault(o => o.Name == instanceName.Value);
+
+            if (obj != null && string.IsNullOrEmpty(obj.InstanceName))
+            {
+                obj.AddInstanceName(instanceName.Key);
+            }
+        }
     }
 
-    private void ScanFile(string fileContent, string filepath)
+    private void ScanFile(string fileContent, string filepath, string filename)
     {
         string[] lines = fileContent.Split('\n');
         bool insideComment = false;
@@ -66,14 +79,17 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
             if (line.StartsWith("--[[")) insideComment = true;
             if (line.StartsWith("]]")) insideComment = false;
-            // some files have incorrect comment endings
             if (line.StartsWith("--]]")) insideComment = false;
+            if (line.StartsWith("--[[") && (line.EndsWith("]]--") || line.EndsWith("]]")))
+            {
+                insideComment = false;
+                comment = true;
+            }
 
             if (!comment && !insideComment)
             {
                 // Match functions
                 Match functionMatch = regexService.FunctionMatcher().Match(line);
-
                 if (functionMatch.Success)
                 {
                     AddFunction(lines, functionMatch, i);
@@ -81,7 +97,6 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
                 // Match objects
                 Match objectMatch = regexService.ObjectTypeMatcher().Match(line);
-
                 if (objectMatch.Success)
                 {
                     int endOfFunction = FindEndOfFunction(lines, i);
@@ -90,7 +105,6 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
                 // Match instance
                 Match instanceMatch = regexService.InstanceMatcher().Match(line);
-
                 if (instanceMatch.Success)
                 {
                     if (objects.TryGetValue(instanceMatch.Groups[2].Value, out EsoUIObject obj))
@@ -107,10 +121,35 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
                 // Match subclasses
                 Match subclassMatch = regexService.SubclassMatcher().Match(line);
-
                 if (subclassMatch.Success)
                 {
-                    _Subclasses.TryAdd(subclassMatch.Groups[1].Value, subclassMatch.Groups[2].Value);
+                    _subclasses.TryAdd(subclassMatch.Groups[1].Value, subclassMatch.Groups[2].Value);
+                }
+
+                // Match fragments
+                Match fragmentMatch = regexService.FragmentMatcher().Match(line);
+                if (fragmentMatch.Success)
+                {
+                    Results.Fragments.TryAdd(fragmentMatch.Groups[1].Value, true);
+                }
+
+                // Match aliases
+                if (filename == "addoncompatibilityaliases.lua" || filename == "globalapi.lua")
+                {
+                    Match aliasMatch = regexService.AliasMatcher().Match(line);
+                    if (aliasMatch.Success)
+                    {
+                        string name = aliasMatch.Groups[1].Value.Trim();
+                        if (ConstantValues.GetConstantValue(name) == null)
+                        {
+                            EsoUIObject esoobject = new EsoUIObject(name, false)
+                            {
+                                ElementType = APIElementType.ALIAS
+                            };
+                            esoobject.AddCode(aliasMatch.Groups[0].Value.Trim());
+                            Results.Objects.Add(esoobject);
+                        }
+                    }
                 }
             }
         }
@@ -121,7 +160,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         }
     }
 
-    private int AddFunction(string[] lines, Match match, int startIndex)
+    private void AddFunction(string[] lines, Match match, int startIndex)
     {
         string functionName = match.Groups[1].Value.Trim();
         string parameters = match.Groups[3].Value;
@@ -144,13 +183,18 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         foreach (string codeline in lines.Skip(startIndex).Take(endPosition - startIndex + 1))
         {
             func.AddCode(codeline);
+
+            Match instanceMatch = regexService.InstanceMatcher().Match(codeline);
+            if (instanceMatch.Success)
+            {
+                string name = instanceMatch.Groups[1].Value;
+                string objectName = instanceMatch.Groups[2].Value;
+                _instanceNames.TryAdd(name, objectName);
+            }
         }
 
         func.ElementType = APIElementType.FUNCTION;
-
         Results.Functions.Add(func);
-
-        return endPosition - startIndex;
     }
 
     private void AddObject(Dictionary<string, EsoUIObject> objects, Match match, string[] lines, int startOfFunction, int endOfFunction)
@@ -169,7 +213,6 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
             {
                 ElementType = APIElementType.OBJECT_TYPE
             };
-
             objects.Add(objectName, obj);
         }
 
@@ -191,7 +234,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
                 if (instance.Success)
                 {
-                    obj.InstanceName = instance.Groups[1].Value;
+                    obj.AddInstanceName(instance.Groups[1].Value);
                 }
             }
         }

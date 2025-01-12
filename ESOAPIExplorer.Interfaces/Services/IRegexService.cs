@@ -4,6 +4,7 @@ namespace ESOAPIExplorer.Services
 {
     public interface IRegexService
     {
+        public Regex AliasMatcher();
         public Regex ApiVersionMatcher();
         public Regex ArgumentMatcher();
         public Regex CallbackObjectMatcher();
@@ -14,6 +15,7 @@ namespace ESOAPIExplorer.Services
         public Regex EnumNameMatcher();
         public Regex EsoStringMatcher();
         public Regex EventMatcher();
+        public Regex FragmentMatcher();
         public Regex FunctionAccessMatcher();
         public Regex FunctionKeywordMatcher();
         public Regex FunctionMatcher();

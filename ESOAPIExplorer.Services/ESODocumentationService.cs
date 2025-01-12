@@ -192,7 +192,7 @@ public class ESODocumentationService : IESODocumentationService
 
         EsoUIDocumentation documentation = await ParseAsync(path);
         _LuaObjectScanner.FolderPath = directoryPath;
-        _LuaObjectScanner.ScanFolderForLuaFunctions();
+        _LuaObjectScanner.ScanFolderForLuaFunctions(documentation.Objects.First(o => o.Value.Name == "ZO_CallbackObject").Value);
         LuaScanResults luaobjects = _LuaObjectScanner.Results;
 
         var dpet = luaobjects.Objects.Where(o => o.InstanceName.StartsWith("PROMOTIONAL")).FirstOrDefault();
@@ -201,6 +201,7 @@ public class ESODocumentationService : IESODocumentationService
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
         Parallel.ForEach(luaobjects.InstanceNames, name => documentation.InstanceNames.TryAdd(name.Name, name));
         Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
+        Parallel.ForEach(luaobjects.Fragments, fragment => documentation.Fragments.Add(fragment.Key));
 
         // lookups
         ConcurrentDictionary<string, string> esoStrings = GetEsoStrings(ingamePath);
@@ -548,7 +549,7 @@ public class ESODocumentationService : IESODocumentationService
         unregisterForUpdate.AddArgument("namespace", "string");
         unregisterForUpdate.AddReturn("success", "bool");
 
-        EsoUIObject eventManager = new EsoUIObject("EventManager");
+        EsoUIObject eventManager = new EsoUIObject("EVENT_MANAGER");
         eventManager.AddFunction(registerForEvent);
         eventManager.AddFunction(registerForAllEvents);
         eventManager.AddFunction(unregisterForEvent);
@@ -568,11 +569,120 @@ public class ESODocumentationService : IESODocumentationService
         EsoUIFunction getAddOnManager = new EsoUIFunction("GetAddOnManager");
         getAddOnManager.AddReturn("addOnManager", "AddOnManager");
 
-        Documentation.Objects["EventManager"] = eventManager;
+        EsoUIFunction registerCallback = new EsoUIFunction("RegisterCallback");
+        registerCallback.AddArgument("eventName", "string");
+        registerCallback.AddArgument("callback", "function");
+        registerCallback.AddArgument("arg");
+
+        EsoUIFunction unregisterAllCallbacks = new EsoUIFunction("UnregisterAllCallbacks");
+        unregisterAllCallbacks.AddArgument("eventName", "string");
+
+        EsoUIFunction setHandleOnce = new EsoUIFunction("SetHandleOnce");
+        setHandleOnce.AddArgument("handleOnce", "boolean");
+
+        EsoUIFunction fireCallbacks = new EsoUIFunction("FireCallbacks");
+        fireCallbacks.AddArgument("eventName", "string");
+        fireCallbacks.AddArgument("...");
+
+        EsoUIFunction clean = new EsoUIFunction("Clean");
+        clean.AddArgument("eventName", "string");
+
+        EsoUIFunction subclass = new EsoUIFunction("Subclass");
+        subclass.AddReturn("subclass", "object");
+
+        EsoUIFunction clearCallbackRegistry = new EsoUIFunction("ClearCallbackRegistry");
+
+        EsoUIFunction getFireCallbackDepth = new EsoUIFunction("GetFireCallbackDepth");
+        fireCallbacks.AddReturn("fireCallbackDepth", "integer");
+
+        EsoUIFunction getDirtyEvents = new EsoUIFunction("GetDirtyEvents");
+        fireCallbacks.AddReturn("dirtyEvents", "table");
+
+        EsoUIObject callbackManager = new EsoUIObject("CALLBACK_MANAGER");
+        callbackManager.AddFunction(registerCallback);
+        callbackManager.AddFunction(unregisterAllCallbacks);
+        callbackManager.AddFunction(setHandleOnce);
+        callbackManager.AddFunction(fireCallbacks);
+        callbackManager.AddFunction(clean);
+        callbackManager.AddFunction(clearCallbackRegistry);
+        callbackManager.AddFunction(getFireCallbackDepth);
+        callbackManager.AddFunction(getDirtyEvents);
+
+        EsoUIObject callbackObject = new EsoUIObject("ZO_CallbackObject");
+        callbackObject.AddFunction(registerCallback);
+        callbackObject.AddFunction(unregisterAllCallbacks);
+        callbackObject.AddFunction(setHandleOnce);
+        callbackObject.AddFunction(fireCallbacks);
+        callbackObject.AddFunction(clean);
+        callbackObject.AddFunction(clearCallbackRegistry);
+        callbackObject.AddFunction(getFireCallbackDepth);
+        callbackObject.AddFunction(getDirtyEvents);
+        callbackObject.AddFunction(subclass);
+
+        EsoUIFunction getbottom = new EsoUIFunction("GetBottom");
+        getbottom.AddReturn("bottom", "number");
+
+        EsoUIFunction getcenter = new EsoUIFunction("GetCenter");
+        getcenter.AddReturn("centerX", "number");
+        getcenter.AddReturn("centerY", "number");
+
+        EsoUIFunction getchild = new EsoUIFunction("GetChild");
+        getchild.AddArgument("childIndex", "integer");
+        getchild.AddReturn("childControl", "object");
+
+        EsoUIFunction getdimensions = new EsoUIFunction("GetDimensions");
+        getdimensions.AddReturn("width", "number");
+        getdimensions.AddReturn("height", "number");
+
+        EsoUIFunction getheight = new EsoUIFunction("GetHeight");
+        getheight.AddReturn("height", "number");
+
+        EsoUIFunction getleft = new EsoUIFunction("GetLeft");
+        getleft.AddReturn("left", "number");
+
+        EsoUIFunction getnumchildren = new EsoUIFunction("GetNumChildren");
+        getnumchildren.AddReturn("numChildren", "integer");
+
+        EsoUIFunction getnamedchild = new EsoUIFunction("GetNamedChild");
+        getnamedchild.AddArgument("childName", "string");
+        getnamedchild.AddReturn("childControl", "object");
+
+        EsoUIFunction getright = new EsoUIFunction("GetRight");
+        getright.AddReturn("right", "number");
+
+        EsoUIFunction getscale = new EsoUIFunction("GetScale");
+        getscale.AddReturn("scale", "number");
+
+        EsoUIFunction gettop = new EsoUIFunction("GetTop");
+        gettop.AddReturn("top", "number");
+
+        EsoUIFunction getwidth = new EsoUIFunction("GetWidth");
+        getwidth.AddReturn("width", "number");
+
+        EsoUIObject guiroot = new EsoUIObject("GuiRoot");
+        guiroot.AddCode("GuiRoot");
+        guiroot.ElementType = APIElementType.C_OBJECT_TYPE;
+        guiroot.AddFunction(getbottom);
+        guiroot.AddFunction(getcenter);
+        guiroot.AddFunction(getchild);
+        guiroot.AddFunction(getdimensions);
+        guiroot.AddFunction(getheight);
+        guiroot.AddFunction(getleft);
+        guiroot.AddFunction(getnumchildren);
+        guiroot.AddFunction(getnamedchild);
+        guiroot.AddFunction(getright);
+        guiroot.AddFunction(getscale);
+        guiroot.AddFunction(gettop);
+        guiroot.AddFunction(getwidth);
+
+        Documentation.Objects["EVENT_MANAGER"] = eventManager;
         Documentation.Functions["GetWindowManager"] = getWindowManager;
         Documentation.Functions["GetAnimationManager"] = getAnimationManager;
         Documentation.Functions["GetEventManager"] = getEventManager;
         Documentation.Functions["GetAddOnManager"] = getAddOnManager;
+        Documentation.Objects["CALLBACK_MANAGER"] = callbackManager;
+        Documentation.Objects["ZO_CallbackObject"] = callbackObject;
+        Documentation.Objects["GuiRoot"] = guiroot;
     }
 
     private Task<EsoUIDocumentation> ParseFileAsync()

@@ -4,6 +4,8 @@ namespace ESOAPIExplorer.Services;
 
 public partial class RegexService : IRegexService
 {
+    [GeneratedRegex(@"^((?![^=]*\.)[A-Zz]\S+)\s*=\s*(?![^=]*\d)(.*)")]
+    private static partial Regex _AliasMatcher();
 
     [GeneratedRegex(@"(\d+)$")]
     private static partial Regex _ApiVersionMatcher();
@@ -35,6 +37,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"^\*\ ([^\s]+)(\s\((.+)\))?")]
     private static partial Regex _EventMatcher();
 
+    [GeneratedRegex(@"\s*((?:[A-Z_]*FRAGMENT))\s=\s")]
+    private static partial Regex _FragmentMatcher();
+
     [GeneratedRegex(@"([^\s]+)( \*(.+)\*)?")]
     private static partial Regex _FunctionAccessMatcher();
 
@@ -56,7 +61,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
 
-    [GeneratedRegex(@"^\s*([A-Z_]+)\s=\s(.+)[:\.]+New\(")]
+    [GeneratedRegex(@"\s*([A-Z_]+)\s=\s(.+)[:\.]+New\(")]
     private static partial Regex _InstanceMatcher();
 
     [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]
@@ -77,6 +82,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"^\s*(?:local\s+)?(.+)\s+=\s+(.+):Subclass\(")]
     private static partial Regex _SubclassMatcher();
 
+    public Regex AliasMatcher() => _AliasMatcher();
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
     public Regex CallbackObjectMatcher() => _CallbackObjectMatcher();
@@ -87,6 +93,7 @@ public partial class RegexService : IRegexService
     public Regex EnumNameMatcher() => _EnumNameMatcher();
     public Regex EsoStringMatcher() => _EsoStringMatcher();
     public Regex EventMatcher() => _EventMatcher();
+    public Regex FragmentMatcher() => _FragmentMatcher();
     public Regex FunctionAccessMatcher() => _FunctionAccessMatcher();
     public Regex FunctionKeywordMatcher() => _FunctionKeywordMatcher();
     public Regex FunctionMatcher() => _FunctionMatcher();

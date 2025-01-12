@@ -7,5 +7,6 @@ namespace ESOAPIExplorer.Models
         public ConcurrentBag<EsoUIFunction> Functions { get; set; } = [];
         public ConcurrentBag<EsoUIInstance> InstanceNames { get; set; } = [];
         public ConcurrentBag<EsoUIObject> Objects { get; set; } = [];
+        public ConcurrentDictionary<string, bool> Fragments { get; set; } = [];
     }
 }

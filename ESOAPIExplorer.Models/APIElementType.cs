@@ -2,6 +2,7 @@ namespace ESOAPIExplorer.Models;
 
 public enum APIElementType
 {
+    ALIAS,
     C_FUNCTION,
     C_OBJECT_METHOD,
     C_OBJECT_TYPE,

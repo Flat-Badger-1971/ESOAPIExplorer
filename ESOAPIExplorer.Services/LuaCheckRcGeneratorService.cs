@@ -11,7 +11,7 @@ public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentatio
     {
         Dictionary<string, bool> Added = [];
 
-        StringBuilder rc = new StringBuilder("std = \"min\"\n");
+        StringBuilder rc = new StringBuilder("std = \"max\"\n");
         rc.AppendLine("max_line_length = 160\n");
         rc.AppendLine("read_globals = {");
 
@@ -20,7 +20,7 @@ public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentatio
         rc.AppendLine($"    -- API Version {docs.ApiVersion}");
         rc.AppendLine("    -- Objects");
 
-        foreach (var obj in docs.Objects)
+        foreach (KeyValuePair<string, EsoUIObject> obj in docs.Objects.Where(o => o.Value.ElementType != APIElementType.ALIAS))
         {
             string instanceName = !string.IsNullOrWhiteSpace(obj.Value.InstanceName) ? obj.Value.InstanceName : obj.Key;
 
@@ -49,7 +49,7 @@ public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentatio
             rc.AppendLine($"    \"{constant.Name}\",");
         }
 
-        foreach (System.Collections.Generic.KeyValuePair<string, EsoUIConstantValue> constant in docs.Constants)
+        foreach (KeyValuePair<string, EsoUIConstantValue> constant in docs.Constants)
         {
             rc.AppendLine($"    \"{constant.Key}\",");
         }
@@ -70,9 +70,25 @@ public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentatio
             rc.AppendLine($"    \"{esoevent.Key}\",");
         }
 
+        // Fragments
+        rc.AppendLine("    -- Fragments");
+
+        foreach (string fragment in docs.Fragments)
+        {
+            rc.AppendLine($"    \"{fragment}\",");
+        }
+
+        // Aliases
+        rc.AppendLine("    -- Aliases");
+
+        foreach (KeyValuePair<string, EsoUIObject> alias in docs.Objects.Where(o => o.Value.ElementType == APIElementType.ALIAS))
+        {
+            rc.AppendLine($"    \"{alias.Key}\",");
+        }
+
         // Miscellanous
-        rc.AppendLine("    -- Miscellanous");
-        rc.AppendLine("    \"unpack\",");
+        //rc.AppendLine("    -- Miscellanous");
+        //rc.AppendLine("    \"unpack\",");
 
         rc.AppendLine("}");
 

@@ -22,6 +22,11 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: implement decent theme colours
 // TODO: object_type code is missing
 // TODO: change returns in multiple lists (see GetSkillLineInfo)
+// TODO: functions in globalapi.lua missing arguments
+// TODO: add busy indicator
+// TODO: add proper export screen with options to control export content
+// TODO: utility.lua in BS
+
 public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
 {
     #region Properties
