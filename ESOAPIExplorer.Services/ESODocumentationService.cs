@@ -516,9 +516,36 @@ public class ESODocumentationService : IESODocumentationService
 
     private void AddManagers()
     {
-        Documentation.Objects["WINDOW_MANAGER"] = Documentation.Objects["WindowManager"];
-        Documentation.Objects["ANIMATION_MANAGER"] = Documentation.Objects["AnimationManager"];
-        Documentation.Objects["EVENT_MANAGER"] = Documentation.Objects["EventManager"];
+        EsoUIObject managerClass = Documentation.Objects["WindowManager"];
+        EsoUIObject windowManager = new EsoUIObject("WINDOW_MANAGER", false)
+        {
+            Code = managerClass.Code,
+            ElementType = APIElementType.C_OBJECT_TYPE,
+            Functions = managerClass.Functions,
+            InstanceName = "WINDOW_MANAGER",
+        };
+
+        EsoUIObject animationClass = Documentation.Objects["AnimationManager"];
+        EsoUIObject animationManager = new EsoUIObject("ANIMATION_MANAGER", false)
+        {
+            Code = animationClass.Code,
+            ElementType = APIElementType.C_OBJECT_TYPE,
+            Functions = animationClass.Functions,
+            InstanceName = "ANIMATION_MANAGER",
+        };
+
+        EsoUIObject eventClass = Documentation.Objects["EventManager"];
+        EsoUIObject eventManager = new EsoUIObject("EVENT_MANAGER", false)
+        {
+            Code = eventClass.Code,
+            ElementType = APIElementType.C_OBJECT_TYPE,
+            Functions = eventClass.Functions,
+            InstanceName = "EVENT_MANAGER",
+        };
+
+        Documentation.Objects["WINDOW_MANAGER"] = windowManager;
+        Documentation.Objects["ANIMATION_MANAGER"] = animationManager;
+        Documentation.Objects["EVENT_MANAGER"] = eventManager;
     }
 
     private void AddCustomData()
@@ -726,14 +753,14 @@ public class ESODocumentationService : IESODocumentationService
                     }
                 }
 
+                AddManagers();
+
                 return Documentation;
             }
             else
             {
                 return null;
             }
-
-            AddManagers();
         });
     }
 
