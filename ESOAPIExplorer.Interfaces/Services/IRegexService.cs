@@ -8,6 +8,7 @@ namespace ESOAPIExplorer.Services
         public Regex ApiVersionMatcher();
         public Regex ArgumentMatcher();
         public Regex CallbackObjectMatcher();
+        public Regex ColorDefMatcher();
         public Regex ConstantMatcher();
         public Regex DoKeywordMatcher();
         public Regex EndKeywordMatcher();

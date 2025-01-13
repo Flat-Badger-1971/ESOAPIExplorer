@@ -16,6 +16,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"^\s*([A-Z_]+)\s+=\s+ZO_CallbackObject.New\(self\)")]
     private static partial Regex _CallbackObjectMatcher();
 
+    [GeneratedRegex(@"^(ZO_.+)\s=\sZO_ColorDef:New\(")]
+    private static partial Regex _ColorDefMatcher();
+
     [GeneratedRegex(@"\[""(.*?)""\]\s*=\s*(.*?),")]
     private static partial Regex _ConstantMatcher();
 
@@ -86,6 +89,7 @@ public partial class RegexService : IRegexService
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
     public Regex CallbackObjectMatcher() => _CallbackObjectMatcher();
+    public Regex ColorDefMatcher() => _ColorDefMatcher();
     public Regex ConstantMatcher() => _ConstantMatcher();
     public Regex DoKeywordMatcher() => _DoKeywordMatcher();
     public Regex EndKeywordMatcher() => _EndKeywordMatcher();

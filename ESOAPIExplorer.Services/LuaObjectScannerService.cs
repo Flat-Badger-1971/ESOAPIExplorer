@@ -68,6 +68,20 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 obj.AddInstanceName(instanceName.Key);
             }
         }
+
+        // Check for colordefs
+        EsoUIObject colordef = Results.Objects.FirstOrDefault(o => o.Name == "ZO_ColorDef");
+
+        if (colordef != null)
+        {
+            foreach (EsoUIObject colorDef in Results.Objects.Where(o => o.ElementType == APIElementType.OBJECT_TYPE && o.Name.EndsWith("_COLOR")))
+            {
+                foreach (KeyValuePair<string, EsoUIFunction> func in colordef.Functions.Where(f => f.Value.Name != "New"))
+                {
+                    colorDef.AddFunction(func.Value);
+                }
+            }
+        }
     }
 
     private void ScanFile(string fileContent, string filepath, string filename)
@@ -154,6 +168,24 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                             Results.Objects.Add(esoobject);
                         }
                     }
+                }
+
+                // Match colordefs
+                Match colorDefMatch = regexService.ColorDefMatcher().Match(line);
+
+                if (colorDefMatch.Success)
+                {
+                    string name = colorDefMatch.Groups[1].Value.Trim();
+                    EsoUIObject esoobject = new EsoUIObject(name, false)
+                    {
+                        ElementType = APIElementType.OBJECT_TYPE,
+                        InstanceName = name,
+                        Code = [colorDefMatch.Groups[0].Value.Trim()],
+                        Functions = [],
+                        Name = name
+                    };
+
+                    Results.Objects.Add(esoobject);
                 }
             }
         }
