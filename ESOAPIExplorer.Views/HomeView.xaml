@@ -122,6 +122,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -150,14 +152,35 @@
                 <Button Command="{Binding SearchWikiCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="show on wiki" Grid.Column="1"/>
             </Grid>
 
+            <!-- instance name -->
+            <StackPanel Grid.Row="3" Visibility="{Binding SelectedObjectDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <TextBlock Text="instance name" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedObjectDetails.InstanceName, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                <Grid DataContext="{Binding SelectedObjectDetails}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ListView
+                        ItemsSource="{Binding InstanceName, Converter={StaticResource SingleValueToListConverter}}"
+                        Grid.Row="1"
+                        Style="{StaticResource InvisibleListViewStyle}"
+                        ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
+                        SelectedItem="{Binding Path=DataContext.SelectedUsedByItem, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Margin="10"
+                        BorderThickness="0"
+                        Visibility="{Binding InstanceName, Converter={StaticResource NotNullToVisibilityConverter}}"
+                        ItemTemplate="{StaticResource UsedByItemTemplate}"/>
+                </Grid>
+            </StackPanel>
+
             <!-- parent class -->
-            <StackPanel Grid.Row="3" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="4" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="parent class" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}" />
                 <TextBlock Text="{Binding SelectedMethodDetails.Parent}" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}"/>
             </StackPanel>
 
             <!-- file path -->
-            <StackPanel Grid.Row="3" Visibility="{Binding SelectedInstanceDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="5" Visibility="{Binding SelectedInstanceDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="file path" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <TextBlock Text="{Binding SelectedInstanceDetails.File}" Margin="10" Foreground="BurlyWood"/>
                 <Grid DataContext="{Binding SelectedInstanceDetails}">
@@ -177,9 +200,9 @@
                           ItemTemplate="{StaticResource UsedByItemTemplate}"/>
                 </Grid>
             </StackPanel>
-            
+
             <!-- access -->
-            <StackPanel Grid.Row="4">
+            <StackPanel Grid.Row="6">
                 <!-- Function details -->
                 <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
                 <TextBlock Text="{Binding SelectedFunctionDetails.Access, Converter={StaticResource LowercaseConverter}}"
@@ -196,7 +219,7 @@
             </StackPanel>
 
             <!-- value -->
-            <StackPanel Grid.Row="5">
+            <StackPanel Grid.Row="7">
                 <!-- Event Values -->
                 <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
                 <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
@@ -235,7 +258,7 @@
             </StackPanel>
 
             <!-- arguments -->
-            <StackPanel Grid.Row="6">
+            <StackPanel Grid.Row="8">
                 <!-- Function Arguments -->
                 <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
                 <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
@@ -283,7 +306,7 @@
             </StackPanel>
 
             <!-- results -->
-            <StackPanel Grid.Row="7">
+            <StackPanel Grid.Row="9">
                 <!-- Function Return Values -->
                 <StackPanel Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                     <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10" />
@@ -316,7 +339,7 @@
             </StackPanel>
 
             <!-- enum -->
-            <StackPanel Grid.Row="8" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
+            <StackPanel Grid.Row="10" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
                 <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
                 <TextBlock Text="{Binding SelectedGlobalDetails.ParentName}" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}" Margin="10"/>
                 <!-- enum Values -->
@@ -352,7 +375,7 @@
             </StackPanel>
 
             <!-- used by -->
-            <Grid Grid.Row="9" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <Grid Grid.Row="11" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
                 <Grid DataContext="{Binding SelectedGlobalEnum}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -372,7 +395,7 @@
             </Grid>
 
             <!-- object methods -->
-            <Grid Grid.Row="10" Visibility="{Binding SelectedObjectDetails, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <Grid Grid.Row="12" Visibility="{Binding SelectedObjectDetails, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -392,10 +415,10 @@
             </Grid>
 
             <!-- SI_ string Value -->
-            <Grid Grid.Row="11" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
+            <Grid Grid.Row="13" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
                 <StackPanel>
-                <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
-                <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="WrapWholeWords"/>
+                    <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
+                    <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="WrapWholeWords"/>
                 </StackPanel>
             </Grid>
         </Grid>

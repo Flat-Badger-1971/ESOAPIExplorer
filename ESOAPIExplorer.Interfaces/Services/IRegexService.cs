@@ -31,5 +31,6 @@ namespace ESOAPIExplorer.Services
         public Regex SectionMatcher();
         public Regex SelfAssignmentMatcher();
         public Regex SubclassMatcher();
+        public Regex UppercaseMatcher();
     }
 }

@@ -64,7 +64,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
 
-    [GeneratedRegex(@"\s*([A-Z_]+)\s=\s(.+)[:\.]+New\(")]
+    [GeneratedRegex(@"\s*([A-Z_]+)\s=\s(.+)[:\.]+New\(.+\)")]
     private static partial Regex _InstanceMatcher();
 
     [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]
@@ -84,6 +84,9 @@ public partial class RegexService : IRegexService
 
     [GeneratedRegex(@"^\s*(?:local\s+)?(.+)\s+=\s+(.+):Subclass\(")]
     private static partial Regex _SubclassMatcher();
+
+    [GeneratedRegex(@"^[A-Z_]+$")]
+    private static partial Regex _UppercaseMatcher();
 
     public Regex AliasMatcher() => _AliasMatcher();
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
@@ -112,4 +115,5 @@ public partial class RegexService : IRegexService
     public Regex SectionMatcher() => _SectionMatcher();
     public Regex SelfAssignmentMatcher() => _SelfAssignmentMatcher();
     public Regex SubclassMatcher() => _SubclassMatcher();
+    public Regex UppercaseMatcher() => _UppercaseMatcher();
 }

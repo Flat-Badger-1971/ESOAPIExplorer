@@ -199,7 +199,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
     private void AddFunction(string[] lines, Match match, int startIndex)
     {
         string functionName = match.Groups[1].Value.Trim();
-        string parameters = match.Groups[3].Value;
+        string parameters = match.Groups[2].Value;
         EsoUIFunction func = new EsoUIFunction(functionName);
 
         // Find end of function
@@ -247,8 +247,10 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         {
             obj = new EsoUIObject(objectName)
             {
-                ElementType = APIElementType.OBJECT_TYPE
+                ElementType = APIElementType.OBJECT_TYPE,
+                Code = [match.Groups[0].Value.Replace("function ","")]
             };
+
             objects.Add(objectName, obj);
         }
 

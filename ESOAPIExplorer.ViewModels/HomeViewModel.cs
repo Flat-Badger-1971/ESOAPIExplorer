@@ -20,14 +20,10 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: diagnose enum list delay
 // TODO: fix scrollable text block padding
 // TODO: implement decent theme colours
-// TODO: object_type code is missing
 // TODO: change returns in multiple lists (see GetSkillLineInfo)
-// TODO: functions in globalapi.lua missing arguments
 // TODO: add busy indicator
 // TODO: add proper export screen with options to control export content
-// TODO: utility.lua in BS
-// TODO: investigate GetGlobalUIScale/ZO_ObjectPool/ZO_ERROR_COLOR
-public partial class HomeViewModel(IDialogService dialogService, IESODocumentationService esoDocumentationService) : ViewModelBase
+public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService) : ViewModelBase
 {
     #region Properties
     private APIElement _SelectedElement;
@@ -156,7 +152,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             Task.Run(async () =>
             {
                 await Task.Delay(10);
-                dialogService.RunOnMainThread(() => SelectedEnum = -1);
+                _dialogService.RunOnMainThread(() => SelectedEnum = -1);
             });
         }
     }
@@ -190,7 +186,12 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 {
                     case APIElementType.OBJECT_TYPE:
                     case APIElementType.C_OBJECT_TYPE:
-                        selected = $"{SelectedObjectDetails.Name}:{value}";
+                        if (!_regexService.UppercaseMatcher().IsMatch(value))
+                        {
+                            // object instance
+                            selected = $"{SelectedObjectDetails.Name}:{value}";
+                        }
+
                         break;
                     case APIElementType.INSTANCE_NAME:
                         selected = SelectedInstanceDetails.InstanceOf;
@@ -248,12 +249,12 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
         if (_AllItems == null || _AllItems?.Count == 0)
         {
-            await esoDocumentationService.InitialiseAsync();
+            await _esoDocumentationService.InitialiseAsync();
 
             _SearchAlgorithms = Utility.ListSearchAlgorithms();
 
             // Events
-            ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Events
+            ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Events
                 .Select(item =>
                     new APIElement
                     {
@@ -264,7 +265,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     }));
 
             // Functions
-            ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Functions
+            ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Functions
                 .Select(item =>
                     new APIElement
                     {
@@ -275,7 +276,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                     }));
 
             // Enums
-            ObservableCollection<APIElement> enums = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Globals
+            ObservableCollection<APIElement> enums = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Globals
                 .Where(g => g.Key != "Globals")
                 .SelectMany(item =>
                     item.Value
@@ -288,7 +289,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             Parent = item.Key,
                             Code = [$"* {detail.Name}"]
                         }))
-                .Concat(esoDocumentationService.Documentation.Globals
+                .Concat(_esoDocumentationService.Documentation.Globals
                 .Where(g => g.Key != "Global")
                 .SelectMany(item =>
                     item.Value
@@ -304,7 +305,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 .Select(e => e.First())));
 
             // Constants
-            ObservableCollection<APIElement> constants = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Constants
+            ObservableCollection<APIElement> constants = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Constants
                 .Select(item =>
                     new APIElement
                     {
@@ -313,7 +314,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                         ElementType = item.Value.Name.StartsWith("SI_") ? APIElementType.SI_GLOBAL : APIElementType.CONSTANT,
                         Code = [$"{item.Value.Name} = {item.Value.Value}"]
                     })
-                .Concat(esoDocumentationService.Documentation.Globals
+                .Concat(_esoDocumentationService.Documentation.Globals
                     .Where(g => g.Key == "Globals")
                     .SelectMany(item =>
                         item.Value
@@ -327,7 +328,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                             }))));
 
             // Objects
-            ObservableCollection<APIElement> objects = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Objects
+            ObservableCollection<APIElement> objects = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Objects
                 .Select(item =>
                     new APIElement
                     {
@@ -339,7 +340,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 ));
 
             // Object methods
-            ObservableCollection<APIElement> methods = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.Objects
+            ObservableCollection<APIElement> methods = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Objects
                 .SelectMany(item =>
                     item.Value.Functions
                     .Select(func =>
@@ -354,7 +355,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 )));
 
             // InstanceNames
-            ObservableCollection<APIElement> instanceNames = new ObservableCollection<APIElement>(esoDocumentationService.Documentation.InstanceNames
+            ObservableCollection<APIElement> instanceNames = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.InstanceNames
                 .Select(n => new APIElement
                 {
                     Id = n.Key,
@@ -424,7 +425,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
         {
             APIElement element = _SelectedElement;
             List<Action> actions = [];
-            EsoUIDocumentation doc = esoDocumentationService.Documentation;
+            EsoUIDocumentation doc = _esoDocumentationService.Documentation;
 
             if (element != null)
             {
@@ -531,7 +532,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 {
                     foreach (Action action in actions)
                     {
-                        dialogService.RunOnMainThread(action);
+                        _dialogService.RunOnMainThread(action);
                     }
                 }
             }
@@ -552,7 +553,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
 
     private bool HasMatchingArgument(APIElement element, string value)
     {
-        EsoUIDocumentation docs = esoDocumentationService.Documentation;
+        EsoUIDocumentation docs = _esoDocumentationService.Documentation;
 
         switch (element.ElementType)
         {
@@ -613,7 +614,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             return AllItems
                 .Where(d =>
                     d.Value.ElementType == APIElementType.SI_GLOBAL &&
-                        esoDocumentationService.Documentation.SI_Lookup.TryGetValue(d.Value.Name, out string value) &&
+                        _esoDocumentationService.Documentation.SI_Lookup.TryGetValue(d.Value.Name, out string value) &&
                         value.Contains(filter.Substring(1), StringComparison.OrdinalIgnoreCase)
                 )
                 .Select(s => s.Value)
@@ -645,13 +646,13 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
                 if (searchQuery == _FilterText)
                 {
                     IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText);
-                    dialogService.RunOnMainThread(() =>
+                    _dialogService.RunOnMainThread(() =>
                     {
                         FilteredItems = new ObservableCollection<APIElement>(filtered);
                         Status = new StatusInformation
                         {
                             APIItems = _FilteredItems.Count,
-                            APIVersion = esoDocumentationService.Documentation.ApiVersion,
+                            APIVersion = _esoDocumentationService.Documentation.ApiVersion,
                             CFunctionItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_FUNCTION).Count(),
                             CMethodItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_METHOD).Count(),
                             CObjectItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_TYPE).Count(),
@@ -707,7 +708,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
     {
         ConcurrentBag<string> usedBy = [];
 
-        Parallel.ForEach(esoDocumentationService.Documentation.Events, item =>
+        Parallel.ForEach(_esoDocumentationService.Documentation.Events, item =>
         {
             Parallel.ForEach(item.Value.Args, arg =>
             {
@@ -718,7 +719,7 @@ public partial class HomeViewModel(IDialogService dialogService, IESODocumentati
             });
         });
 
-        Parallel.ForEach(esoDocumentationService.Documentation.Functions, item =>
+        Parallel.ForEach(_esoDocumentationService.Documentation.Functions, item =>
         {
             Parallel.ForEach(item.Value.Args, arg =>
             {

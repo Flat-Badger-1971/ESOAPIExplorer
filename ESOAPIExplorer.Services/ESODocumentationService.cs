@@ -613,6 +613,9 @@ public class ESODocumentationService : IESODocumentationService
         getAddOnManager.AddCode("* GetAddOnManager()");
         getAddOnManager.AddCode("** _Returns:_ *object* _addOnManager_");
 
+        EsoUIFunction getUIGlobalScale = new EsoUIFunction("GetUIGlobalScale");
+        getUIGlobalScale.AddReturn("globalScale", "number");
+
         #region callback manager
         EsoUIFunction registerCallback = new EsoUIFunction("RegisterCallback");
         registerCallback.AddArgument("eventName", "string");
@@ -728,6 +731,7 @@ public class ESODocumentationService : IESODocumentationService
         Documentation.Functions["GetAnimationManager"] = getAnimationManager;
         Documentation.Functions["GetEventManager"] = getEventManager;
         Documentation.Functions["GetAddOnManager"] = getAddOnManager;
+        Documentation.Functions["GetUIGlobalScale"] = getUIGlobalScale;
         Documentation.Objects["CALLBACK_MANAGER"] = callbackManager;
         Documentation.Objects["ZO_CallbackObject"] = callbackObject;
         Documentation.Objects["GuiRoot"] = guiroot;
