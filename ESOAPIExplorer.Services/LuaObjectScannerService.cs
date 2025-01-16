@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -317,6 +318,35 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         return lines.Length - 1;
     }
 
+    private static IEnumerable<string> SplitReturnValues(string values)
+    {
+        List<string> returnValues = [];
+        StringBuilder stringBuilder = new();
+        string[] splits = values.Split(',');
+        int ccount = 0;
+
+        foreach (string s in splits)
+        {
+            ccount += s.Count(c => c == '(');
+            ccount -= s.Count(c => c == ')');
+
+            if (stringBuilder.Length > 0)
+            {
+                stringBuilder.Append(", ");
+            }
+
+            stringBuilder.Append(s);
+
+            if (ccount == 0)
+            {
+                returnValues.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+            }
+        }
+
+        return returnValues;
+    }
+
     private static List<string> ExtractReturnTypes(string[] lines, int startPosition, int endPosition)
     {
         List<string> returnTypes = [];
@@ -327,7 +357,12 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
             if (line.StartsWith("return "))
             {
-                returnTypes.Add(line.Substring(7));
+                IEnumerable<string> returnValues = SplitReturnValues(line.Substring(7));
+
+                foreach (string returnValue in returnValues)
+                {// needs to handle multiple returns with multiple types
+                    returnTypes.Add(returnValue);
+                }
             }
         }
 
