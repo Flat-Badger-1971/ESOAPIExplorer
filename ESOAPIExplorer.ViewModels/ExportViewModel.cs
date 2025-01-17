@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 
@@ -31,14 +32,18 @@ public class ExportViewModel(ILuaCheckRcGeneratorService luaCheckRcGeneratorServ
 
         // Associate the HWND with the folder picker
         WinRT.Interop.InitializeWithWindow.Initialize(_FolderPicker, hwnd);
+    }
 
+    // public ICommand exportLuchCheck = new RelayCommand(async () => await ExportLuaCheckFile());
+
+    private async Task ExportLuaCheckFile()
+    {
         StorageFolder folder = await _FolderPicker.PickSingleFolderAsync();
 
         if (folder != null)
         {
             StringBuilder luacheckrc = luaCheckRcGeneratorService.Generate();
             StorageFile file = await folder.CreateFileAsync(".luacheckrc", CreationCollisionOption.ReplaceExisting);
-
             await FileIO.WriteTextAsync(file, luacheckrc.ToString());
         }
     }

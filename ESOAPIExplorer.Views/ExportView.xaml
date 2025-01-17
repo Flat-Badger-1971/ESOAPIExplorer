@@ -12,11 +12,26 @@
     d:DataContext="{d:DesignInstance Type=vm:ExportViewModel}">
 
     <Grid x:Name="RootGrid" Margin="20">
-
         <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Vertical">
-            <TextBlock Text="ESO API Explorer" FontSize="32" Margin="0,10,0,20" Foreground="Goldenrod"/>
+        <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center">
+            <TextBlock Text="ESO API Explorer" FontSize="32" Margin="0,10,0,20" Foreground="Goldenrod" FontWeight="Bold"/>
         </StackPanel>
 
+        <!-- Export Options -->
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,20,0,0" HorizontalAlignment="Center" Width="400">
+            <TextBlock Text="Export Options" FontSize="24" Margin="0,0,0,10" Foreground="DarkGray" FontWeight="SemiBold"/>
+
+            <!-- Export to .luacheckrc -->
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Center">
+                <TextBlock Text="Export to .luacheckrc" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="18"/>
+                <Button Content="Select File" Width="100" Height="30" Margin="10,0,0,0" Command="{Binding }"/>
+            </StackPanel>
+
+            <!-- Export to .luarc -->
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Center">
+                <TextBlock Text="Export to .luarc" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="18"/>
+                <Button Content="Select File" Width="100" Height="30" Margin="10,0,0,0"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>
