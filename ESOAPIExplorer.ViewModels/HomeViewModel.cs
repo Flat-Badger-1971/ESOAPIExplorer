@@ -412,6 +412,14 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         }
     }
 
+    private void UpdateObjects(List<EsoUIReturn> returns)
+    {
+        foreach (EsoUIReturn r in returns)
+        {
+            UpdateObjects(r.Values);
+        }
+    }
+
     private void UpdateSelectedElementDetails()
     {
         if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
@@ -731,10 +739,13 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
             Parallel.ForEach(item.Value.Returns, retval =>
             {
-                if (retval.Type.Name == enumName)
+                Parallel.ForEach(retval.Values, ret =>
                 {
-                    usedBy.Add(item.Key);
-                }
+                    if (ret.Type.Name == enumName && !usedBy.Contains(item.Key))
+                    {
+                        usedBy.Add(item.Key);
+                    }
+                });
             });
         });
 

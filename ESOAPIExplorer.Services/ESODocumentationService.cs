@@ -431,7 +431,8 @@ public class ESODocumentationService : IESODocumentationService
                 break;
             case true when LineStartsWith("** _Returns:_"):
                 string args = GetFirstMatch(_RegexService.FunctionReturnMatcher());
-                CurrentFunction.Returns = ParseArgs(args);
+                EsoUIReturn apiReturn = new EsoUIReturn { Index = 1, Values = ParseArgs(args) };
+                CurrentFunction.Returns.Add(apiReturn);
                 CurrentFunction.AddCode(CurrentLine);
                 break;
         }
@@ -472,7 +473,8 @@ public class ESODocumentationService : IESODocumentationService
             case true when LineStartsWith("** _Returns:_"):
                 string args = GetFirstMatch(_RegexService.FunctionReturnMatcher());
                 CurrentObject.AddCode(CurrentLine);
-                CurrentFunction.Returns = ParseArgs(args);
+                EsoUIReturn apiReturn = new EsoUIReturn { Index = 1, Values = ParseArgs(args) };
+                CurrentFunction.Returns.Add(apiReturn);
                 CurrentFunction.AddCode(CurrentLine);
                 break;
             default:

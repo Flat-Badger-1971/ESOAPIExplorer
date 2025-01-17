@@ -5,17 +5,23 @@ namespace ESOAPIExplorer.Models;
 public class EsoUIFunction(string name, EsoUIFunctionAccess access = EsoUIFunctionAccess.PUBLIC)
 {
     private int _ArgumentTotal;
-    private int _ReturnsTotal;
 
     public string Name { get; } = name;
     public EsoUIFunctionAccess Access { get; } = access;
     public List<EsoUIArgument> Args { get; set; } = [];
-    public List<EsoUIArgument> Returns { get; set; } = [];
+    public List<EsoUIReturn> Returns { get; set; } = [];
     public bool HasVariableReturns { get; set; } = false;
     public List<string> Code { get; set; } = [];
     public string Parent { get; set; }
     public void AddArgument(string name, string type = "Unknown") => Args.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ArgumentTotal));
-    public void AddReturn(string name, string type = "Unknown") => Returns.Add(new EsoUIArgument(name, new EsoUIType(type), ++_ReturnsTotal));
+    public void AddReturns(List<EsoUIReturn> returns) => Returns.AddRange(returns);
+    public void AddReturn(EsoUIReturn ret) => Returns.Add(ret);
+    public void AddReturn(string name, string type = "Unknown")
+    {
+        EsoUIReturn ret = new EsoUIReturn();
+        ret.Values.Add(new EsoUIArgument(name, new EsoUIType(type), 1));
+        Returns.Add(ret);
+    }
     public void AddCode(string line) => Code.Add(line);
     public APIElementType ElementType { get; set; } = APIElementType.C_FUNCTION;
 }

@@ -206,16 +206,14 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         // Find end of function
         int endPosition = FindEndOfFunction(lines, startIndex);
 
-        // Extract return statement if any
-        List<string> returnTypes = ExtractReturnTypes(lines, startIndex, endPosition);
-        string returnType = returnTypes.Count > 0 ? string.Join(" /// ", returnTypes) : null;
+        // Extract return statements if any
+        List<EsoUIReturn> returns = ExtractReturns(lines, startIndex, endPosition);
+        func.AddReturns(returns);
 
         foreach (string p in parameters.Split(','))
         {
             func.AddArgument(p.Trim(), "Unknown");
         }
-
-        func.AddReturn(returnType, "Unknown");
 
         foreach (string codeline in lines.Skip(startIndex).Take(endPosition - startIndex + 1))
         {
@@ -241,25 +239,23 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         string[] objectParameters = match.Groups[3].Value.Split(',');
 
         // Extract return statement if any
-        List<string> returnTypes = ExtractReturnTypes(lines, startOfFunction, endOfFunction);
-        string returnType = returnTypes.Count > 0 ? string.Join(" /// ", returnTypes) : null;
+        List<EsoUIReturn> returns = ExtractReturns(lines, startOfFunction, endOfFunction);
+        EsoUIFunction func = new EsoUIFunction(objectMethod)
+        {
+            Parent = objectName,
+            Returns = returns
+        };
 
         if (!objects.TryGetValue(objectName, out EsoUIObject obj))
         {
             obj = new EsoUIObject(objectName)
             {
                 ElementType = APIElementType.OBJECT_TYPE,
-                Code = [match.Groups[0].Value.Replace("function ","")]
+                Code = [match.Groups[0].Value.Replace("function ", "")]
             };
 
             objects.Add(objectName, obj);
         }
-
-        EsoUIFunction func = new EsoUIFunction(objectMethod)
-        {
-            Parent = objectName,
-            Returns = returnType == null ? null : [new EsoUIArgument(returnType, new EsoUIType("Unknown"), 1)]
-        };
 
         foreach (string codeline in lines.Skip(startOfFunction).Take(endOfFunction - startOfFunction + 1))
         {
@@ -318,26 +314,25 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         return lines.Length - 1;
     }
 
-    private static IEnumerable<string> SplitReturnValues(string values)
+    private static List<string> SplitReturnValues(string values)
     {
         List<string> returnValues = [];
         StringBuilder stringBuilder = new();
-        string[] splits = values.Split(',');
-        int ccount = 0;
+        int valueCount = 0;
 
-        foreach (string s in splits)
+        foreach (string value in values.Split(','))
         {
-            ccount += s.Count(c => c == '(');
-            ccount -= s.Count(c => c == ')');
+            valueCount += value.Count(c => c == '(');
+            valueCount -= value.Count(c => c == ')');
 
             if (stringBuilder.Length > 0)
             {
                 stringBuilder.Append(", ");
             }
 
-            stringBuilder.Append(s);
+            stringBuilder.Append(value.Trim());
 
-            if (ccount == 0)
+            if (valueCount == 0)
             {
                 returnValues.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
@@ -347,9 +342,10 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         return returnValues;
     }
 
-    private static List<string> ExtractReturnTypes(string[] lines, int startPosition, int endPosition)
+    private static List<EsoUIReturn> ExtractReturns(string[] lines, int startPosition, int endPosition)
     {
-        List<string> returnTypes = [];
+        List<EsoUIReturn> returns = [];
+        int returnIndex = 0;
 
         for (int i = startPosition; i <= endPosition; i++)
         {
@@ -357,15 +353,18 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
             if (line.StartsWith("return "))
             {
-                IEnumerable<string> returnValues = SplitReturnValues(line.Substring(7));
+                EsoUIReturn ret = new EsoUIReturn
+                {
+                    Index = returnIndex++,
+                    Values = SplitReturnValues(line.Substring(7))
+                    .Select((split, index) => new EsoUIArgument(split, new EsoUIType("Unknown"), index + 1))
+                    .ToList()
+                };
 
-                foreach (string returnValue in returnValues)
-                {// needs to handle multiple returns with multiple types
-                    returnTypes.Add(returnValue);
-                }
+                returns.Add(ret);
             }
         }
 
-        return returnTypes;
+        return returns;
     }
 }

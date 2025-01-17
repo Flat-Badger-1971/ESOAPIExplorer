@@ -111,56 +111,58 @@
 
         <!-- Right: Split Horizontally -->
         <Grid Grid.Column="1" Grid.Row="0" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-            <!-- Name -->
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Grid.Row="0" 
+                    <!-- Name -->
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Grid.Row="0" 
                            Text="{Binding SelectedElement.Name}"
                            Foreground ="Goldenrod"
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
                            TextAlignment="Left" />
-            </StackPanel>
+                    </StackPanel>
 
-            <!-- code -->
-            <c:ScrollableTextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" Grid.Row="1"/>
+                    <!-- code -->
+                    <c:ScrollableTextBlock Text="{Binding SelectedElement, Converter={StaticResource ElementToCodeConverter}}" Grid.Row="1"/>
 
-            <!-- github/wiki -->
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <!-- github/wiki -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                <Button Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="search github" Grid.Column="0"/>
-                <Button Command="{Binding SearchWikiCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="show on wiki" Grid.Column="1"/>
-            </Grid>
+                        <Button Command="{Binding SearchGithubCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="search github" Grid.Column="0"/>
+                        <Button Command="{Binding SearchWikiCommand}" Style="{StaticResource HyperlinkButtonStyle}"  Margin="10" Content="show on wiki" Grid.Column="1"/>
+                    </Grid>
 
-            <!-- instance name -->
-            <StackPanel Grid.Row="3" Visibility="{Binding SelectedObjectDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                <TextBlock Text="instance name" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedObjectDetails.InstanceName, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-                <Grid DataContext="{Binding SelectedObjectDetails}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <ListView
+                    <!-- instance name -->
+                    <StackPanel Grid.Row="3" Visibility="{Binding SelectedObjectDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <TextBlock Text="instance name" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedObjectDetails.InstanceName, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                        <Grid DataContext="{Binding SelectedObjectDetails}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ListView
                         ItemsSource="{Binding InstanceName, Converter={StaticResource SingleValueToListConverter}}"
                         Grid.Row="1"
                         Style="{StaticResource InvisibleListViewStyle}"
@@ -170,27 +172,27 @@
                         BorderThickness="0"
                         Visibility="{Binding InstanceName, Converter={StaticResource NotNullToVisibilityConverter}}"
                         ItemTemplate="{StaticResource UsedByItemTemplate}"/>
-                </Grid>
-            </StackPanel>
+                        </Grid>
+                    </StackPanel>
 
-            <!-- parent class -->
-            <StackPanel Grid.Row="4" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                <TextBlock Text="parent class" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}" />
-                <TextBlock Text="{Binding SelectedMethodDetails.Parent}" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-            </StackPanel>
+                    <!-- parent class -->
+                    <StackPanel Grid.Row="4" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <TextBlock Text="parent class" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}" />
+                        <TextBlock Text="{Binding SelectedMethodDetails.Parent}" Margin="10" Visibility="{Binding SelectedMethodDetails.Parent, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                    </StackPanel>
 
-            <!-- file path -->
-            <StackPanel Grid.Row="5" Visibility="{Binding SelectedInstanceDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                <TextBlock Text="file path" FontWeight="Bold" FontSize="26" Margin="10"/>
-                <TextBlock Text="{Binding SelectedInstanceDetails.File}" Margin="10" Foreground="BurlyWood"/>
-                <Grid DataContext="{Binding SelectedInstanceDetails}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="instance of" FontWeight="Bold" FontSize="26" Margin="10"/>
-                    <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding InstanceOf, Converter={StaticResource ListToVisibilityConverter}}"/>
-                    <ListView
+                    <!-- file path -->
+                    <StackPanel Grid.Row="5" Visibility="{Binding SelectedInstanceDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <TextBlock Text="file path" FontWeight="Bold" FontSize="26" Margin="10"/>
+                        <TextBlock Text="{Binding SelectedInstanceDetails.File}" Margin="10" Foreground="BurlyWood"/>
+                        <Grid DataContext="{Binding SelectedInstanceDetails}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="instance of" FontWeight="Bold" FontSize="26" Margin="10"/>
+                            <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding InstanceOf, Converter={StaticResource ListToVisibilityConverter}}"/>
+                            <ListView
                           ItemsSource="{Binding InstanceOf, Converter={StaticResource SingleValueToListConverter}}"
                           Grid.Row="1"
                           Style="{StaticResource InvisibleListViewStyle}"
@@ -198,192 +200,206 @@
                           SelectedItem="{Binding Path=DataContext.SelectedUsedByItem, ElementName=_this, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Margin="10" BorderThickness="0"
                           ItemTemplate="{StaticResource UsedByItemTemplate}"/>
-                </Grid>
-            </StackPanel>
+                        </Grid>
+                    </StackPanel>
 
-            <!-- access -->
-            <StackPanel Grid.Row="6">
-                <!-- Function details -->
-                <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-                <TextBlock Text="{Binding SelectedFunctionDetails.Access, Converter={StaticResource LowercaseConverter}}"
+                    <!-- access -->
+                    <StackPanel Grid.Row="6">
+                        <!-- Function details -->
+                        <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding SelectedFunctionDetails.Access, Converter={StaticResource LowercaseConverter}}"
                            Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}"
                            Foreground="{Binding SelectedFunctionDetails.Access, Converter={StaticResource AccessLevelToColourConverter}}"
                            Margin="10" />
 
-                <!-- Method details -->
-                <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-                <TextBlock Text="{Binding SelectedMethodDetails.Access, Converter={StaticResource LowercaseConverter}}"
+                        <!-- Method details -->
+                        <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding SelectedMethodDetails.Access, Converter={StaticResource LowercaseConverter}}"
                     Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}"
                     Foreground="{Binding SelectedMethodDetails.Access, Converter={StaticResource AccessLevelToColourConverter}}"
                     Margin="10" />
-            </StackPanel>
+                    </StackPanel>
 
-            <!-- value -->
-            <StackPanel Grid.Row="7">
-                <!-- Event Values -->
-                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
-                <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                    <!-- value -->
+                    <StackPanel Grid.Row="7">
+                        <!-- Event Values -->
+                        <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
+                        <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource ValueItemTemplate}"
                     Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <ListView.Resources>
-                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                    </ListView.Resources>
-                </ListView>
+                            <ListView.Resources>
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                            </ListView.Resources>
+                        </ListView>
 
-                <!-- Global Values -->
-                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-                <ListView ItemsSource="{Binding SelectedGlobalDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                        <!-- Global Values -->
+                        <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                        <ListView ItemsSource="{Binding SelectedGlobalDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource GlobalItemTemplate}" 
                     Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <ListView.Resources>
-                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                    </ListView.Resources>
-                </ListView>
+                            <ListView.Resources>
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                            </ListView.Resources>
+                        </ListView>
 
-                <!-- Constant Value -->
-                <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
-                <ListView ItemsSource="{Binding SelectedConstantDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                        <!-- Constant Value -->
+                        <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                        <ListView ItemsSource="{Binding SelectedConstantDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
                     HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource GlobalConstantTemplate}" 
                     Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <ListView.Resources>
-                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                    </ListView.Resources>
-                </ListView>
-            </StackPanel>
+                            <ListView.Resources>
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                            </ListView.Resources>
+                        </ListView>
+                    </StackPanel>
 
-            <!-- arguments -->
-            <StackPanel Grid.Row="8">
-                <!-- Function Arguments -->
-                <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
-                <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                    <!-- arguments -->
+                    <StackPanel Grid.Row="8">
+                        <!-- Function Arguments -->
+                        <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
+                        <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                           MaxHeight="300"
                           HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
-                        <ListView.Resources>
-                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                        </ListView.Resources>
-                    </ListView>
-                    <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
-                </Grid>
+                                <ListView.Resources>
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                </ListView.Resources>
+                            </ListView>
+                            <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                        </Grid>
 
-                <!-- Event Arguments -->
-                <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
-                <Grid Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <ListView ItemsSource="{Binding SelectedEventDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                        <!-- Event Arguments -->
+                        <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
+                        <Grid Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <ListView ItemsSource="{Binding SelectedEventDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                           MaxHeight="300"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource NotNullToVisibilityConverter}}">
-                        <ListView.Resources>
-                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                        </ListView.Resources>
-                    </ListView>
-                    <TextBlock Text="none" Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
-                </Grid>
+                                <ListView.Resources>
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                </ListView.Resources>
+                            </ListView>
+                            <TextBlock Text="none" Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                        </Grid>
 
-                <!-- Method Arguments -->
-                <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
-                <Grid Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <ListView ItemsSource="{Binding SelectedMethodDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                        <!-- Method Arguments -->
+                        <TextBlock Text="arguments" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
+                        <Grid Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <ListView ItemsSource="{Binding SelectedMethodDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                           MaxHeight="300"
                           HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
-                        <ListView.Resources>
-                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                        </ListView.Resources>
-                    </ListView>
-                    <TextBlock Text="none" Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
-                </Grid>
-            </StackPanel>
-
-            <!-- results -->
-            <StackPanel Grid.Row="9">
-                <!-- Function Return Values -->
-                <StackPanel Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10" />
-                    <ListView ItemsSource="{Binding SelectedFunctionDetails.Returns}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
-                        MaxHeight="300"
-                        HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                        ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                        Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToVisibilityConverter}}">
-                        <ListView.Resources>
-                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                        </ListView.Resources>
-                    </ListView>
-                    <TextBlock Text="nothing" Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
-                </StackPanel>
-
-                <!-- Method Return Values -->
-                <StackPanel Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10" />
-                    <ListView ItemsSource="{Binding SelectedMethodDetails.Returns}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
-                        MaxHeight="300"
-                        HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                        ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                        Visibility="{Binding SelectedMethodDetails.Returns, Converter={StaticResource EmptyListToVisibilityConverter}}">
-                        <ListView.Resources>
-                            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                        </ListView.Resources>
-                    </ListView>
-                    <TextBlock Text="nothing" Visibility="{Binding SelectedMethodDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
-                </StackPanel>
-            </StackPanel>
-
-            <!-- enum -->
-            <StackPanel Grid.Row="10" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
-                <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
-                <TextBlock Text="{Binding SelectedGlobalDetails.ParentName}" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}" Margin="10"/>
-                <!-- enum Values -->
-                <Border BorderBrush="DimGray" BorderThickness="1" Margin="10">
-                    <Grid Style="{StaticResource ListHeaderGridStyle}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" Margin="0" Height="20" Padding="10,0,10,0" Background="{ThemeResource SystemBaseMediumLowColor}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Name" FontWeight="Bold" Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="0"/>
-                            <TextBlock Text="Type" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
-                            <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
+                                <ListView.Resources>
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                </ListView.Resources>
+                            </ListView>
+                            <TextBlock Text="none" Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
                         </Grid>
-                        <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
+                    </StackPanel>
+
+                    <!-- results -->
+                    <StackPanel Grid.Row="9">
+                        <!-- Function Return Values -->
+                        <StackPanel Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="0,10,0,-10" />
+                            <ItemsControl ItemsSource="{Binding SelectedFunctionDetails.Returns}" Margin="10">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,20,0,0">
+                                            <ListView ItemsSource="{Binding Values}" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                                        MaxHeight="300"
+                                        HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                                        ItemTemplate="{StaticResource ArgumentItemTemplate}">
+                                                <ListView.Resources>
+                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                                </ListView.Resources>
+                                            </ListView>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="nothing" Visibility="{Binding SelectedFunctionDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                        </StackPanel>
+
+                        <!-- Method Return Values -->
+                        <StackPanel Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <TextBlock Text="returns" FontWeight="Bold" FontSize="26" Margin="10" />
+                            <ItemsControl ItemsSource="{Binding SelectedMethodDetails.Returns}" Margin="10">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,20,0,0">
+                                            <ListView ItemsSource="{Binding Values}" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
+                                        MaxHeight="300"
+                                        HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                                        ItemTemplate="{StaticResource ArgumentItemTemplate}">
+                                                <ListView.Resources>
+                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                                </ListView.Resources>
+                                            </ListView>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="nothing" Visibility="{Binding SelectedMethodDetails.Returns, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- enum -->
+                    <StackPanel Grid.Row="10" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <TextBlock Text="enum" FontWeight="Bold" FontSize="26" Margin="10"/>
+                        <TextBlock Text="{Binding SelectedGlobalDetails.ParentName}" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}" Margin="10"/>
+                        <!-- enum Values -->
+                        <Border BorderBrush="DimGray" BorderThickness="1" Margin="10">
+                            <Grid Style="{StaticResource ListHeaderGridStyle}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0" Height="20" Padding="10,0,10,0" Background="{ThemeResource SystemBaseMediumLowColor}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="0"/>
+                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
+                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
+                                </Grid>
+                                <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
                                   ItemsSource="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EnumToSortedEnumConverter}}"
                                   ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                                   ItemTemplate="{StaticResource EnumItemTemplate}"
                                   SelectedIndex="{Binding SelectedEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Visibility="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EmptyListToVisibilityConverter}}">
-                            <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
-                            </ListView.Resources>
-                        </ListView>
-                    </Grid>
-                </Border>
-                <TextBlock Text="nothing" Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
-            </StackPanel>
+                                    <ListView.Resources>
+                                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                    </ListView.Resources>
+                                </ListView>
+                            </Grid>
+                        </Border>
+                        <TextBlock Text="nothing" Visibility="{Binding SelectedGlobalEnum, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
+                    </StackPanel>
 
-            <!-- used by -->
-            <Grid Grid.Row="11" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
-                <Grid DataContext="{Binding SelectedGlobalEnum}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="used by" FontWeight="Bold" FontSize="26" Margin="10"/>
-                    <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding UsedBy, Converter={StaticResource ListToVisibilityConverter}}"/>
-                    <ListView ItemsSource="{Binding UsedBy}" 
+                    <!-- used by -->
+                    <Grid Grid.Row="11" Visibility="{Binding SelectedGlobalEnum, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                        <Grid DataContext="{Binding SelectedGlobalEnum}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="used by" FontWeight="Bold" FontSize="26" Margin="10"/>
+                            <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding UsedBy, Converter={StaticResource ListToVisibilityConverter}}"/>
+                            <ListView ItemsSource="{Binding UsedBy}" 
                           Grid.Row="1"
                           Style="{StaticResource InvisibleListViewStyle}"
                           ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
@@ -391,19 +407,19 @@
                           Margin="10" BorderThickness="0"
                           Visibility="{Binding UsedBy, Converter={StaticResource EmptyListToVisibilityConverter}}"
                           ItemTemplate="{StaticResource UsedByItemTemplate}"/>
-                </Grid>
-            </Grid>
+                        </Grid>
+                    </Grid>
 
-            <!-- object methods -->
-            <Grid Grid.Row="12" Visibility="{Binding SelectedObjectDetails, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="methods" FontWeight="Bold" FontSize="26" Margin="10"/>
-                    <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding SelectedObjectDetails.FunctionList, Converter={StaticResource ListToVisibilityConverter}}"/>
-                    <ListView ItemsSource="{Binding SelectedObjectDetails.FunctionList}" 
+                    <!-- object methods -->
+                    <Grid Grid.Row="12" Visibility="{Binding SelectedObjectDetails, Mode=TwoWay, Converter={StaticResource NotNullToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="methods" FontWeight="Bold" FontSize="26" Margin="10"/>
+                            <TextBlock Text="nothing" Grid.Row="1" Margin="10" Visibility="{Binding SelectedObjectDetails.FunctionList, Converter={StaticResource ListToVisibilityConverter}}"/>
+                            <ListView ItemsSource="{Binding SelectedObjectDetails.FunctionList}" 
                         Grid.Row="1"
                         Style="{StaticResource InvisibleListViewStyle}"
                         ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
@@ -411,16 +427,18 @@
                         Margin="10" BorderThickness="0"
                         Visibility="{Binding SelectedObjectDetails.FunctionList, Converter={StaticResource EmptyListToVisibilityConverter}}"
                         ItemTemplate="{StaticResource UsedByItemTemplate}"/>
-                </Grid>
-            </Grid>
+                        </Grid>
+                    </Grid>
 
-            <!-- SI_ string Value -->
-            <Grid Grid.Row="13" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
-                <StackPanel>
-                    <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
-                    <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="WrapWholeWords"/>
-                </StackPanel>
-            </Grid>
+                    <!-- SI_ string Value -->
+                    <Grid Grid.Row="13" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
+                            <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="WrapWholeWords"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
         </Grid>
         <!-- StatusBar at the bottom -->
         <c:ESOStatusBar Grid.Row="1" Grid.ColumnSpan="2" DataContext="{Binding Status}" />
