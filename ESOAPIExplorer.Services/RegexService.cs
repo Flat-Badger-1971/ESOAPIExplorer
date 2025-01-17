@@ -70,6 +70,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]
     private static partial Regex _LocaleStringMatcher();
 
+    [GeneratedRegex(@"^\d+$|.*[iI][dD]$|^num.+")]
+    private static partial Regex _NumberMatcher();
+
     [GeneratedRegex(@"h3\. (.+)$")]
     private static partial Regex _ObjectNameMatcher();
 
@@ -110,6 +113,7 @@ public partial class RegexService : IRegexService
     public Regex IfKeywordMatcher() => _IfKeywordMatcher();
     public Regex InstanceMatcher() => _InstanceMatcher();
     public Regex LocaleStringMatcher() => _LocaleStringMatcher();
+    public Regex NumberMatcher() => _NumberMatcher();
     public Regex ObjectNameMatcher() => _ObjectNameMatcher();
     public Regex ObjectTypeMatcher() => _ObjectTypeMatcher();
     public Regex SectionMatcher() => _SectionMatcher();

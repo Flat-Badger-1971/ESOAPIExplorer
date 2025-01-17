@@ -58,11 +58,11 @@
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
                 <Run Text="C Objects: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                <Run Text="{Binding ObjectItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="{Binding CObjectItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
                 <Run Text="C Object Methods: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />
-                <Run Text="{Binding MethodItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
+                <Run Text="{Binding CMethodItems}" Foreground="{ThemeResource SystemAccentColorDark1}" />
             </TextBlock>
             <TextBlock VerticalAlignment="CENTER" Margin="10,0,0,0" FontSize="10">
                 <Run Text="Constants: " Foreground="{ThemeResource SystemColorActiveCaptionColor}" />

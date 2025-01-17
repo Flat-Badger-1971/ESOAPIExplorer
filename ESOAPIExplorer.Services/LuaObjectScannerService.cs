@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ESOAPIExplorer.Services;
 
-public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectScanner
+public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectScanner
 {
     public string FolderPath { get; set; }
     public LuaScanResults Results { get; set; } = new LuaScanResults();
@@ -108,14 +108,14 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
             if (!comment && !insideComment)
             {
                 // Match functions
-                Match functionMatch = regexService.FunctionMatcher().Match(line);
+                Match functionMatch = _regexService.FunctionMatcher().Match(line);
                 if (functionMatch.Success)
                 {
                     AddFunction(lines, functionMatch, i);
                 }
 
                 // Match objects
-                Match objectMatch = regexService.ObjectTypeMatcher().Match(line);
+                Match objectMatch = _regexService.ObjectTypeMatcher().Match(line);
                 if (objectMatch.Success)
                 {
                     int endOfFunction = FindEndOfFunction(lines, i);
@@ -123,7 +123,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 }
 
                 // Match instance
-                Match instanceMatch = regexService.InstanceMatcher().Match(line);
+                Match instanceMatch = _regexService.InstanceMatcher().Match(line);
                 if (instanceMatch.Success)
                 {
                     if (objects.TryGetValue(instanceMatch.Groups[2].Value, out EsoUIObject obj))
@@ -139,14 +139,14 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 }
 
                 // Match subclasses
-                Match subclassMatch = regexService.SubclassMatcher().Match(line);
+                Match subclassMatch = _regexService.SubclassMatcher().Match(line);
                 if (subclassMatch.Success)
                 {
                     _subclasses.TryAdd(subclassMatch.Groups[1].Value, subclassMatch.Groups[2].Value);
                 }
 
                 // Match fragments
-                Match fragmentMatch = regexService.FragmentMatcher().Match(line);
+                Match fragmentMatch = _regexService.FragmentMatcher().Match(line);
                 if (fragmentMatch.Success)
                 {
                     Results.Fragments.TryAdd(fragmentMatch.Groups[1].Value, true);
@@ -155,7 +155,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 // Match aliases
                 if (filename == "addoncompatibilityaliases.lua" || filename == "globalapi.lua")
                 {
-                    Match aliasMatch = regexService.AliasMatcher().Match(line);
+                    Match aliasMatch = _regexService.AliasMatcher().Match(line);
                     if (aliasMatch.Success)
                     {
                         string name = aliasMatch.Groups[1].Value.Trim();
@@ -172,7 +172,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 }
 
                 // Match colordefs
-                Match colorDefMatch = regexService.ColorDefMatcher().Match(line);
+                Match colorDefMatch = _regexService.ColorDefMatcher().Match(line);
 
                 if (colorDefMatch.Success)
                 {
@@ -212,14 +212,14 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
         foreach (string p in parameters.Split(','))
         {
-            func.AddArgument(p.Trim(), "Unknown");
+            func.AddArgument(p.Trim(), "unknown");
         }
 
         foreach (string codeline in lines.Skip(startIndex).Take(endPosition - startIndex + 1))
         {
             func.AddCode(codeline);
 
-            Match instanceMatch = regexService.InstanceMatcher().Match(codeline);
+            Match instanceMatch = _regexService.InstanceMatcher().Match(codeline);
             if (instanceMatch.Success)
             {
                 string name = instanceMatch.Groups[1].Value;
@@ -242,6 +242,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         List<EsoUIReturn> returns = ExtractReturns(lines, startOfFunction, endOfFunction);
         EsoUIFunction func = new EsoUIFunction(objectMethod)
         {
+            ElementType = APIElementType.OBJECT_METHOD,
             Parent = objectName,
             Returns = returns
         };
@@ -263,8 +264,8 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
             if (objectMethod == "New" || objectMethod == "Initialize")
             {
-                Match callback = regexService.CallbackObjectMatcher().Match(codeline);
-                Match selfAssignment = regexService.SelfAssignmentMatcher().Match(codeline);
+                Match callback = _regexService.CallbackObjectMatcher().Match(codeline);
+                Match selfAssignment = _regexService.SelfAssignmentMatcher().Match(codeline);
                 Match instance = callback.Success ? callback : selfAssignment;
 
                 if (instance.Success)
@@ -295,11 +296,11 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
 
             if (!line.Trim().StartsWith("--"))
             {
-                if (regexService.FunctionKeywordMatcher().IsMatch(line) || regexService.IfKeywordMatcher().IsMatch(line) || regexService.DoKeywordMatcher().IsMatch(line))
+                if (_regexService.FunctionKeywordMatcher().IsMatch(line) || _regexService.IfKeywordMatcher().IsMatch(line) || _regexService.DoKeywordMatcher().IsMatch(line))
                 {
                     depth++;
                 }
-                else if (regexService.EndKeywordMatcher().IsMatch(line))
+                else if (_regexService.EndKeywordMatcher().IsMatch(line))
                 {
                     depth--;
 
@@ -342,7 +343,28 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
         return returnValues;
     }
 
-    private static List<EsoUIReturn> ExtractReturns(string[] lines, int startPosition, int endPosition)
+    private string InferType(string value)
+    {
+        switch (true)
+        {
+            case true when Utility.IsBooleanExpression(value):
+                return "bool";
+            case true when _regexService.NumberMatcher().IsMatch(value):
+                return "number";
+            case true when value.StartsWith('"') && value.EndsWith('"'):
+                return "string";
+            case true when Utility.IsControl(value):
+                return "control";
+            case true when value.StartsWith('{') && value.EndsWith('}'):
+                return "table";
+            case true when Utility.IsObject(value):
+                return "object";
+            default:
+                return "unknown";
+        }
+    }
+
+    private List<EsoUIReturn> ExtractReturns(string[] lines, int startPosition, int endPosition)
     {
         List<EsoUIReturn> returns = [];
         int returnIndex = 0;
@@ -357,7 +379,7 @@ public class LuaObjectScannerService(IRegexService regexService) : ILuaObjectSca
                 {
                     Index = returnIndex++,
                     Values = SplitReturnValues(line.Substring(7))
-                    .Select((split, index) => new EsoUIArgument(split, new EsoUIType("Unknown"), index + 1))
+                    .Select((split, index) => new EsoUIArgument(split, new EsoUIType(InferType(split)), index + 1))
                     .ToList()
                 };
 

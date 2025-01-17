@@ -317,9 +317,9 @@
                                     <DataTemplate>
                                         <StackPanel Margin="0,20,0,0">
                                             <ListView ItemsSource="{Binding Values}" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
-                                        MaxHeight="300"
-                                        HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                                        ItemTemplate="{StaticResource ArgumentItemTemplate}">
+                                                MaxHeight="300"
+                                                HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                                                ItemTemplate="{StaticResource ArgumentItemTemplate}">
                                                 <ListView.Resources>
                                                     <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                                                 </ListView.Resources>
@@ -339,9 +339,9 @@
                                     <DataTemplate>
                                         <StackPanel Margin="0,20,0,0">
                                             <ListView ItemsSource="{Binding Values}" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
-                                        MaxHeight="300"
-                                        HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
-                                        ItemTemplate="{StaticResource ArgumentItemTemplate}">
+                                                MaxHeight="300"
+                                                HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
+                                                ItemTemplate="{StaticResource ArgumentItemTemplate}">
                                                 <ListView.Resources>
                                                     <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
                                                 </ListView.Resources>

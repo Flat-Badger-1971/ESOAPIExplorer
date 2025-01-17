@@ -26,6 +26,7 @@ namespace ESOAPIExplorer.Services
         public Regex IfKeywordMatcher();
         public Regex InstanceMatcher();
         public Regex LocaleStringMatcher();
+        public Regex NumberMatcher();
         public Regex ObjectNameMatcher();
         public Regex ObjectTypeMatcher();
         public Regex SectionMatcher();

@@ -271,7 +271,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                     {
                         Id = item.Key,
                         Name = item.Value.Name,
-                        ElementType = item.Value.Name.StartsWith("zo_", StringComparison.OrdinalIgnoreCase) ? APIElementType.FUNCTION : APIElementType.C_FUNCTION,
+                        ElementType = item.Value.ElementType,
                         Code = item.Value.Code
                     }));
 
@@ -334,7 +334,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                     {
                         Id = item.Key,
                         Name = item.Value.Name,
-                        ElementType = item.Value.FromAPI ? APIElementType.C_OBJECT_TYPE : APIElementType.OBJECT_TYPE,
+                        ElementType = item.Value.ElementType,
                         Code = item.Value.Code
                     }
                 ));
@@ -348,7 +348,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                     {
                         Id = func.Key,
                         Name = $"{item.Key}:{func.Value.Name}",
-                        ElementType = item.Value.FromAPI ? APIElementType.C_OBJECT_METHOD : APIElementType.OBJECT_METHOD,
+                        ElementType = func.Value.ElementType,
                         Code = func.Value.Code,
                         Parent = item.Value.Name
                     }
