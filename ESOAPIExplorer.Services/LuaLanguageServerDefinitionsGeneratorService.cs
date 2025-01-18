@@ -9,7 +9,7 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
 {
     public StringBuilder Generate()
     {
-        StringBuilder definitions = new StringBuilder("---@meta");
+        StringBuilder definitions = new StringBuilder("---@meta\n\n");
 
         // Objects
         EsoUIDocumentation docs = esoDocumentationService.Documentation;

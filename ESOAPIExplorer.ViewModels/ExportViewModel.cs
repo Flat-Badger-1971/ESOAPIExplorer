@@ -3,8 +3,11 @@ using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Services;
 using Microsoft.UI.Xaml;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
@@ -94,8 +97,38 @@ public class ExportViewModel(ILuaCheckRcGeneratorService _luaCheckRcGeneratorSer
         if (folder != null)
         {
             StringBuilder llsdefinition = _luaLanguageServerDefinitionsGeneratorService.Generate();
-            StorageFile file = await folder.CreateFileAsync("eso_lls.def", CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(file, llsdefinition.ToString());
+            StorageFile definitionFile = await folder.CreateFileAsync("esoapi.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(definitionFile, llsdefinition.ToString());
+
+            // Check if .luarc.json exists
+            StorageFile luarcFile = await folder.TryGetItemAsync(".luarc.json") as StorageFile;
+
+            if (luarcFile == null)
+            {
+                // Create .luarc.json if it does not exist
+                luarcFile = await folder.CreateFileAsync(".luarc.json", CreationCollisionOption.FailIfExists);
+                await FileIO.WriteTextAsync(luarcFile, "{}");
+            }
+
+            // Read the content of .luarc.json
+            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true, ReadCommentHandling= JsonCommentHandling.Skip };
+            string luarcContent = await FileIO.ReadTextAsync(luarcFile);
+            Dictionary<string, object> luarcJson = JsonSerializer.Deserialize<Dictionary<string, object>>(luarcContent, options) ?? [];
+
+            // Check if "workspace.library" exists and update it
+            if (luarcJson.ContainsKey("workspace.library"))
+            {
+                luarcJson["workspace.library"] = new[] { "./esoapi.lua" };
+            }
+            else
+            {
+                string[] value = ["./esoapi.lua"];
+                luarcJson.Add("workspace.library", value);
+            }
+
+            // Write the updated content back to .luarc.json
+            string updatedLuarcContent = JsonSerializer.Serialize(luarcJson, options);
+            await FileIO.WriteTextAsync(luarcFile, updatedLuarcContent);
         }
     }
 }
