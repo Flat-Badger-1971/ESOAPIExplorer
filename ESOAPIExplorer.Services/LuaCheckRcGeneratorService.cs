@@ -86,9 +86,9 @@ public class LuaCheckRcGeneratorService(IESODocumentationService esoDocumentatio
         // Fragments
         rc.AppendLine("    -- Fragments");
 
-        foreach (string fragment in docs.Fragments)
+        foreach (KeyValuePair<string, bool> fragment in docs.Fragments)
         {
-            rc.AppendLine($"    \"{fragment}\",");
+            rc.AppendLine($"    \"{fragment.Key}\",");
         }
 
         // Aliases

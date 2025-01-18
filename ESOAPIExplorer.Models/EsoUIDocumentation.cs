@@ -8,7 +8,7 @@ public class EsoUIDocumentation
     public int ApiVersion { get; set; } = 0;
     public ConcurrentDictionary<string, EsoUIConstantValue> Constants { get; set; } = [];
     public ConcurrentDictionary<string, EsoUIEvent> Events { get; set; } = [];
-    public ConcurrentBag<string> Fragments { get; set; } = [];
+    public ConcurrentDictionary<string, bool> Fragments { get; set; } = [];
     public ConcurrentDictionary<string, EsoUIFunction> Functions { get; set; } = [];
     public ConcurrentDictionary<string, ICollection<EsoUIEnumValue>> Globals { get; set; } = [];
     public ConcurrentDictionary<string, EsoUIInstance> InstanceNames { get; set; } = [];

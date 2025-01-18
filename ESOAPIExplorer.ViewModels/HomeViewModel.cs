@@ -20,134 +20,133 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: diagnose enum list delay
 // TODO: fix scrollable text block padding
 // TODO: implement decent theme colours
-// TODO: change returns in multiple lists (see GetSkillLineInfo)
 // TODO: add busy indicator
 // TODO: add proper export screen with options to control export content
 public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService) : ViewModelBase
 {
     #region Properties
-    private APIElement _SelectedElement;
+    private APIElement _selectedElement;
     public APIElement SelectedElement
     {
-        get => _SelectedElement;
+        get => _selectedElement;
         set
         {
-            SetProperty(ref _SelectedElement, value);
+            SetProperty(ref _selectedElement, value);
             UpdateSelectedElementDetails();
 
             if (value != null)
             {
-                AddToHistory(_SelectedElement.Name);
+                AddToHistory(_selectedElement.Name);
             }
         }
     }
 
-    CancellationTokenSource _SelectedElementTokenSource;
+    CancellationTokenSource _selectedElementTokenSource;
 
-    private StatusInformation _Status;
+    private StatusInformation _status;
     public StatusInformation Status
     {
-        get => _Status;
+        get => _status;
         set
         {
-            SetProperty(ref _Status, value);
+            SetProperty(ref _status, value);
         }
     }
 
-    private bool _CanGoBack;
+    private bool _canGoBack;
     public bool CanGoBack
     {
-        get => _CanGoBack;
-        set => SetProperty(ref _CanGoBack, value);
+        get => _canGoBack;
+        set => SetProperty(ref _canGoBack, value);
     }
 
-    private EsoUIEvent _SelectedEventDetails;
+    private EsoUIEvent _selectedEventDetails;
     public EsoUIEvent SelectedEventDetails
     {
-        get => _SelectedEventDetails;
+        get => _selectedEventDetails;
         set
         {
             UpdateProperties(nameof(SelectedEventDetails), value);
         }
     }
 
-    private EsoUIInstance _SelectedInstanceDetails;
+    private EsoUIInstance _selectedInstanceDetails;
     public EsoUIInstance SelectedInstanceDetails
     {
-        get => _SelectedInstanceDetails;
+        get => _selectedInstanceDetails;
         set
         {
             UpdateProperties(nameof(SelectedInstanceDetails), value);
         }
     }
 
-    private EsoUIObject _SelectedObjectDetails;
+    private EsoUIObject _selectedObjectDetails;
     public EsoUIObject SelectedObjectDetails
     {
-        get => _SelectedObjectDetails;
+        get => _selectedObjectDetails;
         set
         {
             UpdateProperties(nameof(SelectedObjectDetails), value);
         }
     }
 
-    private EsoUIFunction _SelectedMethodDetails;
+    private EsoUIFunction _selectedMethodDetails;
     public EsoUIFunction SelectedMethodDetails
     {
-        get => _SelectedMethodDetails;
+        get => _selectedMethodDetails;
         set
         {
             UpdateProperties(nameof(SelectedMethodDetails), value);
         }
     }
 
-    private EsoUIFunction _SelectedFunctionDetails;
+    private EsoUIFunction _selectedFunctionDetails;
     public EsoUIFunction SelectedFunctionDetails
     {
-        get => _SelectedFunctionDetails;
+        get => _selectedFunctionDetails;
         set
         {
             UpdateProperties(nameof(SelectedFunctionDetails), value);
         }
     }
 
-    private EsoUIGlobal _SelectedEnumName;
+    private EsoUIGlobal _selectedEnumName;
     public EsoUIGlobal SelectedEnumName
     {
-        get => _SelectedEnumName;
+        get => _selectedEnumName;
         set
         {
             UpdateProperties(nameof(SelectedEnumName), value);
         }
     }
 
-    private EsoUIGlobal _SelectedGlobalDetails;
+    private EsoUIGlobal _selectedGlobalDetails;
     public EsoUIGlobal SelectedGlobalDetails
     {
-        get => _SelectedGlobalDetails;
+        get => _selectedGlobalDetails;
         set
         {
             UpdateProperties(nameof(SelectedGlobalDetails), value);
         }
     }
 
-    private EsoUIConstantValue _SelectedConstantDetails;
+    private EsoUIConstantValue _selectedConstantDetails;
     public EsoUIConstantValue SelectedConstantDetails
     {
-        get => _SelectedConstantDetails;
+        get => _selectedConstantDetails;
         set
         {
             UpdateProperties(nameof(SelectedConstantDetails), value);
         }
     }
 
-    private int _SelectedEnum;
+    private int _selectedEnum;
     public int SelectedEnum
     {
-        get => _SelectedEnum;
+        get => _selectedEnum;
         set
         {
-            SetProperty(ref _SelectedEnum, value);
+            SetProperty(ref _selectedEnum, value);
 
             Task.Run(async () =>
             {
@@ -159,30 +158,30 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     public EsoUIEnum SelectedGlobalEnum
     {
-        get => _SelectedGlobalEnum;
-        set => SetProperty(ref _SelectedGlobalEnum, value);
+        get => _selectedGlobalEnum;
+        set => SetProperty(ref _selectedGlobalEnum, value);
     }
 
-    private int _SelectedFilterIndex;
+    private int _selectedFilterIndex;
     public int SelectedFilterIndex
     {
-        get => _SelectedFilterIndex;
-        set => SetProperty(ref _SelectedFilterIndex, value);
+        get => _selectedFilterIndex;
+        set => SetProperty(ref _selectedFilterIndex, value);
     }
 
-    private string _SelectedUsedByItem;
+    private string _selectedUsedByItem;
     public string SelectedUsedByItem
     {
-        get => _SelectedUsedByItem;
+        get => _selectedUsedByItem;
         set
         {
-            SetProperty(ref _SelectedUsedByItem, value);
+            SetProperty(ref _selectedUsedByItem, value);
 
             if (value != null)
             {
                 string selected = value;
 
-                switch (_SelectedElement.ElementType)
+                switch (_selectedElement.ElementType)
                 {
                     case APIElementType.OBJECT_TYPE:
                     case APIElementType.C_OBJECT_TYPE:
@@ -203,40 +202,40 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         }
     }
 
-    private string _FilterText;
+    private string _filterText;
     public string FilterText
     {
-        get => _FilterText;
+        get => _filterText;
         set
         {
-            SetProperty(ref _FilterText, value);
+            SetProperty(ref _filterText, value);
             FilterItemsAsync().Wait();
         }
     }
 
-    private ObservableCollection<DisplayModelBase<APIElement>> _AllItems;
+    private ObservableCollection<DisplayModelBase<APIElement>> _allItems;
     public ObservableCollection<DisplayModelBase<APIElement>> AllItems
     {
-        get => _AllItems;
-        set => SetProperty(ref _AllItems, value);
+        get => _allItems;
+        set => SetProperty(ref _allItems, value);
     }
 
-    private ObservableCollection<APIElement> _FilteredItems;
-    private EsoUIEnum _SelectedGlobalEnum;
+    private ObservableCollection<APIElement> _filteredItems;
+    private EsoUIEnum _selectedGlobalEnum;
 
     public ObservableCollection<APIElement> FilteredItems
     {
-        get => _FilteredItems;
-        set => SetProperty(ref _FilteredItems, value);
+        get => _filteredItems;
+        set => SetProperty(ref _filteredItems, value);
     }
 
     #endregion Properties
 
-    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
-    private readonly Stack<string> _HistoryStack = new Stack<string>();
-    private string _CurrentAlgorithmName;
-    private IEnumerable<Type> _SearchAlgorithms;
-    private ISearchAlgorithm _SearchAlgorithm;
+    private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
+    private readonly Stack<string> _historyStack = new Stack<string>();
+    private string _currentAlgorithmName;
+    private IEnumerable<Type> _searchAlgorithms;
+    private ISearchAlgorithm _searchAlgorithm;
 
     public override async Task InitializeAsync(object data)
     {
@@ -247,11 +246,11 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         // intialise the constants dictionary
         ConstantValues.InitialiseConstants();
 
-        if (_AllItems == null || _AllItems?.Count == 0)
+        if (_allItems == null || _allItems?.Count == 0)
         {
             await _esoDocumentationService.InitialiseAsync();
 
-            _SearchAlgorithms = Utility.ListSearchAlgorithms();
+            _searchAlgorithms = Utility.ListSearchAlgorithms();
 
             // Events
             ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Events
@@ -379,15 +378,15 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private void UpdateProperties(string propertyName, object value)
     {
-        SetProperty(ref _SelectedConstantDetails, propertyName == nameof(SelectedConstantDetails) ? value as EsoUIConstantValue : default, nameof(SelectedConstantDetails));
-        SetProperty(ref _SelectedEnumName, propertyName == nameof(SelectedEnumName) ? value as EsoUIGlobal : default, nameof(SelectedEnumName));
-        SetProperty(ref _SelectedEventDetails, propertyName == nameof(SelectedEventDetails) ? value as EsoUIEvent : default, nameof(SelectedEventDetails));
-        SetProperty(ref _SelectedFunctionDetails, propertyName == nameof(SelectedFunctionDetails) ? value as EsoUIFunction : default, nameof(SelectedFunctionDetails));
-        SetProperty(ref _SelectedGlobalDetails, propertyName == nameof(SelectedGlobalDetails) ? value as EsoUIGlobal : default, nameof(SelectedGlobalDetails));
-        SetProperty(ref _SelectedGlobalEnum, propertyName == nameof(SelectedGlobalEnum) ? value as EsoUIEnum : default, nameof(SelectedGlobalEnum));
-        SetProperty(ref _SelectedInstanceDetails, propertyName == nameof(SelectedInstanceDetails) ? value as EsoUIInstance : default, nameof(SelectedInstanceDetails));
-        SetProperty(ref _SelectedObjectDetails, propertyName == nameof(SelectedObjectDetails) ? value as EsoUIObject : default, nameof(SelectedObjectDetails));
-        SetProperty(ref _SelectedMethodDetails, propertyName == nameof(SelectedMethodDetails) ? value as EsoUIFunction : default, nameof(SelectedMethodDetails));
+        SetProperty(ref _selectedConstantDetails, propertyName == nameof(SelectedConstantDetails) ? value as EsoUIConstantValue : default, nameof(SelectedConstantDetails));
+        SetProperty(ref _selectedEnumName, propertyName == nameof(SelectedEnumName) ? value as EsoUIGlobal : default, nameof(SelectedEnumName));
+        SetProperty(ref _selectedEventDetails, propertyName == nameof(SelectedEventDetails) ? value as EsoUIEvent : default, nameof(SelectedEventDetails));
+        SetProperty(ref _selectedFunctionDetails, propertyName == nameof(SelectedFunctionDetails) ? value as EsoUIFunction : default, nameof(SelectedFunctionDetails));
+        SetProperty(ref _selectedGlobalDetails, propertyName == nameof(SelectedGlobalDetails) ? value as EsoUIGlobal : default, nameof(SelectedGlobalDetails));
+        SetProperty(ref _selectedGlobalEnum, propertyName == nameof(SelectedGlobalEnum) ? value as EsoUIEnum : default, nameof(SelectedGlobalEnum));
+        SetProperty(ref _selectedInstanceDetails, propertyName == nameof(SelectedInstanceDetails) ? value as EsoUIInstance : default, nameof(SelectedInstanceDetails));
+        SetProperty(ref _selectedObjectDetails, propertyName == nameof(SelectedObjectDetails) ? value as EsoUIObject : default, nameof(SelectedObjectDetails));
+        SetProperty(ref _selectedMethodDetails, propertyName == nameof(SelectedMethodDetails) ? value as EsoUIFunction : default, nameof(SelectedMethodDetails));
     }
 
     private static void SetTaskbarColour()
@@ -422,16 +421,16 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private void UpdateSelectedElementDetails()
     {
-        if (_SelectedElementTokenSource != null && !_SelectedElementTokenSource.IsCancellationRequested)
+        if (_selectedElementTokenSource != null && !_selectedElementTokenSource.IsCancellationRequested)
         {
-            _SelectedElementTokenSource.Cancel();
+            _selectedElementTokenSource.Cancel();
         }
 
-        _SelectedElementTokenSource = new CancellationTokenSource();
+        _selectedElementTokenSource = new CancellationTokenSource();
 
         Task.Run(() =>
         {
-            APIElement element = _SelectedElement;
+            APIElement element = _selectedElement;
             List<Action> actions = [];
             EsoUIDocumentation doc = _esoDocumentationService.Documentation;
 
@@ -544,18 +543,18 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                     }
                 }
             }
-        }, _SelectedElementTokenSource.Token);
+        }, _selectedElementTokenSource.Token);
     }
 
     private void SetSearchAlgorithm()
     {
-        string selectedAlgorithmName = _Settings.Values["SearchAlgorithm"].ToString();
+        string selectedAlgorithmName = _settings.Values["SearchAlgorithm"].ToString();
 
-        if (selectedAlgorithmName != _CurrentAlgorithmName)
+        if (selectedAlgorithmName != _currentAlgorithmName)
         {
-            Type algorithm = _SearchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
-            _SearchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
-            _CurrentAlgorithmName = selectedAlgorithmName;
+            Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
+            _searchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
+            _currentAlgorithmName = selectedAlgorithmName;
         }
     }
 
@@ -630,7 +629,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         }
 
         // normal search
-        return _SearchAlgorithm.Search(filter, keywordList);
+        return _searchAlgorithm.Search(filter, keywordList);
     }
 
     CancellationTokenSource token;
@@ -646,12 +645,12 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
         _ = Task.Run(() =>
         {
-            string searchQuery = _FilterText;
+            string searchQuery = _filterText;
             Thread.Sleep(300);
 
             if (!token.IsCancellationRequested)
             {
-                if (searchQuery == _FilterText)
+                if (searchQuery == _filterText)
                 {
                     IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText);
                     _dialogService.RunOnMainThread(() =>
@@ -659,20 +658,20 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                         FilteredItems = new ObservableCollection<APIElement>(filtered);
                         Status = new StatusInformation
                         {
-                            APIItems = _FilteredItems.Count,
+                            APIItems = _filteredItems.Count,
                             APIVersion = _esoDocumentationService.Documentation.ApiVersion,
-                            CFunctionItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_FUNCTION).Count(),
-                            CMethodItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_METHOD).Count(),
-                            CObjectItems = _FilteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_TYPE).Count(),
-                            ConstantItems = _FilteredItems.Where(f => f.ElementType == APIElementType.CONSTANT).Count(),
-                            EnumConstants = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_CONSTANT).Count(),
-                            EnumTypes = _FilteredItems.Where(g => g.ElementType == APIElementType.ENUM_TYPE).Count(),
-                            EventItems = _FilteredItems.Where(e => e.ElementType == APIElementType.EVENT).Count(),
-                            FunctionItems = _FilteredItems.Where(f => f.ElementType == APIElementType.FUNCTION).Count(),
-                            GlobalInstanceItems = _FilteredItems.Where(f => f.ElementType == APIElementType.INSTANCE_NAME).Count(),
-                            MethodItems = _FilteredItems.Where(f => f.ElementType == APIElementType.OBJECT_METHOD).Count(),
-                            ObjectItems = _FilteredItems.Where(f => f.ElementType == APIElementType.OBJECT_TYPE).Count(),
-                            SIGlobalItems = _FilteredItems.Where(f => f.ElementType == APIElementType.SI_GLOBAL).Count(),
+                            CFunctionItems = _filteredItems.Where(f => f.ElementType == APIElementType.C_FUNCTION).Count(),
+                            CMethodItems = _filteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_METHOD).Count(),
+                            CObjectItems = _filteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_TYPE).Count(),
+                            ConstantItems = _filteredItems.Where(f => f.ElementType == APIElementType.CONSTANT).Count(),
+                            EnumConstants = _filteredItems.Where(g => g.ElementType == APIElementType.ENUM_CONSTANT).Count(),
+                            EnumTypes = _filteredItems.Where(g => g.ElementType == APIElementType.ENUM_TYPE).Count(),
+                            EventItems = _filteredItems.Where(e => e.ElementType == APIElementType.EVENT).Count(),
+                            FunctionItems = _filteredItems.Where(f => f.ElementType == APIElementType.FUNCTION).Count(),
+                            GlobalInstanceItems = _filteredItems.Where(f => f.ElementType == APIElementType.INSTANCE_NAME).Count(),
+                            MethodItems = _filteredItems.Where(f => f.ElementType == APIElementType.OBJECT_METHOD).Count(),
+                            ObjectItems = _filteredItems.Where(f => f.ElementType == APIElementType.OBJECT_TYPE).Count(),
+                            SIGlobalItems = _filteredItems.Where(f => f.ElementType == APIElementType.SI_GLOBAL).Count(),
                         };
                     });
                 }
@@ -683,19 +682,19 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         return Task.CompletedTask;
     }
 
-    public ICommand SearchGithubCommand => new RelayCommand(() => _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_SelectedElement.Name}&type=code")));
+    public ICommand SearchGithubCommand => new RelayCommand(() => _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_selectedElement.Name}&type=code")));
     public ICommand SearchWikiCommand => new RelayCommand(() =>
     {
         string subpath;
 
-        switch (_SelectedElement.ElementType)
+        switch (_selectedElement.ElementType)
         {
             case APIElementType.OBJECT_TYPE:
                 subpath = "Controls#";
                 break;
             case APIElementType.SI_GLOBAL:
             case APIElementType.GLOBAL:
-                subpath = _SelectedElement.ElementType == APIElementType.SI_GLOBAL ? "Constant_Values_SI*" : "Constant_Values#";
+                subpath = _selectedElement.ElementType == APIElementType.SI_GLOBAL ? "Constant_Values_SI*" : "Constant_Values#";
                 break;
             case APIElementType.CONSTANT:
                 subpath = "Constant_Values#";
@@ -709,7 +708,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                 break;
         }
 
-        _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://wiki.esoui.com/{subpath}{_SelectedElement.Name}"));
+        _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://wiki.esoui.com/{subpath}{_selectedElement.Name}"));
     });
 
     private IEnumerable<string> GetUsedByParallel(string enumName)
@@ -754,11 +753,11 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private void AddToHistory(string value)
     {
-        _HistoryStack.Push(value);
+        _historyStack.Push(value);
 
-        if (_HistoryStack.Count > 1 && !CanGoBack)
+        if (_historyStack.Count > 1 && !CanGoBack)
         {
-            SetProperty(ref _CanGoBack, true, nameof(CanGoBack));
+            SetProperty(ref _canGoBack, true, nameof(CanGoBack));
         }
     }
 
@@ -769,7 +768,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
             AddToHistory(elementName);
         }
 
-        SetProperty(ref _SelectedElement, AllItems.First(i => i.Value.Name == elementName).Value, nameof(SelectedElement));
+        SetProperty(ref _selectedElement, AllItems.First(i => i.Value.Name == elementName).Value, nameof(SelectedElement));
         UpdateSelectedElementDetails();
     }
 
@@ -780,17 +779,17 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     public ICommand GoBack => new RelayCommand(() =>
     {
-        string previous = _HistoryStack.Pop();
+        string previous = _historyStack.Pop();
 
         if (previous == SelectedElement?.Name)
         {
             // pop again to remove the current selection from the stack
-            previous = _HistoryStack.Pop();
+            previous = _historyStack.Pop();
         }
 
-        if (_HistoryStack.Count == 0)
+        if (_historyStack.Count == 0)
         {
-            SetProperty(ref _CanGoBack, false, nameof(CanGoBack));
+            SetProperty(ref _canGoBack, false, nameof(CanGoBack));
         }
 
         if (!string.IsNullOrEmpty(previous))

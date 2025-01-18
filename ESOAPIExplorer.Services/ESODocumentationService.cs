@@ -56,7 +56,7 @@ public class ESODocumentationService : IESODocumentationService
         string path = $"{ApplicationData.Current.LocalCacheFolder.Path}\\apiCache.br";
 
 #if DEBUG
-        UseCache = false;
+        // UseCache = false;
 #endif
         try
         {
@@ -201,7 +201,7 @@ public class ESODocumentationService : IESODocumentationService
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
         Parallel.ForEach(luaobjects.InstanceNames, name => documentation.InstanceNames.TryAdd(name.Name, name));
         Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
-        Parallel.ForEach(luaobjects.Fragments, fragment => documentation.Fragments.Add(fragment.Key));
+        Parallel.ForEach(luaobjects.Fragments, fragment => documentation.Fragments.TryAdd(fragment.Key, true));
 
         // lookups
         ConcurrentDictionary<string, string> esoStrings = GetEsoStrings(ingamePath);
