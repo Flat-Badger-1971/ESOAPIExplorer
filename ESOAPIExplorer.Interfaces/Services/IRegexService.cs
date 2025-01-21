@@ -30,6 +30,7 @@ namespace ESOAPIExplorer.Services
         public Regex NumberMatcher();
         public Regex ObjectNameMatcher();
         public Regex ObjectTypeMatcher();
+        public Regex ScopeMatcher();
         public Regex SectionMatcher();
         public Regex SelfAssignmentMatcher();
         public Regex SubclassMatcher();

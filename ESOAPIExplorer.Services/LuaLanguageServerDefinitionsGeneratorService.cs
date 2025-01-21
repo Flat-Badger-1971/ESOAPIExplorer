@@ -1,5 +1,4 @@
 using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +29,6 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
         definitions.AppendLine("--- @module './objects.lua'");
         //definitions.AppendLine("--- @module './aliases.lua'");
         //definitions.AppendLine("--- @module './aliases.lua'");
-        definitions.AppendLine();
 
         // create esoapi.lua
         StorageFile esoapiFile = await esofolder.CreateFileAsync("esoapi.lua", CreationCollisionOption.ReplaceExisting);
@@ -44,32 +42,14 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
 
         esoapiFile = await esofolder.CreateFileAsync("objects.lua", CreationCollisionOption.ReplaceExisting);
         await FileIO.WriteTextAsync(esoapiFile, AddObjects());
+    }
 
-        // Constants
-        //foreach (EsoUIEnumValue constant in docs.Globals.Where(g => g.Key != "Globals").SelectMany(i => i.Value))
-        //{
-        //    globals.Add(constant.Name);
-        //}
-
-        //foreach (KeyValuePair<string, EsoUIConstantValue> constant in docs.Constants)
-        //{
-        //    globals.Add(constant.Key);
-        //}
-
-        // Functions
-        //foreach (KeyValuePair<string, EsoUIFunction> func in docs.Functions)
-        //{
-        //    globals.Add(func.Key);
-        //}
-
-        // Events
-        AddEvents();
-
-        // Fragments
-        //foreach (KeyValuePair<string, bool> fragment in docs.Fragments)
-        //{
-        //    globals.Add(fragment.Key);
-        //}
+    private string ReplaceProblematicCharacters(string input)
+    {
+        return input.Replace("#", "(num)")
+            .Replace(" ", "_")
+            .Replace("<=", "lte")
+            .Replace(">=", "gte");
     }
 
     private string AddObjects()
@@ -134,10 +114,39 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
                             }
                         }
 
-                        code = $"function {apifuncvalues.Groups[1].Value}({rawparamlist}) end";
+                        string funcLine = apifuncvalues.Groups[1].Value;
+
+                        Match scopeInfo = _regexService.ScopeMatcher().Match(funcLine);
+
+                        if (scopeInfo.Success)
+                        {
+                            switch (scopeInfo.Groups[1].Value)
+                            {
+                                case "protected":
+                                    param.Append("\n--- @protected");
+                                    break;
+                                case "private":
+                                    param.Append("\n--- @private");
+                                    break;
+                            }
+
+                            code = $"function {funcLine.Replace($" *{scopeInfo.Groups[1].Value}* ", "")}({rawparamlist}) end";
+                        }
+                        else
+                        {
+                            code = $"function {funcLine}({rawparamlist}) end";
+                        }
                     }
                     else
                     {
+                        // remove any comments
+                        int trueEOL = code.LastIndexOf(')');
+
+                        if (trueEOL != -1 && trueEOL < code.Length - 1)
+                        {
+                            code = code.Substring(0, trueEOL + 1);
+                        }
+
                         code = $"{code} end";
                     }
 
@@ -150,11 +159,11 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
 
                     if (i == esofunc.Value.Returns.Count - 1)
                     {
-                        returns.Append($"--- @return {string.Join(", ", ret.Values.Select(v => $"{v.Name} {v.Type.Name.Replace(":nilable", "|nil")}"))}");
+                        returns.Append($"--- @return {string.Join(", ", ret.Values.Select(v => $"{ReplaceProblematicCharacters(v.Name)} {v.Type.Name.Replace(":nilable", "|nil")}"))}");
                     }
                     else
                     {
-                        returns.AppendLine($"--- @return {string.Join(", ", ret.Values.Select(v => $"{v.Name} {v.Type.Name.Replace(":nilable", "|nil")}"))}");
+                        returns.AppendLine($"--- @return {string.Join(", ", ret.Values.Select(v => $"{ReplaceProblematicCharacters(v.Name)} {v.Type.Name.Replace(":nilable", "|nil")}"))}");
                     }
                 }
 
@@ -216,7 +225,7 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
         aliasdefs.AppendLine("--- @alias void nil");
         aliasdefs.AppendLine("--- @alias bool boolean");
         aliasdefs.AppendLine("--- @alias id64 integer");
-        aliasdefs.AppendLine("--- @alias luaindex integer\n");
+        aliasdefs.AppendLine("--- @alias luaindex integer");
 
         return aliasdefs.ToString();
     }
@@ -228,7 +237,7 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
         func.Clear();
     }
 
-    private async Task<StorageFolder> SetupDefinitionsStorage(StorageFolder folder)
+    private static async Task<StorageFolder> SetupDefinitionsStorage(StorageFolder folder)
     {
         // Check if .luarc.json exists
         StorageFile luarcFile = await folder.TryGetItemAsync(".luarc.json") as StorageFile;

@@ -82,6 +82,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"^function (.+):(.+)\((.*)\)")]
     private static partial Regex _ObjectTypeMatcher();
 
+    [GeneratedRegex(@"\s\*(.+)\*\s")]
+    private static partial Regex _ScopeMatcher();
+
     [GeneratedRegex(@"\[""(Constants|SI_String_Constants)""\]\s*=\s*{\s*((?:.*?,\s*)+)\s*}", RegexOptions.Multiline)]
     private static partial Regex _SectionMatcher();
 
@@ -120,6 +123,7 @@ public partial class RegexService : IRegexService
     public Regex NumberMatcher() => _NumberMatcher();
     public Regex ObjectNameMatcher() => _ObjectNameMatcher();
     public Regex ObjectTypeMatcher() => _ObjectTypeMatcher();
+    public Regex ScopeMatcher() => _ScopeMatcher();
     public Regex SectionMatcher() => _SectionMatcher();
     public Regex SelfAssignmentMatcher() => _SelfAssignmentMatcher();
     public Regex SubclassMatcher() => _SubclassMatcher();

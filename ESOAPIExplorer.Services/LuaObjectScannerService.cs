@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static ABI.System.Collections.Generic.IReadOnlyDictionary_Delegates;
 
 namespace ESOAPIExplorer.Services;
 
@@ -275,7 +276,7 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         {
             foreach (string p in objectParameters)
             {
-                func.AddArgument(p.Trim());
+                func.AddArgument(p.Trim(), InferType(p.Trim()));
             }
         }
 
@@ -346,11 +347,16 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
             case true when Utility.IsBooleanExpression(value):
                 return "bool";
             case true when _regexService.NumberMatcher().IsMatch(value):
+            case true when value == "i":
+            case true when value.EndsWith("offset", StringComparison.OrdinalIgnoreCase):
+            case true when value.EndsWith("padding", StringComparison.OrdinalIgnoreCase):
+            case true when value.StartsWith("#", StringComparison.OrdinalIgnoreCase):
                 return "number";
             case true when value.StartsWith('"') && value.EndsWith('"'):
                 return "string";
             case true when Utility.IsControl(value):
-                return "control";
+            case true when value == "control":
+                return "userdata";
             case true when value.StartsWith('{') && value.EndsWith('}'):
                 return "table";
             case true when Utility.IsObject(value):
@@ -364,6 +370,8 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
     {
         List<EsoUIReturn> returns = [];
         int returnIndex = 0;
+        bool insideReturnBlock = false;
+        StringBuilder returnBlock = new();
 
         for (int i = startPosition; i <= endPosition; i++)
         {
@@ -371,15 +379,37 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
 
             if (line.StartsWith("return "))
             {
-                EsoUIReturn ret = new EsoUIReturn
-                {
-                    Index = returnIndex++,
-                    Values = SplitReturnValues(line.Substring(7))
-                    .Select((split, index) => new EsoUIArgument(split, new EsoUIType(InferType(split)), index + 1))
-                    .ToList()
-                };
+                insideReturnBlock = true;
+                returnBlock.Append(line.Substring(7).Trim());
+            }
+            else if (insideReturnBlock)
+            {
+                returnBlock.Append(line.Trim());
 
-                returns.Add(ret);
+                if (line.EndsWith('}') || line.EndsWith("},") || line.EndsWith(',') || string.IsNullOrWhiteSpace(line))
+                {
+                    if (!line.EndsWith(',') && !string.IsNullOrWhiteSpace(line))
+                    {
+                        insideReturnBlock = false;
+                    }
+
+                    if (!insideReturnBlock || i == endPosition)
+                    {
+                        EsoUIReturn ret = new()
+                        {
+                            Index = returnIndex++,
+                            Values = SplitReturnValues(returnBlock.ToString())
+                                .Select((split, index) => new EsoUIArgument(split, new EsoUIType(InferType(split)), index + 1))
+                                .ToList()
+                        };
+                        returns.Add(ret);
+                        returnBlock.Clear();
+                    }
+                }
+            }
+            else if (line.StartsWith("return"))
+            {
+                insideReturnBlock = true;
             }
         }
 
