@@ -1,90 +1,266 @@
 using ESOAPIExplorer.Models;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace ESOAPIExplorer.Services;
 
-public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationService esoDocumentationService) : ILuaLanguageServerDefinitionsGeneratorService
+public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationService _esoDocumentationService, IRegexService _regexService) : ILuaLanguageServerDefinitionsGeneratorService
 {
-    public StringBuilder Generate()
+    private readonly StringBuilder returns = new StringBuilder();
+    private readonly StringBuilder param = new StringBuilder();
+    private readonly StringBuilder func = new StringBuilder();
+    private readonly EsoUIDocumentation docs = _esoDocumentationService.Documentation;
+
+    public async Task Generate(StorageFolder folder)
     {
-        StringBuilder definitions = new StringBuilder("---@meta\n\n");
+        StorageFolder esofolder = await SetupDefinitionsStorage(folder);
 
-        // Objects
-        EsoUIDocumentation docs = esoDocumentationService.Documentation;
-        definitions.AppendLine($"-- API Version {docs.ApiVersion}");
-        definitions.AppendLine("-- Objects");
+        // add modules
+        StringBuilder definitions = new StringBuilder("--- @meta\n\n");
 
-        foreach (KeyValuePair<string, EsoUIObject> obj in docs.Objects.Where(o => o.Value.ElementType != APIElementType.ALIAS))
-        {
-            string instanceName = obj.Value.InstanceName;
+        definitions.AppendLine("--- @module './aliases.lua'");
+        definitions.AppendLine("--- @module './events.lua'");
+        definitions.AppendLine("--- @module './objects.lua'");
+        //definitions.AppendLine("--- @module './aliases.lua'");
+        //definitions.AppendLine("--- @module './aliases.lua'");
+        definitions.AppendLine();
 
-            if (!string.IsNullOrWhiteSpace(instanceName))
-            {
-                AddObject(definitions, instanceName, obj.Value);
-            }
+        // create esoapi.lua
+        StorageFile esoapiFile = await esofolder.CreateFileAsync("esoapi.lua", CreationCollisionOption.ReplaceExisting);
+        await FileIO.WriteTextAsync(esoapiFile, definitions.ToString());
 
-            AddObject(definitions, obj.Key, obj.Value);
-        }
+        esoapiFile = await esofolder.CreateFileAsync("aliases.lua", CreationCollisionOption.ReplaceExisting);
+        await FileIO.WriteTextAsync(esoapiFile, AddAliases());
+
+        esoapiFile = await esofolder.CreateFileAsync("events.lua", CreationCollisionOption.ReplaceExisting);
+        await FileIO.WriteTextAsync(esoapiFile, AddEvents());
+
+        esoapiFile = await esofolder.CreateFileAsync("objects.lua", CreationCollisionOption.ReplaceExisting);
+        await FileIO.WriteTextAsync(esoapiFile, AddObjects());
 
         // Constants
-        definitions.AppendLine("-- Constants");
+        //foreach (EsoUIEnumValue constant in docs.Globals.Where(g => g.Key != "Globals").SelectMany(i => i.Value))
+        //{
+        //    globals.Add(constant.Name);
+        //}
 
-        foreach (EsoUIEnumValue constant in docs.Globals.Where(g => g.Key != "Globals").SelectMany(i => i.Value))
-        {
-            definitions.AppendLine($"---@type {constant.Name}");
-        }
-
-        foreach (KeyValuePair<string, EsoUIConstantValue> constant in docs.Constants)
-        {
-            definitions.AppendLine($"---@type {constant.Key}");
-        }
+        //foreach (KeyValuePair<string, EsoUIConstantValue> constant in docs.Constants)
+        //{
+        //    globals.Add(constant.Key);
+        //}
 
         // Functions
-        definitions.AppendLine("-- Functions");
-
-        foreach (KeyValuePair<string, EsoUIFunction> func in docs.Functions)
-        {
-            definitions.AppendLine($"---@function {func.Key}");
-        }
+        //foreach (KeyValuePair<string, EsoUIFunction> func in docs.Functions)
+        //{
+        //    globals.Add(func.Key);
+        //}
 
         // Events
-        definitions.AppendLine("-- Events");
+        AddEvents();
+
+        // Fragments
+        //foreach (KeyValuePair<string, bool> fragment in docs.Fragments)
+        //{
+        //    globals.Add(fragment.Key);
+        //}
+    }
+
+    private string AddObjects()
+    {
+        StringBuilder objectdefs = new StringBuilder();
+
+        foreach (KeyValuePair<string, EsoUIObject> obj in docs.Objects)
+        {
+            Clear();
+
+            objectdefs.AppendLine($"--- @class {obj.Key}");
+            objectdefs.AppendLine($"{obj.Key} = {{}}\n");
+
+            foreach (KeyValuePair<string, EsoUIFunction> esofunc in obj.Value.Functions)
+            {
+                Clear();
+
+                for (int i = 0; i < esofunc.Value.Args.Count; i++)
+                {
+                    EsoUIArgument arg = esofunc.Value.Args[i];
+
+                    if (i == esofunc.Value.Args.Count - 1)
+                    {
+                        param.Append($"--- @param {arg.Name} {arg.Type.Name.Replace(":nilable", "|nil")}");
+                    }
+                    else
+                    {
+                        param.AppendLine($"--- @param {arg.Name} {arg.Type.Name.Replace(":nilable", "|nil")}");
+                    }
+                }
+
+                if (esofunc.Value.Code.Count == 0)
+                {
+                    // TODO: fix missing items
+                    func.AppendLine("-- ***missing!***");
+                }
+                else
+                {
+                    string code = esofunc.Value.Code[0].Replace("\r", "");
+
+                    if (code.StartsWith("* "))
+                    {
+                        Match apifuncvalues = _regexService.ApiParamSplitMatcher().Match(code);
+                        string paramlist = string.Empty;
+                        string rawparamlist = string.Empty;
+
+                        if (apifuncvalues.Success)
+                        {
+                            string[] paramarray = apifuncvalues.Groups[2].Value.Split(",");
+
+                            if (paramarray.Length > 1)
+                            {
+                                StringBuilder rawparambuilder = new StringBuilder();
+
+                                foreach (string param in paramarray)
+                                {
+                                    string[] parts = param.Trim().Split(" ");
+                                    rawparambuilder.Append($"{parts[1].Replace("_", "")}, ");
+                                }
+
+                                rawparamlist = rawparambuilder.ToString().TrimEnd(' ').TrimEnd(',');
+                            }
+                        }
+
+                        code = $"function {apifuncvalues.Groups[1].Value}({rawparamlist}) end";
+                    }
+                    else
+                    {
+                        code = $"{code} end";
+                    }
+
+                    func.AppendLine(code);
+                }
+
+                for (int i = 0; i < esofunc.Value.Returns.Count; i++)
+                {
+                    EsoUIReturn ret = esofunc.Value.Returns[i];
+
+                    if (i == esofunc.Value.Returns.Count - 1)
+                    {
+                        returns.Append($"--- @return {string.Join(", ", ret.Values.Select(v => $"{v.Name} {v.Type.Name.Replace(":nilable", "|nil")}"))}");
+                    }
+                    else
+                    {
+                        returns.AppendLine($"--- @return {string.Join(", ", ret.Values.Select(v => $"{v.Name} {v.Type.Name.Replace(":nilable", "|nil")}"))}");
+                    }
+                }
+
+                if (returns.Length == 0)
+                {
+                    returns.Append("--- @return void");
+                }
+
+                if (param.Length > 0)
+                {
+                    objectdefs.AppendLine(param.ToString());
+                }
+
+                objectdefs.AppendLine(returns.ToString());
+                objectdefs.AppendLine(func.ToString());
+            }
+        }
+
+        return objectdefs.ToString();
+    }
+
+    private string AddEvents()
+    {
+        StringBuilder eventdefs = new StringBuilder();
 
         foreach (KeyValuePair<string, EsoUIEvent> esoevent in docs.Events)
         {
-            definitions.AppendLine($"---@event {esoevent.Key}");
+            Clear();
+
+            for (int i = 0; i < esoevent.Value.Args.Count; i++)
+            {
+                EsoUIArgument arg = esoevent.Value.Args[i];
+
+                if (i == esoevent.Value.Args.Count - 1)
+                {
+                    param.Append($"--- @param {arg.Name} {arg.Type.Name.Replace(":nilable", "|nil")}");
+                }
+                else
+                {
+                    param.AppendLine($"--- @param {arg.Name} {arg.Type.Name.Replace(":nilable", "|nil")}");
+                }
+            }
+
+            returns.Append("--- @return void");
+            func.AppendLine($"function {esoevent.Key}({string.Join(", ", esoevent.Value.Args.Select(a => a.Name))}) end");
+
+            eventdefs.AppendLine(param.ToString());
+            eventdefs.AppendLine(returns.ToString());
+            eventdefs.AppendLine(func.ToString());
         }
 
-        // Fragments
-        definitions.AppendLine("-- Fragments");
-
-        foreach (KeyValuePair<string, bool> fragment in docs.Fragments)
-        {
-            definitions.AppendLine($"---@fragment {fragment.Key}");
-        }
-
-        // Aliases
-        definitions.AppendLine("-- Aliases");
-
-        foreach (KeyValuePair<string, EsoUIObject> alias in docs.Objects.Where(o => o.Value.ElementType == APIElementType.ALIAS))
-        {
-            definitions.AppendLine($"---@alias {alias.Key}");
-        }
-
-        return definitions;
+        return eventdefs.ToString();
     }
 
-    private static void AddObject(StringBuilder definitions, string name, EsoUIObject obj)
+    private static string AddAliases()
     {
-        definitions.AppendLine($"---@class {name}");
+        StringBuilder aliasdefs = new StringBuilder();
 
-        foreach (string func in obj.FunctionList)
+        aliasdefs.AppendLine("--- @alias void nil");
+        aliasdefs.AppendLine("--- @alias bool boolean");
+        aliasdefs.AppendLine("--- @alias id64 integer");
+        aliasdefs.AppendLine("--- @alias luaindex integer\n");
+
+        return aliasdefs.ToString();
+    }
+
+    private void Clear()
+    {
+        returns.Clear();
+        param.Clear();
+        func.Clear();
+    }
+
+    private async Task<StorageFolder> SetupDefinitionsStorage(StorageFolder folder)
+    {
+        // Check if .luarc.json exists
+        StorageFile luarcFile = await folder.TryGetItemAsync(".luarc.json") as StorageFile;
+
+        if (luarcFile == null)
         {
-            definitions.AppendLine($"---@field {func} function");
+            // Create .luarc.json if it does not exist
+            luarcFile = await folder.CreateFileAsync(".luarc.json", CreationCollisionOption.FailIfExists);
+            await FileIO.WriteTextAsync(luarcFile, "{}");
         }
 
-        definitions.AppendLine();
+        // Read the content of .luarc.json
+        JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true, ReadCommentHandling = JsonCommentHandling.Skip };
+        string luarcContent = await FileIO.ReadTextAsync(luarcFile);
+        Dictionary<string, object> luarcJson = JsonSerializer.Deserialize<Dictionary<string, object>>(luarcContent, options) ?? [];
+
+        // Check if "workspace.library" exists and update it
+        if (luarcJson.ContainsKey("workspace.library"))
+        {
+            luarcJson["workspace.library"] = new[] { "./esoapi/esoapi.lua" };
+        }
+        else
+        {
+            string[] value = ["./esoapi/esoapi.lua"];
+            luarcJson.Add("workspace.library", value);
+        }
+
+        // Write the updated content back to .luarc.json
+        string updatedLuarcContent = JsonSerializer.Serialize(luarcJson, options);
+        await FileIO.WriteTextAsync(luarcFile, updatedLuarcContent);
+
+        // ensure the folder exists
+        return await folder.TryGetItemAsync("esoapi") as StorageFolder ?? await folder.CreateFolderAsync("esoapi");
     }
 }

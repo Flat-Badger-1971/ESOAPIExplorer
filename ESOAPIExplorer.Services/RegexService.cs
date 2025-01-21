@@ -7,6 +7,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"^((?![^=]*\.)[A-Zz]\S+)\s*=\s*(?![^=]*\d)(.*)")]
     private static partial Regex _AliasMatcher();
 
+    [GeneratedRegex(@"^\*\s(.+)\((.*)\)")]
+    private static partial Regex _ApiParamSplitMatcher();
+
     [GeneratedRegex(@"(\d+)$")]
     private static partial Regex _ApiVersionMatcher();
 
@@ -92,6 +95,7 @@ public partial class RegexService : IRegexService
     private static partial Regex _UppercaseMatcher();
 
     public Regex AliasMatcher() => _AliasMatcher();
+    public Regex ApiParamSplitMatcher() => _ApiParamSplitMatcher();
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
     public Regex CallbackObjectMatcher() => _CallbackObjectMatcher();

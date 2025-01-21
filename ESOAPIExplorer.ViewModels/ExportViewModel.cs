@@ -32,7 +32,7 @@ public class ExportViewModel(ILuaCheckRcGeneratorService _luaCheckRcGeneratorSer
     private readonly ObservableCollection<DisplayModelBase<ExportOption>> _ExportOptions =
     [
         new DisplayModelBase<ExportOption> { Value = new ExportOption {Id = 1, DisplayName = "Luacheck configuration file '.luacheckrc'" } },
-        new DisplayModelBase<ExportOption> { Value = new ExportOption {Id = 2, DisplayName = "lua-language-server definitions file 'esoapi.lua'" } }
+        new DisplayModelBase<ExportOption> { Value = new ExportOption {Id = 2, DisplayName = "lua-language-server globals '.luarc.json'" } }
     ];
 
     public ObservableCollection<DisplayModelBase<ExportOption>> ExportOptions
@@ -89,46 +89,14 @@ public class ExportViewModel(ILuaCheckRcGeneratorService _luaCheckRcGeneratorSer
         }
     }
 
-    // TODO: add not to user to add the path to workspace.library (string array) in .luarc.json
     public async Task ExportLLSDefinition()
     {
+        // TODO: change this so all entries are added to the .luarc.json file in the "diagnostics.globals" section
         StorageFolder folder = await _FolderPicker.PickSingleFolderAsync();
 
         if (folder != null)
         {
-            StringBuilder llsdefinition = _luaLanguageServerDefinitionsGeneratorService.Generate();
-            StorageFile definitionFile = await folder.CreateFileAsync("esoapi.lua", CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(definitionFile, llsdefinition.ToString());
-
-            // Check if .luarc.json exists
-            StorageFile luarcFile = await folder.TryGetItemAsync(".luarc.json") as StorageFile;
-
-            if (luarcFile == null)
-            {
-                // Create .luarc.json if it does not exist
-                luarcFile = await folder.CreateFileAsync(".luarc.json", CreationCollisionOption.FailIfExists);
-                await FileIO.WriteTextAsync(luarcFile, "{}");
-            }
-
-            // Read the content of .luarc.json
-            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true, ReadCommentHandling= JsonCommentHandling.Skip };
-            string luarcContent = await FileIO.ReadTextAsync(luarcFile);
-            Dictionary<string, object> luarcJson = JsonSerializer.Deserialize<Dictionary<string, object>>(luarcContent, options) ?? [];
-
-            // Check if "workspace.library" exists and update it
-            if (luarcJson.ContainsKey("workspace.library"))
-            {
-                luarcJson["workspace.library"] = new[] { "./esoapi.lua" };
-            }
-            else
-            {
-                string[] value = ["./esoapi.lua"];
-                luarcJson.Add("workspace.library", value);
-            }
-
-            // Write the updated content back to .luarc.json
-            string updatedLuarcContent = JsonSerializer.Serialize(luarcJson, options);
-            await FileIO.WriteTextAsync(luarcFile, updatedLuarcContent);
+            await _luaLanguageServerDefinitionsGeneratorService.Generate(folder);            
         }
     }
 }

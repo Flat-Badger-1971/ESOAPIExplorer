@@ -215,9 +215,9 @@
                         <!-- Method details -->
                         <TextBlock Text="access" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
                         <TextBlock Text="{Binding SelectedMethodDetails.Access, Converter={StaticResource LowercaseConverter}}"
-                    Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}"
-                    Foreground="{Binding SelectedMethodDetails.Access, Converter={StaticResource AccessLevelToColourConverter}}"
-                    Margin="10" />
+                            Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}"
+                            Foreground="{Binding SelectedMethodDetails.Access, Converter={StaticResource AccessLevelToColourConverter}}"
+                            Margin="10" />
                     </StackPanel>
 
                     <!-- value -->

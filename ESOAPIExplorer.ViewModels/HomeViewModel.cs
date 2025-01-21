@@ -22,6 +22,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: implement decent theme colours
 // TODO: add busy indicator
 // TODO: add proper export screen with options to control export content
+// TODO: replace copyright and tm with icons
 public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService) : ViewModelBase
 {
     #region Properties

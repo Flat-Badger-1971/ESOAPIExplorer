@@ -39,10 +39,6 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         // Check for subclass methods
         foreach (KeyValuePair<string, string> subclass in _subclasses)
         {
-            if (subclass.Key == "ZO_ObjectPool")
-            {
-
-            }
             EsoUIObject obj = Results.Objects.FirstOrDefault(o => o.Name == subclass.Key);
 
             if (obj != null)

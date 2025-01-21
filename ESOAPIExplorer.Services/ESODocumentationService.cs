@@ -495,14 +495,13 @@ public class ESODocumentationService : IESODocumentationService
                 List<string> matches = GetMatches(_RegexService.EventMatcher());
                 string name = matches[0];
                 string argsString = matches[2];
-
-                List<EsoUIArgument> args;
+                List<EsoUIArgument> args = [];
 
                 if (string.IsNullOrEmpty(argsString))
                 {
                     args = ParseArgs("*integer* _eventId_");
                 }
-                else
+                else if(!argsString.Contains("eventid",StringComparison.OrdinalIgnoreCase ))
                 {
                     args = ParseArgs("*integer* _eventId_," + argsString);
                 }

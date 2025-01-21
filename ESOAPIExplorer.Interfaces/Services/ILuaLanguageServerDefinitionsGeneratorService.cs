@@ -1,9 +1,10 @@
-﻿using System.Text;
+﻿using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace ESOAPIExplorer.Services
 {
     public interface ILuaLanguageServerDefinitionsGeneratorService
     {
-        StringBuilder Generate();
+        public Task Generate(StorageFolder folder);
     }
 }
