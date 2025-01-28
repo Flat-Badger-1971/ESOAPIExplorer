@@ -56,7 +56,7 @@ public class ESODocumentationService : IESODocumentationService
         string path = $"{ApplicationData.Current.LocalCacheFolder.Path}\\apiCache.br";
 
 #if DEBUG
-        // UseCache = false;
+        UseCache = false;
 #endif
         try
         {

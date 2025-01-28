@@ -71,6 +71,10 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
                 {
                     EsoUIArgument arg = esofunc.Value.Args[i];
 
+                    if (arg.Name == "ZO_ParametricScrollList:HasDataTemplate")
+                    {
+
+                    }
                     if (i == esofunc.Value.Args.Count - 1)
                     {
                         param.Append($"--- @param {arg.Name} {arg.Type.Name.Replace(":nilable", "|nil")}");

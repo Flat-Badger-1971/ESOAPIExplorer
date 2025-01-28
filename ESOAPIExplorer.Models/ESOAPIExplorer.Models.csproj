@@ -8,6 +8,9 @@
     <UseWinUI>true</UseWinUI>
 	  <OutputType>Library</OutputType>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Search\tmp.cs" />
+  </ItemGroup>
 
   <ItemGroup>
       <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />

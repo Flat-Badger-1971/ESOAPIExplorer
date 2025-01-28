@@ -8,6 +8,7 @@ namespace ESOAPIExplorer.Services
         public Regex ApiParamSplitMatcher();
         public Regex ApiVersionMatcher();
         public Regex ArgumentMatcher();
+        public Regex BooleanMatcher();
         public Regex CallbackObjectMatcher();
         public Regex ColorDefMatcher();
         public Regex ConstantMatcher();

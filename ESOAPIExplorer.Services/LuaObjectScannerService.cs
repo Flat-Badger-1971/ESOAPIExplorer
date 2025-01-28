@@ -312,16 +312,49 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         return lines.Length - 1;
     }
 
+    private int FindEndOfLocalFunction(string[] lines, int startPosition)
+    {
+        int depth = 1;
+
+        for (int i = startPosition; i < lines.Length; i++)
+        {
+            string line = lines[i];
+
+            if (!line.Trim().StartsWith("--"))
+            {
+                if (_regexService.IfKeywordMatcher().IsMatch(line) || _regexService.DoKeywordMatcher().IsMatch(line))
+                {
+                    depth++;
+                }
+                else if (_regexService.EndKeywordMatcher().IsMatch(line))
+                {
+                    depth--;
+
+                    if (depth == 0)
+                    {
+                        return i;
+                    }
+                }
+            }
+        }
+
+        return lines.Length - 1;
+    }
+
     private static List<string> SplitReturnValues(string values)
     {
         List<string> returnValues = [];
         StringBuilder stringBuilder = new();
         int valueCount = 0;
+        int objCount = 0;
+        bool isObject = false;
 
         foreach (string value in values.Split(','))
         {
             valueCount += value.Count(c => c == '(');
             valueCount -= value.Count(c => c == ')');
+            objCount += value.Count(c => c == '{');
+            objCount -= value.Count(c => c == '}');
 
             if (stringBuilder.Length > 0)
             {
@@ -330,7 +363,19 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
 
             stringBuilder.Append(value.Trim());
 
-            if (valueCount == 0)
+            if (objCount > 0)
+            {
+                isObject = true;
+            }
+
+            if (isObject && objCount == 0)
+            {
+                returnValues.Clear();
+                returnValues.Add("data");
+
+                return returnValues;
+            }
+            else if (valueCount == 0)
             {
                 returnValues.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
@@ -345,22 +390,30 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         switch (true)
         {
             case true when Utility.IsBooleanExpression(value):
+            case true when _regexService.BooleanMatcher().IsMatch(value):
                 return "bool";
             case true when _regexService.NumberMatcher().IsMatch(value):
             case true when value == "i":
             case true when value.EndsWith("offset", StringComparison.OrdinalIgnoreCase):
             case true when value.EndsWith("padding", StringComparison.OrdinalIgnoreCase):
-            case true when value.StartsWith("#", StringComparison.OrdinalIgnoreCase):
+            case true when value.StartsWith('#'):
+            case true when value.EndsWith("index", StringComparison.OrdinalIgnoreCase):
+            case true when value.EndsWith("amount", StringComparison.OrdinalIgnoreCase):
                 return "number";
             case true when value.StartsWith('"') && value.EndsWith('"'):
+            case true when value.EndsWith("Name") || value == "name":
                 return "string";
             case true when Utility.IsControl(value):
             case true when value == "control":
+            case true when value == "data":
                 return "userdata";
             case true when value.StartsWith('{') && value.EndsWith('}'):
                 return "table";
             case true when Utility.IsObject(value):
                 return "object";
+            case true when value.EndsWith("Function"):
+            case true when value == "fn":
+                return "function";
             default:
                 return "unknown";
         }
@@ -375,6 +428,12 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
 
         for (int i = startPosition; i <= endPosition; i++)
         {
+            if (lines[i].Contains("local function"))
+            {
+                i = FindEndOfLocalFunction(lines, i);
+                continue;
+            }
+
             string line = lines[i].Trim();
 
             if (line.StartsWith("return "))

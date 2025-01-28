@@ -16,6 +16,9 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\*(.+)\* _(.+)_")]
     private static partial Regex _ArgumentMatcher();
 
+    [GeneratedRegex(@"^(is|can|should)[A-Z]+")]
+    private static partial Regex _BooleanMatcher();
+
     [GeneratedRegex(@"^\s*([A-Z_]+)\s+=\s+ZO_CallbackObject.New\(self\)")]
     private static partial Regex _CallbackObjectMatcher();
 
@@ -49,7 +52,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"([^\s]+)( \*(.+)\*)?")]
     private static partial Regex _FunctionAccessMatcher();
 
-    [GeneratedRegex(@"\bfunction\b")]
+    [GeneratedRegex(@"^\bfunction\b")]
     private static partial Regex _FunctionKeywordMatcher();
 
     [GeneratedRegex(@"^function\s+(\w+)\((.*)\)")]
@@ -101,6 +104,7 @@ public partial class RegexService : IRegexService
     public Regex ApiParamSplitMatcher() => _ApiParamSplitMatcher();
     public Regex ApiVersionMatcher() => _ApiVersionMatcher();
     public Regex ArgumentMatcher() => _ArgumentMatcher();
+    public Regex BooleanMatcher() => _BooleanMatcher();
     public Regex CallbackObjectMatcher() => _CallbackObjectMatcher();
     public Regex ColorDefMatcher() => _ColorDefMatcher();
     public Regex ConstantMatcher() => _ConstantMatcher();
