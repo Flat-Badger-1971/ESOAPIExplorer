@@ -32,11 +32,14 @@ public class NavigationService : INavigationService
         MainFrame.Navigated += async (sender, e) =>
         {
             NavigationModel nav = (NavigationModel)e.ExtraData;
-            Type viewModelType = nav?.ViewModel?.GetType();
-            MainFrame.DataContext = nav?.ViewModel;
-            OnNavigationPerformed(viewModelType);
-            await(nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
-            MainFrame.Content = GetPage(viewModelType);
+            if (nav != null)
+            {
+                Type viewModelType = nav?.ViewModel?.GetType();
+                MainFrame.DataContext = nav?.ViewModel;
+                OnNavigationPerformed(viewModelType);
+                await (nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
+                MainFrame.Content = GetPage(viewModelType);
+            }
         };
 
     }

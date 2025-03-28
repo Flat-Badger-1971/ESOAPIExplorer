@@ -10,7 +10,6 @@
     xmlns:converters="clr-namespace:ESOAPIExplorer.ValueConverters;assembly=ESOAPIExplorer.ValueConverters"    
     xmlns:c="clr-namespace:ESOAPIExplorer.Controls;assembly=ESOAPIExplorer.Controls"
     mc:Ignorable="d"
-    Background="Red"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
     <Page.Resources>
@@ -87,7 +86,7 @@
                         ToolTipService.ToolTip="Back"
                         Grid.Column="0" />
                 <!-- Filter TextBox -->
-                <ComboBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" Margin="5,0,5,0" Grid.Column="1" />
+                <ComboBox IsEditable="True" x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" Margin="5,0,5,0" Grid.Column="1" />
             </Grid>
             <!-- Full Height ListBox -->
             <ListView Name="MainListView"

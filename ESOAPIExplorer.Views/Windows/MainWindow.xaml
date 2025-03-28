@@ -17,7 +17,9 @@
                 <MenuItem Header="About" Command="{Binding NavigateCommand}" CommandParameter="InfoViewModel"/>
                 <MenuItem Header="Settings" Command="{Binding NavigateCommand}" CommandParameter="SettingsViewModel"/>
             </Menu>
-            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden" Background="Yellow"/>
+            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden" Source="pack://application:,,,/ESOAPIExplorer.Views;component/HomeView.xaml">
+                
+            </Frame>
         </DockPanel>
     </Grid>
 </Window>

@@ -118,7 +118,7 @@ public partial class HighlightedTextBlock : Grid
     }
 
     public static readonly DependencyProperty ForegroundProperty =
-    DependencyProperty.Register(nameof(Foreground), typeof(SolidColorBrush), typeof(HighlightedTextBlock), new PropertyMetadata(Application.Current.Resources["ESOTextColour"]));
+    DependencyProperty.Register(nameof(Foreground), typeof(SolidColorBrush), typeof(HighlightedTextBlock), new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
     public SolidColorBrush Foreground
     {
