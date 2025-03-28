@@ -1,5 +1,5 @@
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace ESOAPIExplorer.Views;
 

@@ -5,11 +5,10 @@
     xmlns:local="using:ESOAPIExplorer.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:ESOAPIExplorer.ViewModels"    
+    xmlns:vm="clr-namespace:ESOAPIExplorer.ViewModels;assembly=ESOAPIExplorer.ViewModels"    
     xmlns:converters="using:ESOAPIExplorer.ValueConverters"    
-    xmlns:c="using:ESOAPIExplorer.Controls"
+    xmlns:c="clr-namespace:ESOAPIExplorer.Controls;assembly=ESOAPIExplorer.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}">
 

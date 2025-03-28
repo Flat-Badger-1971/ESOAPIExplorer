@@ -1,40 +1,37 @@
 using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views.Dialogs;
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using Window = Microsoft.UI.Xaml.Window;
+using System.Windows.Threading;
 
 namespace ESOAPIExplorer.Services;
 
-public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDialogViewModel viewModel) : IDialogService
+public class DialogService(Dispatcher mainDispatcherQueue, CustomMessageDialogViewModel viewModel) : IDialogService
 {
-    readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-    private readonly DispatcherQueue _MainDispatcherQueue = mainDispatcherQueue;
-    private readonly CustomMessageDialogViewModel _ViewModel = viewModel;
+    private readonly Dispatcher _mainDispatcher = mainDispatcherQueue;
+    private readonly CustomMessageDialogViewModel _viewModel = viewModel;
 
     public Task ShowAsync(string message, string title = "Message") => ShowAsync(message, title, "Ok", null);
 
-    public async Task ShowAsync(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action positiveCallback = null, Action negativeCallback = null, bool isSelectable = false)
+    public Task ShowAsync(string message, string title = "Message", string positiveText = "Ok", string negativeText = "Cancel", Action positiveCallback = null, Action negativeCallback = null, bool isSelectable = false)
     {
         CustomMessageDialog messageDialog = new()
         {
-            DataContext = _ViewModel,
-            XamlRoot = _MainWindow.Content.XamlRoot
+            DataContext = _viewModel,
+            // XamlRoot = _MainWindow.Content.XamlRoot
         };
 
         // Create the message dialog and set its content
-        _ViewModel.Title = title;
-        _ViewModel.Message = message;
-        _ViewModel.PositiveText = positiveText;
-        _ViewModel.NegativeText = negativeText;
-        _ViewModel.IsSelectable = isSelectable;
+        _viewModel.Title = title;
+        _viewModel.Message = message;
+        _viewModel.PositiveText = positiveText;
+        _viewModel.NegativeText = negativeText;
+        _viewModel.IsSelectable = isSelectable;
 
         positiveCallback ??= () => messageDialog.Hide();
         negativeCallback ??= () => messageDialog.Hide();
 
-        _ViewModel.ResponseEntered += (source, args) =>
+        _viewModel.ResponseEntered += (source, args) =>
         {
             if (args)
             {
@@ -46,13 +43,19 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
             }
         };
 
-        await messageDialog.ShowAsync();
+        return Task.FromResult(messageDialog.ShowDialog());
     }
 
     public bool RunOnMainThread(Action action)
     {
-        bool success = _MainDispatcherQueue.TryEnqueue(new DispatcherQueueHandler(action));
-
-        return success;
+        try
+        {
+            _mainDispatcher.Invoke(action);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 }

@@ -1,16 +1,16 @@
-﻿using Microsoft.UI.Dispatching;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace ESOAPIExplorer.Models;
 
 public static class DispatcherQueueExtensions
 {
-    public static Task EnqueueAsync(this DispatcherQueue dispatcherQueue, Action action)
+    public static Task EnqueueAsync(this Dispatcher dispatcherQueue, Action action)
     {
         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
-        dispatcherQueue.TryEnqueue(() =>
+        dispatcherQueue.EnqueueAsync(() =>
         {
             try
             {

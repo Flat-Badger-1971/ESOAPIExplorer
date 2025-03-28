@@ -1,32 +1,17 @@
-<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
-<!-- Licensed under the MIT License. See LICENSE in the project root for license information. -->
-
-<ContentDialog
+<Window
     x:Class="ESOAPIExplorer.Views.Dialogs.CustomMessageDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ESOAPIExplorer.Views.Dialogs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:ESOAPIExplorer.ViewModels"
-    xmlns:converters="using:ESOAPIExplorer.ValueConverters"
+    xmlns:vm="clr-namespace:ESOAPIExplorer.ViewModels;assembly=ESOAPIExplorer.ViewModels"
+    xmlns:converters="clr-namespace:ESOAPIExplorer.ValueConverters;assembly=ESOAPIExplorer.ValueConverters"
     mc:Ignorable="d"
     x:Name="_this"
     Background="White"
     
-    SecondaryButtonText="{Binding PositiveText}"
-    SecondaryButtonCommand="{Binding ResponseEnteredCommand}"
-    PrimaryButtonText="{Binding NegativeText}"
-    PrimaryButtonCommand="{Binding ResponseEnteredCommand}"
-    d:DataContext="{d:DesignInstance Type=vm:CustomMessageDialogViewModel}"
-    PrimaryButtonStyle="{StaticResource SecondaryDialogButtonStyle}"
-    SecondaryButtonStyle="{StaticResource DialogButtonStyle}">
-    <ContentDialog.PrimaryButtonCommandParameter>
-        <x:Boolean>True</x:Boolean>
-    </ContentDialog.PrimaryButtonCommandParameter>
-    <ContentDialog.SecondaryButtonCommandParameter>
-        <x:Boolean>False</x:Boolean>
-    </ContentDialog.SecondaryButtonCommandParameter>
+    d:DataContext="{d:DesignInstance Type=vm:CustomMessageDialogViewModel}">
 
     <Grid MinHeight="200">
         <Grid.RowDefinitions>
@@ -38,13 +23,19 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Text="{Binding Title}" Style="{StaticResource DialogSubHeadingTextBlockStyle}" Grid.Row="0"/>
-        <TextBlock Text="{Binding Message}" Style="{StaticResource DialogBodyTextBlockStyle}" Grid.Row="1" Margin="0,20,0,0" TextWrapping="WrapWholeWords" Visibility="{Binding IsSelectable, Converter={StaticResource InvertedBoolToVisibilityConverter}}"/>
-        <ScrollView Visibility="{Binding IsSelectable, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="1" Margin="0,20,0,0">
+        <TextBlock Text="{Binding Title}" Style="{StaticResource DialogSubHeadingLabelStyle}" Grid.Row="0"/>
+        <TextBlock Text="{Binding Message}" Style="{StaticResource DialogBodyLabelStyle}" Grid.Row="1" Margin="0,20,0,0" TextWrapping="Wrap" Visibility="{Binding IsSelectable, Converter={StaticResource InvertedBoolToVisibilityConverter}}"/>
+        <ScrollViewer Visibility="{Binding IsSelectable, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="1" Margin="0,20,0,0">
             <TextBox AcceptsReturn="True" TextWrapping="Wrap"
          ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="true"  Text="{Binding Message}"/>
-        </ScrollView>
+        </ScrollViewer>
         <Button Content="{StaticResource glyph-copy}" Grid.Row="1" FontFamily="{StaticResource icoFont}" Command="{Binding CopyToClipboardCommand}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="{Binding IsSelectable, Converter={StaticResource BoolToVisibilityConverter}}"/>
         <TextBlock Text="{Binding ActionMessage}" Foreground="Red" Grid.Row="2"/>
+
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="PrimaryButton" Style="{StaticResource SecondaryDialogButtonStyle}" Content="{Binding NegativeText}" Command="{Binding ResponseEnteredCommand}"/>
+            <Button x:Name="SecondaryButton" Style="{StaticResource SecondaryDialogButtonStyle}" Content="{Binding PosativeText}" Command="{Binding ResponseEnteredCommand}"/>
+        </StackPanel>
     </Grid>
-</ContentDialog>
+</Window>
+ 

@@ -6,17 +6,17 @@
     xmlns:local="using:ESOAPIExplorer.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:ESOAPIExplorer.ViewModels"    
-    xmlns:converters="using:ESOAPIExplorer.ValueConverters"    
-    xmlns:c="using:ESOAPIExplorer.Controls"
+    xmlns:vm="clr-namespace:ESOAPIExplorer.ViewModels;assembly=ESOAPIExplorer.ViewModels"    
+    xmlns:converters="clr-namespace:ESOAPIExplorer.ValueConverters;assembly=ESOAPIExplorer.ValueConverters"    
+    xmlns:c="clr-namespace:ESOAPIExplorer.Controls;assembly=ESOAPIExplorer.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
     <Page.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="ArgTextBlockTemplate">
-                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{ThemeResource SystemBaseHighColor}" />
+                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{StaticResource SystemBaseHighColor}" />
             </DataTemplate>
             <DataTemplate x:Key="ArgButtonTemplate">
                 <Button Content="{Binding Type, Converter={StaticResource TypeToNameConverter}}"
@@ -24,29 +24,29 @@
                         Command="{Binding Path=DataContext.HandleSelectedItemElement, ElementName=_this}"
                         CommandParameter="{Binding Type, Converter={StaticResource TypeToNameConverter}}"/>
             </DataTemplate>
-            <converters:TypeTemplateSelector x:Key="TypeTemplateSelector" TextBlockTemplate="{StaticResource ArgTextBlockTemplate}" ButtonTemplate="{StaticResource ArgButtonTemplate}" />
+            <!--<converters:TypeTemplateSelector x:Key="TypeTemplateSelector" TextBlockTemplate="{StaticResource ArgTextBlockTemplate}" ButtonTemplate="{StaticResource ArgButtonTemplate}" />-->
             <DataTemplate x:Key="ArgumentHeaderTemplate">
-                <Grid Margin="0" Height="20" Padding="10,0,10,0" Background="{ThemeResource SystemBaseMediumLowColor}">
+                <Grid Margin="0" Height="20" Background="{StaticResource SystemBaseMediumLowColor}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="6*"/>
                         <ColumnDefinition Width="4*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{ThemeResource SystemBaseHighColor}"/>
-                    <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{ThemeResource SystemBaseHighColor}"/>
-                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{ThemeResource SystemBaseHighColor}"/>
+                    <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemBaseHighColor}"/>
+                    <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemBaseHighColor}"/>
+                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{StaticResource SystemBaseHighColor}"/>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="ArgumentItemTemplate">
-                <Grid Height="20" Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}" Padding="0">
+                <Grid Height="20" Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="6*"/>
                             <ColumnDefinition Width="4*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"  Foreground="{ThemeResource SystemBaseHighColor}"/>
-                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"  Foreground="{ThemeResource SystemBaseHighColor}"/>
+                        <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemBaseHighColor}"/>
+                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemBaseHighColor}"/>
                         <ContentControl Content="{Binding Type}" ContentTemplateSelector="{StaticResource TypeTemplateSelector}" Margin="0" Grid.Column="2" />
                     </Grid>
                 </Grid>
@@ -85,7 +85,7 @@
                         ToolTipService.ToolTip="Back"
                         Grid.Column="0" />
                 <!-- Filter TextBox -->
-                <AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" PlaceholderText="Filter items..." Margin="5,0,5,0" Grid.Column="1" />
+                <ComboBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" Margin="5,0,5,0" Grid.Column="1" />
             </Grid>
             <!-- Full Height ListBox -->
             <ListView Name="MainListView"
@@ -100,9 +100,9 @@
                             <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
                             <!-- Visible Text Column -->
                             <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod"/>
-                            <Frame CornerRadius="5" Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
-                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{ThemeResource SystemBaseHighColor}"/>
-                            </Frame>
+                            <Grid Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemBaseHighColor}"/>
+                            </Grid>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -226,11 +226,10 @@
                         <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}" />
                         <ListView ItemsSource="{Binding SelectedEventDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
-                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource ValueItemTemplate}"
                     Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                             </ListView.Resources>
                         </ListView>
 
@@ -238,11 +237,10 @@
                         <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
                         <ListView ItemsSource="{Binding SelectedGlobalDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
-                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource GlobalItemTemplate}" 
                     Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                             </ListView.Resources>
                         </ListView>
 
@@ -250,11 +248,10 @@
                         <TextBlock Text="value" FontWeight="Bold" FontSize="26" Margin="10" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}"/>
                         <ListView ItemsSource="{Binding SelectedConstantDetails, Converter={StaticResource SingleValueToListConverter}}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                     MaxHeight="300"
-                    HeaderTemplate="{StaticResource ValueHeaderTemplate}"
                     ItemTemplate="{StaticResource GlobalConstantTemplate}" 
                     Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                             </ListView.Resources>
                         </ListView>
                     </StackPanel>
@@ -266,11 +263,10 @@
                         <Grid Visibility="{Binding SelectedFunctionDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView ItemsSource="{Binding SelectedFunctionDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                           MaxHeight="300"
-                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                 <ListView.Resources>
-                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                                 </ListView.Resources>
                             </ListView>
                             <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
@@ -282,10 +278,9 @@
                             <ListView ItemsSource="{Binding SelectedEventDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                           MaxHeight="300"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
-                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource NotNullToVisibilityConverter}}">
                                 <ListView.Resources>
-                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                                 </ListView.Resources>
                             </ListView>
                             <TextBlock Text="none" Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
@@ -296,11 +291,10 @@
                         <Grid Visibility="{Binding SelectedMethodDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView ItemsSource="{Binding SelectedMethodDetails.Args}" Margin="10" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                           MaxHeight="300"
-                          HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                 <ListView.Resources>
-                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                                 </ListView.Resources>
                             </ListView>
                             <TextBlock Text="none" Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
@@ -318,10 +312,9 @@
                                         <StackPanel Margin="0,20,0,0">
                                             <ListView ItemsSource="{Binding Values}" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                                                 MaxHeight="300"
-                                                HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                                                 ItemTemplate="{StaticResource ArgumentItemTemplate}">
                                                 <ListView.Resources>
-                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                                                 </ListView.Resources>
                                             </ListView>
                                         </StackPanel>
@@ -340,10 +333,9 @@
                                         <StackPanel Margin="0,20,0,0">
                                             <ListView ItemsSource="{Binding Values}" BorderBrush="DimGray" BorderThickness="1" ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}" 
                                                 MaxHeight="300"
-                                                HeaderTemplate="{StaticResource ArgumentHeaderTemplate}"
                                                 ItemTemplate="{StaticResource ArgumentItemTemplate}">
                                                 <ListView.Resources>
-                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                                                 </ListView.Resources>
                                             </ListView>
                                         </StackPanel>
@@ -365,15 +357,15 @@
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
-                                <Grid Grid.Row="0" Margin="0" Height="20" Padding="10,0,10,0" Background="{ThemeResource SystemBaseMediumLowColor}">
+                                <Grid Grid.Row="0" Margin="0" Height="20" Background="{StaticResource SystemBaseMediumLowColor}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="1*"/>
                                         <ColumnDefinition Width="2*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="0"/>
-                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
-                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
+                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{StaticResource SystemBaseHighColor}" Margin="0" Grid.Column="0"/>
+                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{StaticResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
+                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{StaticResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
                                 </Grid>
                                 <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
                                   ItemsSource="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EnumToSortedEnumConverter}}"
@@ -382,7 +374,7 @@
                                   SelectedIndex="{Binding SelectedEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Visibility="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                     <ListView.Resources>
-                                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />
+                                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
                                     </ListView.Resources>
                                 </ListView>
                             </Grid>
@@ -434,7 +426,7 @@
                     <Grid Grid.Row="13" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
                         <StackPanel>
                             <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
-                            <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="WrapWholeWords"/>
+                            <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{StaticResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

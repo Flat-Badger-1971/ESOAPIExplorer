@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
-using Windows.Storage;
-
-namespace ESOAPIExplorer.Services
+﻿namespace ESOAPIExplorer.Services
 {
     public interface ILuaLanguageServerDefinitionsGeneratorService
     {
-        public Task Generate(StorageFolder folder);
+        // public Task Generate(StorageFolder folder);
     }
 }

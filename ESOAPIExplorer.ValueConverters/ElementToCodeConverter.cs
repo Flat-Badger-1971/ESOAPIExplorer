@@ -1,13 +1,13 @@
-using System;
-using System.Linq;
 using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml.Data;
+using System;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace ESOAPIExplorer.ValueConverters;
 
 public class ElementToCodeConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         string code = string.Empty;
 
@@ -22,7 +22,7 @@ public class ElementToCodeConverter : IValueConverter
         return code;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

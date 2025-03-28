@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using ESOAPIExplorer.Models;
+using System.Windows;
 
 namespace ESOAPIExplorer.Services;
 
@@ -15,7 +16,7 @@ public class ThemeService : IThemeService
     {
         if (_element != null)
         {
-            _element.RequestedTheme = theme;
+            // _element.RequestedTheme = theme;
         }
     }
 }

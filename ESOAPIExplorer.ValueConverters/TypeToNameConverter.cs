@@ -1,12 +1,13 @@
 using System;
 using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml.Data;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace ESOAPIExplorer.ValueConverters;
 
 public class TypeToNameConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is EsoUIType arg)
         {
@@ -16,7 +17,7 @@ public class TypeToNameConverter : IValueConverter
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

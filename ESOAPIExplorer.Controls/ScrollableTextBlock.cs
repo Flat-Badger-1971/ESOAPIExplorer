@@ -1,8 +1,7 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using System.Threading;
+﻿using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ESOAPIExplorer.Controls;
 
@@ -23,7 +22,7 @@ public partial class ScrollableTextBlock : UserControl
         InitialiseComponents();
         UpdateTextBlockPadding();
 
-        _ScrollViewer.ViewChanged += (s, args) => UpdateTextBlockPadding();
+        _ScrollViewer.ScrollChanged += (s, args) => UpdateTextBlockPadding();
         _TextBlock.SizeChanged += (s, args) => UpdateTextBlockPadding();
     }
 
@@ -33,7 +32,7 @@ public partial class ScrollableTextBlock : UserControl
         {
             Background = new SolidColorBrush(Colors.Black),
             Margin = new Thickness(10, 0, 10, 0),
-            Padding = new Thickness(10)
+            // Padding = new Thickness(10)
         };
 
         _ScrollViewer = new ScrollViewer
@@ -56,8 +55,8 @@ public partial class ScrollableTextBlock : UserControl
 
     private void UpdateTextBlockPadding()
     {
-        var horizontalVisible = _ScrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
-        var verticalVisible = _ScrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
+        bool horizontalVisible = _ScrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
+        bool verticalVisible = _ScrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
 
         if (horizontalVisible || verticalVisible)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.UI.Xaml.Data;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace ESOAPIExplorer.ValueConverters;
 
@@ -9,7 +10,7 @@ public class StringToValueConverter : IValueConverter
     public Type ReturnType { get; set; }
     public Dictionary<string, object> Values { get; set; } = [];
 
-    public object Convert(object value, Type targetType, object parameter, string culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         string s = value.ToString();
 
@@ -21,7 +22,7 @@ public class StringToValueConverter : IValueConverter
         return null;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

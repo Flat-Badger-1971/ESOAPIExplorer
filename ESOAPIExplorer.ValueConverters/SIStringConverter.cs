@@ -1,6 +1,7 @@
 using System;
 using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml.Data;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace ESOAPIExplorer.ValueConverters;
 
@@ -10,7 +11,7 @@ public class SIStringToVisibilityConverter : IValueConverter
     public object NotNullValue { get; set; }
     public Type ReturnType { get; set; }
 
-    public object Convert(object value, Type targetType, object parameter, string culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is EsoUIConstantValue constant && constant != null)
         {
@@ -23,7 +24,7 @@ public class SIStringToVisibilityConverter : IValueConverter
         return System.Convert.ChangeType(NullValue, ReturnType);
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
 namespace ESOAPIExplorer.ValueConverters;
 
 public class EmptyListToTextConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is IList list && list.Count == 0)
         {
@@ -22,7 +23,7 @@ public class EmptyListToTextConverter : IValueConverter
         return Visibility.Collapsed;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

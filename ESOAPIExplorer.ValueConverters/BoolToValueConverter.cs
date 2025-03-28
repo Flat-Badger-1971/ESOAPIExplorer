@@ -1,5 +1,6 @@
 using System;
-using Microsoft.UI.Xaml.Data;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace ESOAPIExplorer.ValueConverters;
 
@@ -8,10 +9,9 @@ public class BoolToValueConverter : IValueConverter
     public object TrueValue { get; set; }
     public object FalseValue { get; set; }
     public object NullValue { get; set; }
-
     public Type ReturnType { get; set; }
 
-    public object Convert(object value, Type targetType, object parameter, string culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is bool v && v)
         {
@@ -27,7 +27,7 @@ public class BoolToValueConverter : IValueConverter
         }
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

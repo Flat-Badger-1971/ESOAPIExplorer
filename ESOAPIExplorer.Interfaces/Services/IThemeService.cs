@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using ESOAPIExplorer.Models;
+using System.Windows;
 
 namespace ESOAPIExplorer.Services
 {

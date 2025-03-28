@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Storage;
 
 namespace ESOAPIExplorer.Services;
 
@@ -19,40 +18,27 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
     private readonly EsoUIDocumentation docs = _esoDocumentationService.Documentation;
     private bool _added = false;
 
-    public async Task Generate(StorageFolder esofolder)
+    public async Task Generate(string esofolder)
     {
-        StorageFile esoapiFile;
-
         // create definition files
-        esoapiFile = await esofolder.CreateFileAsync("aliases.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddAliases());
+        await CreateFileAsync("aliases.lua", AddAliases());
+        await CreateFileAsync("api.lua", AddAPI());
+        await CreateFileAsync("classes.lua", AddClasses(false));
+        await CreateFileAsync("zoclasses.lua", AddClasses(true));
+        await CreateFileAsync("events.lua", AddEvents());
+        await CreateFileAsync("functions.lua", AddFunctions());
+        await CreateFileAsync("globals.lua", AddGlobals());
+        await CreateFileAsync("sounds.lua", AddSounds());
+        await CreateFileAsync("zoclasses.min", AddClasses(true, true));
+        await CreateFileAsync("fragments.lua", AddFragments());
+    }
 
-        esoapiFile = await esofolder.CreateFileAsync("api.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddAPI());
-
-        esoapiFile = await esofolder.CreateFileAsync("classes.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddClasses(false));
-
-        esoapiFile = await esofolder.CreateFileAsync("zoclasses.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddClasses(true));
-
-        esoapiFile = await esofolder.CreateFileAsync("events.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddEvents());
-
-        esoapiFile = await esofolder.CreateFileAsync("functions.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddFunctions());
-
-        esoapiFile = await esofolder.CreateFileAsync("globals.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddGlobals());
-
-        esoapiFile = await esofolder.CreateFileAsync("sounds.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddSounds());
-
-        esoapiFile = await esofolder.CreateFileAsync("zoclasses.min", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddClasses(true, true));
-
-        esoapiFile = await esofolder.CreateFileAsync("fragments.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddFragments());
+    private async Task CreateFileAsync(string fileName, string content)
+    {
+        using (FileStream file = File.Create(fileName))
+        {
+            await file.WriteAsync(Encoding.UTF8.GetBytes(content));
+        }
     }
 
     private string AddFragments()
@@ -685,41 +671,5 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
         returns.Clear();
         param.Clear();
         func.Clear();
-    }
-
-    private static async Task<StorageFolder> SetupDefinitionsStorage(StorageFolder folder)
-    {
-        // Check if .luarc.json exists
-        StorageFile luarcFile = await folder.TryGetItemAsync(".luarc.json") as StorageFile;
-
-        if (luarcFile == null)
-        {
-            // Create .luarc.json if it does not exist
-            luarcFile = await folder.CreateFileAsync(".luarc.json", CreationCollisionOption.FailIfExists);
-            await FileIO.WriteTextAsync(luarcFile, "{}");
-        }
-
-        // Read the content of .luarc.json
-        JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true, ReadCommentHandling = JsonCommentHandling.Skip };
-        string luarcContent = await FileIO.ReadTextAsync(luarcFile);
-        Dictionary<string, object> luarcJson = JsonSerializer.Deserialize<Dictionary<string, object>>(luarcContent, options) ?? [];
-
-        // Check if "workspace.library" exists and update it
-        if (luarcJson.ContainsKey("workspace.library"))
-        {
-            luarcJson["workspace.library"] = new[] { "./esoapi/esoapi.lua" };
-        }
-        else
-        {
-            string[] value = ["./esoapi/esoapi.lua"];
-            luarcJson.Add("workspace.library", value);
-        }
-
-        // Write the updated content back to .luarc.json
-        string updatedLuarcContent = JsonSerializer.Serialize(luarcJson, options);
-        await FileIO.WriteTextAsync(luarcFile, updatedLuarcContent);
-
-        // ensure the folder exists
-        return await folder.TryGetItemAsync("esoapi") as StorageFolder ?? await folder.CreateFolderAsync("esoapi");
     }
 }

@@ -1,5 +1,5 @@
 using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml;
+using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,8 +9,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace ESOAPIExplorer.Services;
 
@@ -24,8 +22,8 @@ public class ESODocumentationService : IESODocumentationService
     private ReaderState State { get; set; }
     public bool UseCache { get; set; } = true;
 
-    private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
-    private readonly FileOpenPicker _FilePicker;
+    // private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
+    // private readonly FileOpenPicker _FilePicker;
     private readonly ILuaObjectScanner _LuaObjectScanner;
     private readonly IRegexService _RegexService;
 
@@ -33,30 +31,38 @@ public class ESODocumentationService : IESODocumentationService
 
     public ESODocumentationService(ILuaObjectScanner luaObjectScanner, IRegexService regexService)
     {
-        _FilePicker = new FileOpenPicker
-        {
-            ViewMode = PickerViewMode.List,
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-        };
+        //_FilePicker = new FileOpenPicker
+        //{
+        //    ViewMode = PickerViewMode.List,
+        //    SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+        //};
 
-        // Get the current window's HWND by passing in the Window object
-        Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-        nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
+        //// Get the current window's HWND by passing in the Window object
+        //Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+        //nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
 
-        // Associate the HWND with the file picker
-        WinRT.Interop.InitializeWithWindow.Initialize(_FilePicker, hwnd);
+        //// Associate the HWND with the file picker
+        //WinRT.Interop.InitializeWithWindow.Initialize(_FilePicker, hwnd);
 
-        _FilePicker.FileTypeFilter.Add(".txt");
+        //_FilePicker.FileTypeFilter.Add(".txt");
         _LuaObjectScanner = luaObjectScanner;
         _RegexService = regexService;
     }
 
     public async Task InitialiseAsync()
     {
-        string path = $"{ApplicationData.Current.LocalCacheFolder.Path}\\apiCache.br";
+        // Make sure the directory exists
+        string path = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "ESOAPIExplorer");
+
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
 
 #if DEBUG
-         UseCache = false;
+        UseCache = false;
 #endif
         try
         {
@@ -74,8 +80,8 @@ public class ESODocumentationService : IESODocumentationService
 
                         byte[] byteData = data.ToArray();
                         Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
-                    };
-                };
+                    }
+                }
             }
             else
             {
@@ -256,21 +262,26 @@ public class ESODocumentationService : IESODocumentationService
 
     private async Task<string> GetPathAsync()
     {
-        string path = _Settings.Values["last path"] as string;
+        string path = "";// Properties.Settings.Default.LastPath;
 
         if (string.IsNullOrEmpty(path))
         {
-            StorageFile file = await _FilePicker.PickSingleFileAsync();
-
-            if (file != null)
+            OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                _Settings.Values["last path"] = file.Path;
-                path = file.Path;
+                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                //path = openFileDialog.FileName;
+                //Properties.Settings.Default.LastPath = path;
+                //Properties.Settings.Default.Save();
             }
         }
         else if (!File.Exists(path))
         {
-            _Settings.Values["last path"] = null;
+            //Properties.Settings.Default.LastPath = null;
             path = await GetPathAsync();
         }
 
@@ -505,7 +516,7 @@ public class ESODocumentationService : IESODocumentationService
                 {
                     args = ParseArgs("*integer* _eventId_");
                 }
-                else if(!argsString.Contains("eventid",StringComparison.OrdinalIgnoreCase ))
+                else if (!argsString.Contains("eventid", StringComparison.OrdinalIgnoreCase))
                 {
                     args = ParseArgs("*integer* _eventId_," + argsString);
                 }
@@ -706,11 +717,11 @@ public class ESODocumentationService : IESODocumentationService
         callbackManager.AddFunction(getDirtyEvents);
 
         EsoUIObject callbackObject = new EsoUIObject("ZO_CallbackObject");
-        foreach(KeyValuePair<string, EsoUIFunction> func in callbackManager.Functions)
+        foreach (KeyValuePair<string, EsoUIFunction> func in callbackManager.Functions)
         {
             callbackObject.AddFunction(func.Value);
         }
-        
+
         callbackObject.AddFunction(subclass);
         #endregion
 

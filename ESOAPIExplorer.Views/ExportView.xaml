@@ -5,12 +5,12 @@
     xmlns:local="using:ESOAPIExplorer.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:ESOAPIExplorer.ViewModels"    
+    xmlns:vm="using:ESOAPIExplorer.ViewModels;assembly=ESOAPIExplorer.ViewModels"    
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:ExportViewModel}">
 
+    <!--Background="{StaticResource ApplicationPageBackgroundThemeBrush}"-->
     <Grid x:Name="RootGrid" Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -26,13 +26,6 @@
         <!-- Export Options -->
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,20,0,0" HorizontalAlignment="Left" Width="400">
             <TextBlock Text="Export Options" FontSize="24" Margin="0,0,0,10" Foreground="DarkGray" FontWeight="SemiBold"/>
-            <!--<RadioButtons ItemsSource="{Binding ExportOptions}" SelectedItem="{Binding SelectedExportOption, Mode=TwoWay}" SelectedIndex="0">
-                <RadioButtons.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Value.DisplayName}" FontSize="18"/>
-                    </DataTemplate>
-                </RadioButtons.ItemTemplate>
-            </RadioButtons>-->
             <Button Content="Export" Margin="0,20,0,0" FontSize="18" Command="{Binding ExportCommand}"/>
         </StackPanel>
     </Grid>

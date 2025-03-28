@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
+using System.Windows;
+using System.Windows.Data;
 
 namespace ESOAPIExplorer.ValueConverters;
 
 public class EmptyListToVisibilityConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo language)
     {
         Type t = value?.GetType();
 
@@ -32,7 +33,7 @@ public class EmptyListToVisibilityConverter : IValueConverter
         }
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo language)
     {
         throw new NotImplementedException();
     }

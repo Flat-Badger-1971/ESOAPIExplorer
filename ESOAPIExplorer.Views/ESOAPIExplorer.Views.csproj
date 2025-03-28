@@ -1,54 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>ESOAPIExplorer.Views</RootNamespace>
-    <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &gt;= 8">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &lt; 8">win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-    <UseWinUI>true</UseWinUI>
-	  <OutputType>Library</OutputType>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Dialogs\CustomMessageDialog.xaml" />
-    <None Remove="HomeView.xaml" />
-    <None Remove="Windows\MainWindow.xaml" />
-  </ItemGroup>
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
-      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
-  </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ESOAPIExplorer.Controls\ESOAPIExplorer.Controls.csproj" />
+    <ProjectReference Include="..\ESOAPIExplorer.Models\ESOAPIExplorer.Models.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.ValueConverters\ESOAPIExplorer.ValueConverters.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.ViewModels\ESOAPIExplorer.ViewModels.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Page Update="ExportView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="InfoView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="SettingsView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Windows\MainWindow.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Dialogs\CustomMessageDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="HomeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
 </Project>

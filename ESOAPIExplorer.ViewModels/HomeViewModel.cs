@@ -2,8 +2,6 @@ using ESOAPIExplorer.DisplayModels;
 using ESOAPIExplorer.Models;
 using ESOAPIExplorer.Models.Search;
 using ESOAPIExplorer.Services;
-using Microsoft.UI;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,8 +9,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
-using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
 // TODO: IDE formatters
@@ -233,7 +231,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     #endregion Properties
 
-    private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
+    // private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
     private readonly Stack<string> _historyStack = new Stack<string>();
     private string _currentAlgorithmName;
     private IEnumerable<Type> _searchAlgorithms;
@@ -394,7 +392,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
     private static void SetTaskbarColour()
     {
         Window MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-        MainWindow.AppWindow.TitleBar.BackgroundColor = Colors.Gray;
+        // MainWindow.AppWindow.TitleBar.BackgroundColor = Colors.Gray;
     }
 
     private void UpdateObjects(List<EsoUIArgument> arguments)
@@ -550,14 +548,14 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private void SetSearchAlgorithm()
     {
-        string selectedAlgorithmName = _settings.Values["SearchAlgorithm"].ToString();
+        //string selectedAlgorithmName = _settings.Values["SearchAlgorithm"].ToString();
 
-        if (selectedAlgorithmName != _currentAlgorithmName)
-        {
-            Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
-            _searchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
-            _currentAlgorithmName = selectedAlgorithmName;
-        }
+        //if (selectedAlgorithmName != _currentAlgorithmName)
+        //{
+        //    Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
+        //    _searchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
+        //    _currentAlgorithmName = selectedAlgorithmName;
+        //}
     }
 
     private bool HasMatchingArgument(APIElement element, string value)
@@ -621,10 +619,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         {
             // look for any SI global value that contains the text following $
             return AllItems
-                .Where(d =>
-                    d.Value.ElementType == APIElementType.SI_GLOBAL &&
-                        _esoDocumentationService.Documentation.SI_Lookup.TryGetValue(d.Value.Name, out string value) &&
-                        value.Contains(filter.Substring(1), StringComparison.OrdinalIgnoreCase)
+                .Where(d => d.Value.ElementType == APIElementType.SI_GLOBAL && _esoDocumentationService.Documentation.SI_Lookup.ContainsValue(d.Value.Name) && d.Value.Name.Contains(filter.Substring(1), StringComparison.OrdinalIgnoreCase)
                 )
                 .Select(s => s.Value)
                 .OrderBy(v => v.Name);
@@ -684,7 +679,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         return Task.CompletedTask;
     }
 
-    public ICommand SearchGithubCommand => new RelayCommand(() => _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_selectedElement.Name}&type=code")));
+    // public ICommand SearchGithubCommand => new RelayCommand(() => _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_selectedElement.Name}&type=code")));
     public ICommand SearchWikiCommand => new RelayCommand(() =>
     {
         string subpath;
@@ -710,7 +705,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                 break;
         }
 
-        _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://wiki.esoui.com/{subpath}{_selectedElement.Name}"));
+        // _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://wiki.esoui.com/{subpath}{_selectedElement.Name}"));
     });
 
     private IEnumerable<string> GetUsedByParallel(string enumName)

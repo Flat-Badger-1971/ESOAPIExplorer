@@ -1,12 +1,14 @@
-using ESOAPIExplorer.EventArguments;
+using ESOAPIExplorer.Models;
 using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Data.Common;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace ESOAPIExplorer.Services;
 
@@ -15,7 +17,7 @@ public class NavigationService : INavigationService
     private readonly IServiceProvider _Container;
     private readonly IEventService _EventService;
     private readonly IDialogService _DialogService;
-    protected MainWindow CurrentApplication;
+    protected Views.MainWindow CurrentApplication;
     protected Frame MainFrame;
 
     public NavigationService(IServiceProvider container, IEventService eventService, IDialogService dialogService)
@@ -24,13 +26,24 @@ public class NavigationService : INavigationService
         _EventService = eventService;
         _DialogService = dialogService;
 
-        CurrentApplication = (MainWindow)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-        MainFrame = CurrentApplication.NavigationFrame;
+        CurrentApplication = (Views.MainWindow)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+        MainFrame = (CurrentApplication).NavigationFrame;
+
+        MainFrame.Navigated += async (sender, e) =>
+        {
+            NavigationModel nav = (NavigationModel)e.ExtraData;
+            Type viewModelType = nav?.ViewModel?.GetType();
+            MainFrame.DataContext = nav?.ViewModel;
+            OnNavigationPerformed(viewModelType);
+            await(nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
+        };
+
     }
+    
 
     public async Task InitializeAsync()
     {
-        CurrentApplication.MainContainer.DataContext = _Container.GetRequiredService<MainViewModel>();
+        CurrentApplication.MainContainer.DataContext = _Container.GetService(typeof(MainViewModel));
         await GoToAsync<HomeViewModel>();
     }
 
@@ -38,7 +51,7 @@ public class NavigationService : INavigationService
     {
         try
         {
-            MainFrame.BackStack.Clear();
+            //MainFrame.BackStack.Clear();
             return Task.CompletedTask;
         }
         finally { }
@@ -65,7 +78,7 @@ public class NavigationService : INavigationService
     {
         if (CurrentApplication is not null and MainWindow)
         {
-            MainFrame.BackStack.Remove(MainFrame.BackStack[MainFrame.BackStack.Count - 2]);
+            MainFrame.RemoveBackEntry();// .BackStack.Remove(MainFrame.BackStack[MainFrame.BackStack.Count() - 2]);
         }
 
         return Task.FromResult(true);
@@ -124,35 +137,32 @@ public class NavigationService : INavigationService
 
     protected virtual async Task InternalNavigateToAsync(Type viewModelType, object parameter)
     {
-        object vm = _Container.GetRequiredService(viewModelType);
+        object vm = _Container.GetService(viewModelType);
+        object nav = new NavigationModel { ViewModel = vm, Parameter = parameter };
         Type pageType = GetPageTypeForViewModel(viewModelType);
 
         // Do not repeat app initialisation when the Window already has content,
         // just ensure that the window is active
-        if (CurrentApplication.Content == null)
+        if (Application.Current.MainWindow.Content == null)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
-            Frame frame = new Frame();
-            frame.NavigationFailed += CurrentApplication_NavigationFailed;
+            //MainFrame = new Frame();
+            MainFrame.NavigationFailed += CurrentApplication_NavigationFailed;
 
             // Place the frame in the current Window
-            Window.Current.Content = frame;
+            Application.Current.MainWindow.Content = MainFrame;
         }
 
-        if (vm is MainViewModel)
-        {
-            MainFrame.Navigate(pageType);
-            ((Page)MainFrame.Content).DataContext = vm;
-        }
+        //if (vm is MainViewModel)
+        //{
+        //    MainFrame.Navigate(pageType,nav);
+        //   // ((Page)MainFrame.Content).DataContext = vm;
+        //}
 
-        MainFrame.Navigate(pageType);
-        ((Page)MainFrame.Content).DataContext = vm;
-        OnNavigationPerformed(viewModelType);
-
-        await (vm as ViewModelBase).InitializeAsync(parameter);
+        MainFrame.Navigate(pageType,nav);
     }
 
-    private void CurrentApplication_NavigationFailed(object sender, Microsoft.UI.Xaml.Navigation.NavigationFailedEventArgs e)
+    private void CurrentApplication_NavigationFailed(object sender, NavigationFailedEventArgs e)
     {
         throw new NotImplementedException();
     }
@@ -215,7 +225,7 @@ public class NavigationService : INavigationService
 
         try
         {
-            Page page = _Container.GetRequiredService(pageType) as Page;
+            Page page = _Container.GetService(pageType) as Page;
 
             return page;
         }
@@ -227,9 +237,9 @@ public class NavigationService : INavigationService
 
     protected virtual void OnNavigationPerformed(Type viewModelType)
     {
-        NavigationEventArgs args = new() { ViewModelType = viewModelType };
+        EventArguments.NavigationEventArgs args = new() { ViewModelType = viewModelType };
         NavigationPerformed?.Invoke(this, args);
     }
 
-    public event EventHandler<NavigationEventArgs> NavigationPerformed;
+    public event EventHandler<EventArguments.NavigationEventArgs> NavigationPerformed;
 }

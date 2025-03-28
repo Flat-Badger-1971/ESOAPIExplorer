@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.ApplicationModel.DataTransfer;
 
 namespace ESOAPIExplorer.ViewModels;
 
@@ -72,24 +71,24 @@ public partial class CustomMessageDialogViewModel : ViewModelBase
 
     public ICommand CopyToClipboardCommand => new RelayCommand(async () =>
     {
-        DataPackage dataPackage = new()
-        {
-            RequestedOperation = DataPackageOperation.Copy
-        };
+        //DataPackage dataPackage = new()
+        //{
+        //    RequestedOperation = DataPackageOperation.Copy
+        //};
 
-        dataPackage.SetText(_Message);
-        Clipboard.SetContent(dataPackage);
-        ActionMessage = "Copied to clipboard";
+        //dataPackage.SetText(_Message);
+        //Clipboard.SetContent(dataPackage);
+        //ActionMessage = "Copied to clipboard";
 
-        DateTime now = DateTime.Now;
-        _LastCopied = now;
+        //DateTime now = DateTime.Now;
+        //_LastCopied = now;
 
-        await Task.Delay(4000);
+        //await Task.Delay(4000);
 
-        if (_LastCopied == now)
-        {
-            ActionMessage = "";
-        }
+        //if (_LastCopied == now)
+        //{
+        //    ActionMessage = "";
+        //}
 
     });
 

@@ -1,14 +1,15 @@
 ﻿using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml.Data;
+using System.Windows.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace ESOAPIExplorer.ValueConverters
 {
     public class EnumToSortedEnumConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo language)
         {
             if (value is List<EsoUIEnumValue> enumvalues)
             {
@@ -37,7 +38,7 @@ namespace ESOAPIExplorer.ValueConverters
             return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo language)
         {
             throw new NotImplementedException();
         }
