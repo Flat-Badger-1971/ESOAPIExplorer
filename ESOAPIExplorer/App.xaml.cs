@@ -1,11 +1,10 @@
-using ESOAPIExplorer.Services;
+﻿using ESOAPIExplorer.Services;
 using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Xaml;
 using System;
-using Windows.ApplicationModel;
+using System.Windows;
 
 namespace ESOAPIExplorer;
 
@@ -15,7 +14,7 @@ namespace ESOAPIExplorer;
 #pragma warning disable CA1416
 public partial class App : Application
 {
-    public static Window MainWindow { get; private set; }
+    public static Window MasterWindow { get; private set; }
     public IServiceProvider Container { get; private set; }
     private IConfigurationRoot _ConfigurationRoot;
     private IConfigurationBuilder _ConfigurationManager;
@@ -32,15 +31,15 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override void OnStartup(StartupEventArgs args)
     {
-        MainWindow = new MainWindow();
-        MainWindow.AppWindow.SetIcon("Assets/Images/win32Icon.ico");
+        MasterWindow = new MainWindow();
+        // MasterWindow.AppWindow.SetIcon("Assets/Images/win32Icon.ico");
         Container = RegisterDependencyInjection;
 
         INavigationService navigation = Container.GetRequiredService<INavigationService>();
         navigation.InitializeAsync();
-        MainWindow.Activate();
+        MasterWindow.Activate();
     }
 
     private IServiceProvider RegisterDependencyInjection
@@ -78,7 +77,7 @@ public partial class App : Application
     private void RegisterServices(ServiceCollection services)
     {
         //App Services
-        services.AddSingleton(MainWindow.DispatcherQueue);
+        services.AddSingleton(MasterWindow.Dispatcher);
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IEventService, EventService>();
         services.AddTransient<IDialogService, DialogService>();
@@ -93,9 +92,9 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
-        _ConfigurationManager = new ConfigurationManager()
-            .SetBasePath(Package.Current.InstalledLocation.Path)
-            .AddJsonFile("appsettings.json", optional: false);
+        _ConfigurationManager = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
         _ConfigurationRoot = _ConfigurationManager.Build();
     }
