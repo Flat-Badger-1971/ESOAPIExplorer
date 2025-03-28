@@ -10,7 +10,7 @@
     xmlns:converters="clr-namespace:ESOAPIExplorer.ValueConverters;assembly=ESOAPIExplorer.ValueConverters"    
     xmlns:c="clr-namespace:ESOAPIExplorer.Controls;assembly=ESOAPIExplorer.Controls"
     mc:Ignorable="d"
-    Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+    Background="Red"
     x:Name="_this"
     d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}">
     <Page.Resources>
@@ -37,6 +37,7 @@
                     <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{StaticResource SystemBaseHighColor}"/>
                 </Grid>
             </DataTemplate>
+
             <DataTemplate x:Key="ArgumentItemTemplate">
                 <Grid Height="20" Background="{Binding Id, Converter={StaticResource OddEvenToColourConverter}}">
                     <Grid Margin="10,0,10,0">
@@ -78,9 +79,10 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <!--Back Button-->
+                <!--Style="{StaticResource NavigationBackButtonNormalStyle}"-->
                 <Button x:Name="BackButton"
                         Command="{Binding GoBack}"
-                        Style="{StaticResource NavigationBackButtonNormalStyle}"
+                        
                         IsEnabled="{Binding CanGoBack, UpdateSourceTrigger=PropertyChanged}"
                         ToolTipService.ToolTip="Back"
                         Grid.Column="0" />

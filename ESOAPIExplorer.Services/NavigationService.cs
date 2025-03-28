@@ -36,6 +36,7 @@ public class NavigationService : INavigationService
             MainFrame.DataContext = nav?.ViewModel;
             OnNavigationPerformed(viewModelType);
             await(nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
+            MainFrame.Content = GetPage(viewModelType);
         };
 
     }

@@ -17,7 +17,7 @@
                 <MenuItem Header="About" Command="{Binding NavigateCommand}" CommandParameter="InfoViewModel"/>
                 <MenuItem Header="Settings" Command="{Binding NavigateCommand}" CommandParameter="SettingsViewModel"/>
             </Menu>
-            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden"/>
+            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden" Background="Yellow"/>
         </DockPanel>
     </Grid>
 </Window>

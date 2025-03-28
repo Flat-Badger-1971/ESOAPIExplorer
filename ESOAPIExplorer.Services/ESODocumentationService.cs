@@ -51,18 +51,18 @@ public class ESODocumentationService : IESODocumentationService
 
     public async Task InitialiseAsync()
     {
-        // Make sure the directory exists
-        string path = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "ESOAPIExplorer");
+        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string appDataFolder = Path.Combine(localAppData, "ESOAPIExplorer");
 
-        if (!Directory.Exists(path))
+        if (!Directory.Exists(appDataFolder))
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(appDataFolder);
         }
 
+        string path = Path.Combine(appDataFolder, "cache.br");
+
 #if DEBUG
-        UseCache = false;
+        // UseCache = false;
 #endif
         try
         {
@@ -274,7 +274,7 @@ public class ESODocumentationService : IESODocumentationService
 
             if (openFileDialog.ShowDialog() == true)
             {
-                //path = openFileDialog.FileName;
+                path = openFileDialog.FileName;
                 //Properties.Settings.Default.LastPath = path;
                 //Properties.Settings.Default.Save();
             }
