@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ public class EsoUIObject(string name, bool fromAPI = false)
     public string InstanceName { get; set; } = string.Empty;
     public bool FromAPI { get; set; } = fromAPI;
     public APIElementType ElementType { get; set; } = APIElementType.C_OBJECT_TYPE;
-
+    public string Extends { get; set; }
     public IEnumerable<string> FunctionList {
         get
         {
@@ -46,5 +47,10 @@ public class EsoUIObject(string name, bool fromAPI = false)
         }
 
         Code.Add(code);
+    }
+
+    public void AddExtends(string extends)
+    {
+        Extends = extends;
     }
 }

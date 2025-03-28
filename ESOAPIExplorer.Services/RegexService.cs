@@ -31,7 +31,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bdo\b")]
     private static partial Regex _DoKeywordMatcher();
 
-    [GeneratedRegex(@"\bend\b")]
+    [GeneratedRegex(@"\bend\b[^\)]")]
     private static partial Regex _EndKeywordMatcher();
 
     [GeneratedRegex(@"\* (.+)$")]
@@ -70,7 +70,7 @@ public partial class RegexService : IRegexService
     [GeneratedRegex(@"\bif\b")]
     private static partial Regex _IfKeywordMatcher();
 
-    [GeneratedRegex(@"\s*([A-Z_]+)\s=\s(.+)[:\.]+New\(.+\)")]
+    [GeneratedRegex(@"\s*([A-Z_]+)\s=\s(.+)[:\.]+(New|Initialize)\(.*\)")]
     private static partial Regex _InstanceMatcher();
 
     [GeneratedRegex(@"^SafeAddString\(([^,]+),\s""([^""]+)""")]

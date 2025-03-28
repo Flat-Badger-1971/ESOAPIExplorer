@@ -26,13 +26,13 @@
         <!-- Export Options -->
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,20,0,0" HorizontalAlignment="Left" Width="400">
             <TextBlock Text="Export Options" FontSize="24" Margin="0,0,0,10" Foreground="DarkGray" FontWeight="SemiBold"/>
-            <RadioButtons ItemsSource="{Binding ExportOptions}" SelectedItem="{Binding SelectedExportOption, Mode=TwoWay}" SelectedIndex="0">
+            <!--<RadioButtons ItemsSource="{Binding ExportOptions}" SelectedItem="{Binding SelectedExportOption, Mode=TwoWay}" SelectedIndex="0">
                 <RadioButtons.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Value.DisplayName}" FontSize="18"/>
                     </DataTemplate>
                 </RadioButtons.ItemTemplate>
-            </RadioButtons>
+            </RadioButtons>-->
             <Button Content="Export" Margin="0,20,0,0" FontSize="18" Command="{Binding ExportCommand}"/>
         </StackPanel>
     </Grid>

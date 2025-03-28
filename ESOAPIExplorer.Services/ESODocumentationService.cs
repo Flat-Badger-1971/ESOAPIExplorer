@@ -56,7 +56,7 @@ public class ESODocumentationService : IESODocumentationService
         string path = $"{ApplicationData.Current.LocalCacheFolder.Path}\\apiCache.br";
 
 #if DEBUG
-        UseCache = false;
+         UseCache = false;
 #endif
         try
         {
@@ -195,13 +195,12 @@ public class ESODocumentationService : IESODocumentationService
         _LuaObjectScanner.ScanFolderForLuaFunctions(documentation.Objects.First(o => o.Value.Name == "ZO_CallbackObject").Value);
         LuaScanResults luaobjects = _LuaObjectScanner.Results;
 
-        var dpet = luaobjects.Objects.Where(o => o.InstanceName.StartsWith("PROMOTIONAL")).FirstOrDefault();
-        var dpeto = luaobjects.Objects.Where(o => o.Name.Contains("Promotional")).FirstOrDefault();
-
         Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
         Parallel.ForEach(luaobjects.InstanceNames, name => documentation.InstanceNames.TryAdd(name.Name, name));
         Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
         Parallel.ForEach(luaobjects.Fragments, fragment => documentation.Fragments.TryAdd(fragment.Key, true));
+
+        documentation.SoundsPath = _LuaObjectScanner.SoundsPath;
 
         // lookups
         ConcurrentDictionary<string, string> esoStrings = GetEsoStrings(ingamePath);
@@ -421,6 +420,11 @@ public class ESODocumentationService : IESODocumentationService
                 if (!string.IsNullOrEmpty(matches[1]))
                 {
                     CurrentFunction.Args = ParseArgs(matches[1]);
+
+                    if (name == "ReloadUI")
+                    {
+                        CurrentFunction.Args.First().Type.Name = "string|nil";
+                    }
                 }
 
                 functions[name] = CurrentFunction;
@@ -524,6 +528,8 @@ public class ESODocumentationService : IESODocumentationService
             ElementType = APIElementType.C_OBJECT_TYPE,
             Functions = managerClass.Functions,
             InstanceName = "WINDOW_MANAGER",
+            Extends = "WindowManager",
+            FromAPI = false
         };
 
         EsoUIObject animationClass = Documentation.Objects["AnimationManager"];
@@ -533,6 +539,8 @@ public class ESODocumentationService : IESODocumentationService
             ElementType = APIElementType.C_OBJECT_TYPE,
             Functions = animationClass.Functions,
             InstanceName = "ANIMATION_MANAGER",
+            Extends = "AnimationManager",
+            FromAPI = false
         };
 
         EsoUIObject eventClass = Documentation.Objects["EventManager"];
@@ -542,6 +550,8 @@ public class ESODocumentationService : IESODocumentationService
             ElementType = APIElementType.C_OBJECT_TYPE,
             Functions = eventClass.Functions,
             InstanceName = "EVENT_MANAGER",
+            Extends = "EventManager",
+            FromAPI = false
         };
 
         Documentation.Objects["WINDOW_MANAGER"] = windowManager;
@@ -553,45 +563,83 @@ public class ESODocumentationService : IESODocumentationService
     {
         #region event manager
         EsoUIFunction registerForEvent = new EsoUIFunction("RegisterForEvent");
+        registerForEvent.AddCode("* RegisterForEvent(*string* _namespace_, *integer* _event_, *function* _callback_)");
+        registerForEvent.AddCode("** _Returns:_ *bool* _success_");
         registerForEvent.AddArgument("namespace", "string");
         registerForEvent.AddArgument("event", "integer");
         registerForEvent.AddArgument("callback", "function");
-        registerForEvent.AddReturn("success", "bool");
+        registerForEvent.AddReturn("success", "boolean");
 
         EsoUIFunction registerForAllEvents = new EsoUIFunction("RegisterForAllEvents");
+        registerForAllEvents.AddCode("* RegisterForAllEvents(*string* _namespace_, *function* _callback_)");
+        registerForAllEvents.AddCode("** _Returns:_ *bool* _success_");
         registerForAllEvents.AddArgument("namespace", "string");
         registerForAllEvents.AddArgument("callback", "function");
+        registerForAllEvents.AddReturn("success", "boolean");
 
         EsoUIFunction unregisterForEvent = new EsoUIFunction("UnregisterForEvent");
+        unregisterForEvent.AddCode("* UnregisterForEvent(*string* _namespace_, *integer* _event_)");
+        unregisterForEvent.AddCode("** _Returns:_ *bool* _success_");
         unregisterForEvent.AddArgument("namespace", "string");
         unregisterForEvent.AddArgument("event", "integer");
-        unregisterForEvent.AddReturn("success", "bool");
+        unregisterForEvent.AddReturn("success", "boolean");
 
         EsoUIFunction addFilterForEvent = new EsoUIFunction("AddFilterForEvent");
+        addFilterForEvent.AddCode("* AddFilterForEvent(*string* _namespace_, *integer* _event_, *RegisterForEventFilterType* _filterType_, *variant* _filterParameter_)");
+        addFilterForEvent.AddCode("** _Returns:_ *bool* _success_");
         addFilterForEvent.AddArgument("namespace", "string");
         addFilterForEvent.AddArgument("event", "integer");
         addFilterForEvent.AddArgument("filterType", "RegisterForEventFilterType");
-        addFilterForEvent.AddArgument("filterValue");
-        addFilterForEvent.AddArgument("...");
-        addFilterForEvent.AddReturn("success", "bool");
+        addFilterForEvent.AddArgument("filterParameter", "any");
+        addFilterForEvent.AddReturn("success", "boolean");
 
         EsoUIFunction registerForUpdate = new EsoUIFunction("RegisterForUpdate");
+        registerForUpdate.AddCode("* RegisterForUpdate(*string* _namespace_, *integer* _interval_, *function* _callback_)");
+        registerForUpdate.AddCode("** _Returns:_ *bool* _success_");
         registerForUpdate.AddArgument("namespace", "string");
         registerForUpdate.AddArgument("interval", "integer");
         registerForUpdate.AddArgument("callback", "function");
-        registerForUpdate.AddReturn("success", "bool");
+        registerForUpdate.AddReturn("success", "boolean");
 
         EsoUIFunction unregisterForUpdate = new EsoUIFunction("UnregisterForUpdate");
+        unregisterForUpdate.AddCode("* UnregisterForUpdate(*string* _namespace_)");
+        unregisterForUpdate.AddCode("** _Returns:_ *bool* _success_");
         unregisterForUpdate.AddArgument("namespace", "string");
-        unregisterForUpdate.AddReturn("success", "bool");
+        unregisterForUpdate.AddReturn("success", "boolean");
 
-        EsoUIObject eventManager = new EsoUIObject("EventManager");
+        EsoUIFunction registerForPostEffectsUpdate = new EsoUIFunction("RegisterForPostEffectsUpdate");
+        registerForPostEffectsUpdate.AddCode("* RegisterForPostEffectsUpdate(*string* _addonName_, *function* _callback_)");
+        registerForPostEffectsUpdate.AddCode("** _Returns:_ *bool* _success_");
+        registerForPostEffectsUpdate.AddArgument("addonName", "string");
+        registerForPostEffectsUpdate.AddArgument("callback", "function");
+        registerForPostEffectsUpdate.AddReturn("success", "boolean");
+
+        EsoUIFunction unregisterForAllEvents = new EsoUIFunction("UnregisterForAllEvents");
+        unregisterForAllEvents.AddCode("* UnregisterForAllEvents(*string* _addonName_)");
+        unregisterForAllEvents.AddCode("** _Returns:_ *bool* _success_");
+        unregisterForAllEvents.AddArgument("addonName", "string");
+        unregisterForAllEvents.AddReturn("success", "boolean");
+
+        EsoUIFunction unregisterForPostEffectsUpdate = new EsoUIFunction("UnregisterForPostEffectsUpdate");
+        unregisterForPostEffectsUpdate.AddCode("* UnregisterForPostEffectsUpdate(*string* _addonName_)");
+        unregisterForPostEffectsUpdate.AddCode("** _Returns:_ *bool* _success_");
+        unregisterForPostEffectsUpdate.AddArgument("addonName", "string");
+        unregisterForPostEffectsUpdate.AddReturn("success", "boolean");
+
+        EsoUIObject eventManager = new EsoUIObject("EventManager")
+        {
+            FromAPI = true
+        };
+
         eventManager.AddFunction(registerForEvent);
         eventManager.AddFunction(registerForAllEvents);
         eventManager.AddFunction(unregisterForEvent);
         eventManager.AddFunction(addFilterForEvent);
         eventManager.AddFunction(registerForUpdate);
         eventManager.AddFunction(unregisterForUpdate);
+        eventManager.AddFunction(registerForPostEffectsUpdate);
+        eventManager.AddFunction(unregisterForAllEvents);
+        eventManager.AddFunction(unregisterForPostEffectsUpdate);
         #endregion
 
         EsoUIFunction getWindowManager = new EsoUIFunction("GetWindowManager");
@@ -658,14 +706,11 @@ public class ESODocumentationService : IESODocumentationService
         callbackManager.AddFunction(getDirtyEvents);
 
         EsoUIObject callbackObject = new EsoUIObject("ZO_CallbackObject");
-        callbackObject.AddFunction(registerCallback);
-        callbackObject.AddFunction(unregisterAllCallbacks);
-        callbackObject.AddFunction(setHandleOnce);
-        callbackObject.AddFunction(fireCallbacks);
-        callbackObject.AddFunction(clean);
-        callbackObject.AddFunction(clearCallbackRegistry);
-        callbackObject.AddFunction(getFireCallbackDepth);
-        callbackObject.AddFunction(getDirtyEvents);
+        foreach(KeyValuePair<string, EsoUIFunction> func in callbackManager.Functions)
+        {
+            callbackObject.AddFunction(func.Value);
+        }
+        
         callbackObject.AddFunction(subclass);
         #endregion
 

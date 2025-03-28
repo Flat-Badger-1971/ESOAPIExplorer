@@ -6,6 +6,7 @@ namespace ESOAPIExplorer.Models;
 public class EsoUIDocumentation
 {
     public int ApiVersion { get; set; } = 0;
+    public string SoundsPath { get; set; }
     public ConcurrentDictionary<string, EsoUIConstantValue> Constants { get; set; } = [];
     public ConcurrentDictionary<string, EsoUIEvent> Events { get; set; } = [];
     public ConcurrentDictionary<string, bool> Fragments { get; set; } = [];

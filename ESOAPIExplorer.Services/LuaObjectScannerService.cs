@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static ABI.System.Collections.Generic.IReadOnlyDictionary_Delegates;
 
 namespace ESOAPIExplorer.Services;
 
@@ -15,6 +14,7 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
 {
     public string FolderPath { get; set; }
     public LuaScanResults Results { get; set; } = new LuaScanResults();
+    public string SoundsPath { get; set; }
 
     private readonly ConcurrentDictionary<string, string> _subclasses = new ConcurrentDictionary<string, string>();
     private readonly ConcurrentDictionary<string, string> _instanceNames = new ConcurrentDictionary<string, string>();
@@ -30,7 +30,11 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         {
             string filename = Path.GetFileName(file);
 
-            if (!ignore.ContainsKey(filename))
+            if (filename == "soundids.lua")
+            {
+                SoundsPath = file;
+            }
+            else if (!ignore.ContainsKey(filename))
             {
                 string content = File.ReadAllText(file);
                 ScanFile(content, file, filename);
@@ -53,6 +57,8 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
                         obj.AddFunction(func.Value);
                     }
                 }
+
+                obj.AddExtends(subclass.Value);
             }
         }
 
@@ -122,7 +128,12 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
                 // Match instance
                 Match instanceMatch = _regexService.InstanceMatcher().Match(line);
                 if (instanceMatch.Success)
-                {
+                { 
+                    if (instanceMatch.Groups[2].Value.Contains("SHARED_INVENTORY"))
+                    {
+
+                    }
+
                     if (objects.TryGetValue(instanceMatch.Groups[2].Value, out EsoUIObject obj))
                     {
                         string name = instanceMatch.Groups[1].Value;
@@ -197,36 +208,51 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
     private void AddFunction(string[] lines, Match match, int startIndex)
     {
         string functionName = match.Groups[1].Value.Trim();
-        string parameters = match.Groups[2].Value;
-        EsoUIFunction func = new EsoUIFunction(functionName);
 
-        // Find end of function
-        int endPosition = FindEndOfFunction(lines, startIndex);
-
-        // Extract return statements if any
-        List<EsoUIReturn> returns = ExtractReturns(lines, startIndex, endPosition);
-        func.AddReturns(returns);
-
-        foreach (string p in parameters.Split(','))
+        if (functionName != "all")
         {
-            func.AddArgument(p.Trim(), "unknown");
-        }
+            string parameters = match.Groups[2].Value;
+            EsoUIFunction func = new EsoUIFunction(functionName);
 
-        foreach (string codeline in lines.Skip(startIndex).Take(endPosition - startIndex + 1))
-        {
-            func.AddCode(codeline);
+            // Find end of function
+            int endPosition = FindEndOfFunction(lines, startIndex);
 
-            Match instanceMatch = _regexService.InstanceMatcher().Match(codeline);
-            if (instanceMatch.Success)
+            // Extract return statements if any
+            if (func.Name == "Subclass" && !string.IsNullOrEmpty(func.Parent))
             {
-                string name = instanceMatch.Groups[1].Value;
-                string objectName = instanceMatch.Groups[2].Value;
-                _instanceNames.TryAdd(name, objectName);
+                func.AddReturn("", func.Parent);
             }
-        }
+            else
+            {
+                List<EsoUIReturn> returns = ExtractReturns(lines, startIndex, endPosition);
+                func.AddReturns(returns);
+            }
 
-        func.ElementType = APIElementType.FUNCTION;
-        Results.Functions.Add(func);
+            if (!string.IsNullOrWhiteSpace(parameters))
+            {
+                foreach (string p in parameters.Split(','))
+                {
+                    string pt = p.Replace(" : ", "_").Trim();
+                    func.AddArgument(pt, Utility.InferType(pt, _regexService));
+                }
+            }
+
+            foreach (string codeline in lines.Skip(startIndex).Take(endPosition - startIndex + 1))
+            {
+                func.AddCode(codeline);
+
+                Match instanceMatch = _regexService.InstanceMatcher().Match(codeline);
+                if (instanceMatch.Success)
+                {
+                    string name = instanceMatch.Groups[1].Value;
+                    string objectName = instanceMatch.Groups[2].Value;
+                    _instanceNames.TryAdd(name, objectName);
+                }
+            }
+
+            func.ElementType = APIElementType.FUNCTION;
+            Results.Functions.Add(func);
+        }
     }
 
     private void AddObject(Dictionary<string, EsoUIObject> objects, Match match, string[] lines, int startOfFunction, int endOfFunction)
@@ -255,6 +281,8 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
             objects.Add(objectName, obj);
         }
 
+        string firstLine = lines[startOfFunction].Trim();
+
         foreach (string codeline in lines.Skip(startOfFunction).Take(endOfFunction - startOfFunction + 1))
         {
             func.AddCode(codeline);
@@ -270,13 +298,21 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
                     obj.AddInstanceName(instance.Groups[1].Value);
                 }
             }
+
+            if (objectMethod == "Subclass" || objectMethod == "New" || objectMethod == "Clone")
+            {
+                if (codeline.Trim() == firstLine)
+                {
+                    func.SetReturn(objectName);
+                }
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(objectParameters[0]))
         {
             foreach (string p in objectParameters)
             {
-                func.AddArgument(p.Trim(), InferType(p.Trim()));
+                func.AddArgument(p.Trim(), Utility.InferType(p.Trim(), _regexService));
             }
         }
 
@@ -385,40 +421,6 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         return returnValues;
     }
 
-    private string InferType(string value)
-    {
-        switch (true)
-        {
-            case true when Utility.IsBooleanExpression(value):
-            case true when _regexService.BooleanMatcher().IsMatch(value):
-                return "bool";
-            case true when _regexService.NumberMatcher().IsMatch(value):
-            case true when value == "i":
-            case true when value.EndsWith("offset", StringComparison.OrdinalIgnoreCase):
-            case true when value.EndsWith("padding", StringComparison.OrdinalIgnoreCase):
-            case true when value.StartsWith('#'):
-            case true when value.EndsWith("index", StringComparison.OrdinalIgnoreCase):
-            case true when value.EndsWith("amount", StringComparison.OrdinalIgnoreCase):
-                return "number";
-            case true when value.StartsWith('"') && value.EndsWith('"'):
-            case true when value.EndsWith("Name") || value == "name":
-                return "string";
-            case true when Utility.IsControl(value):
-            case true when value == "control":
-            case true when value == "data":
-                return "userdata";
-            case true when value.StartsWith('{') && value.EndsWith('}'):
-                return "table";
-            case true when Utility.IsObject(value):
-                return "object";
-            case true when value.EndsWith("Function"):
-            case true when value == "fn":
-                return "function";
-            default:
-                return "unknown";
-        }
-    }
-
     private List<EsoUIReturn> ExtractReturns(string[] lines, int startPosition, int endPosition)
     {
         List<EsoUIReturn> returns = [];
@@ -458,7 +460,7 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
                         {
                             Index = returnIndex++,
                             Values = SplitReturnValues(returnBlock.ToString())
-                                .Select((split, index) => new EsoUIArgument(split, new EsoUIType(InferType(split)), index + 1))
+                                .Select((split, index) => new EsoUIArgument(split, new EsoUIType(Utility.InferType(split, _regexService)), index + 1))
                                 .ToList()
                         };
                         returns.Add(ret);

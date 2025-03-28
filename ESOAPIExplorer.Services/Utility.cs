@@ -1,10 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ESOAPIExplorer.Models;
+namespace ESOAPIExplorer.Services;
 
 public static class Utility
 {
+    public static string InferType(string value, IRegexService regexService)
+    {
+        switch (true)
+        {
+            case true when IsBooleanExpression(value):
+            case true when regexService.BooleanMatcher().IsMatch(value):
+            case true when value.EndsWith("enabled", StringComparison.OrdinalIgnoreCase):
+                return "boolean";
+            case true when regexService.NumberMatcher().IsMatch(value):
+            case true when value == "i":
+            case true when value.EndsWith("offset", StringComparison.OrdinalIgnoreCase):
+            case true when value.EndsWith("padding", StringComparison.OrdinalIgnoreCase):
+            case true when value.StartsWith('#'):
+            case true when value.EndsWith("index", StringComparison.OrdinalIgnoreCase):
+            case true when value.EndsWith("amount", StringComparison.OrdinalIgnoreCase):
+                return "number";
+            case true when value.StartsWith('"') && value.EndsWith('"'):
+            case true when value.EndsWith("Name") || value == "name":
+                return "string";
+            case true when IsControl(value):
+            case true when value == "control":
+            case true when value == "data":
+            case true when IsObject(value):
+                return "userdata";
+            case true when value.StartsWith('{') && value.EndsWith('}'):
+                return "table";
+            case true when value.EndsWith("Function"):
+            case true when value == "fn":
+                return "function";
+            default:
+                return "any";
+        }
+    }
+
     public static bool IsControl(string value)
     {
         switch (value)
@@ -25,52 +59,13 @@ public static class Utility
         {
             case true when value.StartsWith("ZO_", StringComparison.OrdinalIgnoreCase):
             case true when value.EndsWith("node", StringComparison.OrdinalIgnoreCase):
+            case true when value == "self":
                 return true;
             default:
                 return false;
         }
     }
 
-    // check if a number is prime
-    private static bool IsPrime(int number)
-    {
-        if (number <= 1)
-        {
-            return false;
-        }
-
-        if (number == 2)
-        {
-            return true;
-        }
-
-        if (number % 2 == 0)
-        {
-            return false;
-        }
-
-        int boundary = (int)Math.Floor(Math.Sqrt(number));
-
-        for (int i = 3; i <= boundary; i += 2)
-        {
-            if (number % i == 0) return false;
-        }
-
-        return true;
-    }
-
-    // find the next highest prime number
-    public static int NextPrime(int number)
-    {
-        int nextNumber = number + 1;
-
-        while (!IsPrime(nextNumber))
-        {
-            nextNumber++;
-        }
-
-        return nextNumber;
-    }
     private static HashSet<string> variables = new HashSet<string>();
 
     public static bool IsBooleanExpression(string expression)

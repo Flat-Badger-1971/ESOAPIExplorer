@@ -64,17 +64,17 @@ public class ExportViewModel(ILuaCheckRcGeneratorService _luaCheckRcGeneratorSer
 
     public ICommand ExportCommand => new RelayCommand(async () =>
     {
-        switch (SelectedExportOption.Value.Id)
-        {
-            case 1:
-                await ExportLuaCheck();
-                break;
-            case 2:
+        //switch (SelectedExportOption.Value.Id)
+        //{
+        //    case 1:
+        //        await ExportLuaCheck();
+        //        break;
+        //    case 2:
                 await ExportLLSDefinition();
-                break;
-            default:
-                break;
-        }
+        //        break;
+        //    default:
+        //        break;
+        //}
     });
 
     public async Task ExportLuaCheck()
