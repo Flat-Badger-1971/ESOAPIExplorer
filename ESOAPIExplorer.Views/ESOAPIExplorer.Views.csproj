@@ -1,17 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>disable</Nullable>
-    <UseWPF>true</UseWPF>
-    <ImplicitUsings>disable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>disable</Nullable>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>disable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ESOAPIExplorer.Controls\ESOAPIExplorer.Controls.csproj" />
-    <ProjectReference Include="..\ESOAPIExplorer.Models\ESOAPIExplorer.Models.csproj" />
-    <ProjectReference Include="..\ESOAPIExplorer.ValueConverters\ESOAPIExplorer.ValueConverters.csproj" />
-    <ProjectReference Include="..\ESOAPIExplorer.ViewModels\ESOAPIExplorer.ViewModels.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ESOAPIExplorer.Controls\ESOAPIExplorer.Controls.csproj" />
+		<ProjectReference Include="..\ESOAPIExplorer.Models\ESOAPIExplorer.Models.csproj" />
+		<ProjectReference Include="..\ESOAPIExplorer.ValueConverters\ESOAPIExplorer.ValueConverters.csproj" />
+		<ProjectReference Include="..\ESOAPIExplorer.ViewModels\ESOAPIExplorer.ViewModels.csproj" />
+	</ItemGroup>
 
 </Project>

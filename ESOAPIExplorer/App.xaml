@@ -6,6 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:ESOAPIExplorer.ValueConverters;assembly=ESOAPIExplorer.ValueConverters"
     xmlns:models="clr-namespace:ESOAPIExplorer.Models;assembly=ESOAPIExplorer.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     StartupUri="pack://application:,,,/ESOAPIExplorer.Views;component/Windows/MainWindow.xaml"
     xmlns:local="using:ESOAPIExplorer">
     <Application.Resources>
@@ -13,6 +14,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <!--<XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />-->
                 <!-- Other merged dictionaries here -->
+                <!-- Moderm WPF UI -->
+                <ui:ThemeResources />
+                <ui:XamlControlsResources />
                 <!-- Styles -->
                 <ResourceDictionary Source="Assets/Styles/BaseStyles.xaml"/>
                 <!-- Fonts -->
