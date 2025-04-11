@@ -1,3 +1,8 @@
+using ESOAPIExplorer.Services;
+using ESOAPIExplorer.ViewModels;
+using System;
+using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -14,5 +19,37 @@ public sealed partial class HomeView : Page
     public HomeView()
     {
         InitializeComponent();
+
+        INavigationService navigation = Application.Current.GetType().GetProperty("Navigation").GetValue(Application.Current) as INavigationService;
+        ViewModelBase vm = (ViewModelBase)navigation.GetDataContextForPage(this);
+        this.DataContext = vm;
+        vm.InitializeAsync(null);
+        this.Loaded += (s, a) =>
+        {
+        };
+        ListViewGrid.SizeChanged += ListViewGridSizeChanged;
     }
+
+    private void ListViewGridSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        HomeViewModel vm = (HomeViewModel)this.DataContext;
+        if (vm != null)
+        {
+            vm.ListViewHeight = e.NewSize.Height;// sizeInfo.NewSize.Height;
+        }
+    }
+
+    protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+    {
+        //base.OnRenderSizeChanged(sizeInfo);
+        //if (sizeInfo.NewSize.Width < 800)
+        //{
+        //    this.Width = 800;
+        //}
+        //else
+        //{
+        //    this.Width = sizeInfo.NewSize.Width;
+        //}
+    }
+
 }

@@ -13,12 +13,12 @@
     <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
         <DockPanel>
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="Home" Command="{Binding NavigateCommand}" CommandParameter="HomeViewModel"/>
+                <MenuItem Header="Home" Command="{Binding NavigateHomeCommand}" CommandParameter="HomeViewModel"/>
                 <MenuItem Header="Export" Command="{Binding NavigateCommand}" CommandParameter="ExportViewModel"/>
                 <MenuItem Header="About" Command="{Binding NavigateCommand}" CommandParameter="InfoViewModel"/>
                 <MenuItem Header="Settings" Command="{Binding NavigateCommand}" CommandParameter="SettingsViewModel"/>
             </Menu>
-            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden" Source="pack://application:,,,/ESOAPIExplorer.Views;component/HomeView.xaml">
+            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden">
                 
             </Frame>
         </DockPanel>

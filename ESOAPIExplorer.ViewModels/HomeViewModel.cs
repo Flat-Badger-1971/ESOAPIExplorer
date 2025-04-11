@@ -226,7 +226,17 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
     public ObservableCollection<APIElement> FilteredItems
     {
         get => _filteredItems;
-        set => SetProperty(ref _filteredItems, value);
+        set
+        {
+            SetProperty(ref _filteredItems, value);
+        }
+    }
+
+    private double _ListViewHeight = 0;
+    public double ListViewHeight
+    {
+        get => _ListViewHeight;
+        set => SetProperty(ref _ListViewHeight, value);
     }
 
     #endregion Properties

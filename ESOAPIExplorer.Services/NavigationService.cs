@@ -26,7 +26,7 @@ public class NavigationService : INavigationService
         _EventService = eventService;
         _DialogService = dialogService;
 
-        CurrentApplication = (Views.MainWindow)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+        CurrentApplication = (Views.MainWindow)Application.Current.GetType().GetProperty("MasterWindow").GetValue(Application.Current);
         MainFrame = (CurrentApplication).NavigationFrame;
 
         MainFrame.Navigated += async (sender, e) =>
@@ -34,11 +34,13 @@ public class NavigationService : INavigationService
             NavigationModel nav = (NavigationModel)e.ExtraData;
             if (nav != null)
             {
-                Type viewModelType = nav?.ViewModel?.GetType();
-                MainFrame.DataContext = nav?.ViewModel;
-                OnNavigationPerformed(viewModelType);
-                await (nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
-                MainFrame.Content = GetPage(viewModelType);
+                //Type viewModelType = nav?.ViewModel?.GetType();
+                //MainFrame.DataContext = nav?.ViewModel;
+                //OnNavigationPerformed(viewModelType);
+                //await (nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
+                //Page page = GetPage(viewModelType);
+                //page.DataContext = nav.ViewModel;
+                //MainFrame.Content = page;
             }
         };
 
@@ -163,7 +165,12 @@ public class NavigationService : INavigationService
         //   // ((Page)MainFrame.Content).DataContext = vm;
         //}
 
-        MainFrame.Navigate(pageType,nav);
+        Page page = GetPage(viewModelType);
+        //page.DataContext = vm;
+
+        //MainFrame.Content = page;
+
+        MainFrame.Navigate(page,nav);
     }
 
     private void CurrentApplication_NavigationFailed(object sender, NavigationFailedEventArgs e)
@@ -183,6 +190,23 @@ public class NavigationService : INavigationService
         Type type = GetType(typeFullName);
 
         return type;
+    }
+
+    public object GetDataContextForPage(Page page)
+    {
+        Type pageType = page.GetType();
+        if (!pageType.Name.EndsWith("View"))
+        {
+            throw new Exception($"Invalid type for View ({pageType.Name})");
+        }
+
+        string ns = typeof(MainViewModel).Namespace;
+        string typeFullName = $"{ns}.{pageType.Name.Replace("View", "ViewModel")}";
+        Type type = GetType(typeFullName);
+
+        ViewModelBase vm = (ViewModelBase)_Container.GetService(type);
+        vm.InitializeAsync(null);
+        return vm;
     }
 
     public static Type GetType(string typeName)

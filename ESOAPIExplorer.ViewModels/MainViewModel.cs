@@ -1,4 +1,5 @@
 using ESOAPIExplorer.Services;
+using System.Windows.Input;
 
 namespace ESOAPIExplorer.ViewModels;
 
@@ -30,4 +31,27 @@ public class MainViewModel(INavigationService navigationService) : ViewModelBase
     //        }
     //    }
     //}
+    public ICommand NavigateCommand => new RelayCommand<string>((string destination) =>
+    {
+        switch (destination)
+        {
+            default:
+            case nameof(HomeViewModel):
+                _ = navigationService.GoToAsync<HomeViewModel>();
+                break;
+            case nameof(SettingsViewModel):
+                _ = navigationService.GoToAsync<SettingsViewModel>();
+                break;
+            case nameof(InfoViewModel):
+                _ = navigationService.GoToAsync<InfoViewModel>();
+                break;
+            case nameof(ExportViewModel):
+                _ = navigationService.GoToAsync<ExportViewModel>();
+                break;
+        }
+    });
+    public ICommand NavigateHomeCommand => new RelayCommand(() =>
+    {
+        navigationService.GoToAsync<HomeViewModel>();
+    });
 }

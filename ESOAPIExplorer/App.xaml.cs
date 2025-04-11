@@ -18,6 +18,7 @@ public partial class App : Application
     public IServiceProvider Container { get; private set; }
     private IConfigurationRoot _ConfigurationRoot;
     private IConfigurationBuilder _ConfigurationManager;
+    public INavigationService Navigation {private set; get;}
     /// <summary>
     /// Initialises the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -37,8 +38,8 @@ public partial class App : Application
         // MasterWindow.AppWindow.SetIcon("Assets/Images/win32Icon.ico");
         Container = RegisterDependencyInjection;
 
-        INavigationService navigation = Container.GetRequiredService<INavigationService>();
-        navigation.InitializeAsync();
+        Navigation = Container.GetRequiredService<INavigationService>();
+        Navigation.InitializeAsync();
         MasterWindow.Activate();
     }
 
@@ -71,7 +72,7 @@ public partial class App : Application
 
     private static void RegisterViews(ServiceCollection services)
     {
-        services.AddTransient<HomeView>();
+        services.AddSingleton<HomeView>();
     }
 
     private void RegisterServices(ServiceCollection services)

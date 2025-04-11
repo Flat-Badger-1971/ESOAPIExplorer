@@ -1,6 +1,7 @@
 using ESOAPIExplorer.EventArguments;
 using System;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace ESOAPIExplorer.Services;
 
@@ -18,4 +19,6 @@ public interface INavigationService
     public Task RemoveLastFromBackStackAsync();
     public Task PopToRootAsync();
     public event EventHandler<NavigationEventArgs> NavigationPerformed;
+
+    public object GetDataContextForPage(Page page);
 }

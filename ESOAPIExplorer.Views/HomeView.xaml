@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:ESOAPIExplorer.ViewModels;assembly=ESOAPIExplorer.ViewModels"    
     xmlns:converters="clr-namespace:ESOAPIExplorer.ValueConverters;assembly=ESOAPIExplorer.ValueConverters"    
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:c="clr-namespace:ESOAPIExplorer.Controls;assembly=ESOAPIExplorer.Controls"
     mc:Ignorable="d"
     x:Name="_this"
@@ -15,7 +16,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="ArgTextBlockTemplate">
-                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{StaticResource SystemBaseHighColor}" />
+                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" />
             </DataTemplate>
             <DataTemplate x:Key="ArgButtonTemplate">
                 <Button Content="{Binding Type, Converter={StaticResource TypeToNameConverter}}"
@@ -31,9 +32,9 @@
                         <ColumnDefinition Width="6*"/>
                         <ColumnDefinition Width="4*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemBaseHighColor}"/>
-                    <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemBaseHighColor}"/>
-                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{StaticResource SystemBaseHighColor}"/>
+                    <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
                 </Grid>
             </DataTemplate>
 
@@ -45,8 +46,8 @@
                             <ColumnDefinition Width="6*"/>
                             <ColumnDefinition Width="4*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemBaseHighColor}"/>
-                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemBaseHighColor}"/>
+                        <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
                         <ContentControl Content="{Binding Type}" ContentTemplateSelector="{StaticResource TypeTemplateSelector}" Margin="0" Grid.Column="2" />
                     </Grid>
                 </Grid>
@@ -89,25 +90,97 @@
                 <ComboBox IsEditable="True" x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" Margin="5,0,5,0" Grid.Column="1" />
             </Grid>
             <!-- Full Height ListBox -->
-            <ListView Name="MainListView"
-                      ItemsSource="{Binding FilteredItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                      Grid.Row="1" 
+            <Grid Grid.Row="1" Name="ListViewGrid">
+                <ui:ListView Name="MainListView"
+                         Height="{Binding ListViewHeight, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding FilteredItems, Mode=OneWay}"
                       SelectedItem="{Binding SelectedElement, Mode=TwoWay}"
                       SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <ListView.ItemTemplate>
+                    <ui:ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <!--<StackPanel/>
+                    If StackPanel was used, the memory consumed was over 2GB and dead slow.
+                    -->
+                            <VirtualizingStackPanel>
+                                <!--Memory footprint is only 200 mb-->
+                            </VirtualizingStackPanel>
+                        </ItemsPanelTemplate>
+                    </ui:ListView.ItemsPanel>
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0" Height="20">
+                                <!-- Hidden ID Column -->
+                                <TextBlock Text="{Binding Id}" Visibility="Visible" Margin="0"/>
+                                <!-- Visible Text Column -->
+                                <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod"/>
+                                <Grid Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
+                                    <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+            </Grid>
+            <!--<ItemsControl ItemsSource="{Binding FilteredItems}" Grid.Row="1">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer CanContentScroll="True">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0" Height="20">
-                            <!-- Hidden ID Column -->
                             <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
-                            <!-- Visible Text Column -->
                             <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod"/>
                             <Grid Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
-                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemBaseHighColor}"/>
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
                             </Grid>
                         </StackPanel>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>-->
+            <!--<ui:ListView Name="MainListView"
+                      Grid.Row="1" 
+                      ItemsSource="{Binding FilteredItems, Mode=OneWay}"
+                      SelectedItem="{Binding SelectedElement, Mode=TwoWay}"
+                      SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ui:ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0" Height="20">
+                            --><!-- Hidden ID Column --><!--
+                            <TextBlock Text="{Binding Id}" Visibility="Collapsed" Margin="0"/>
+                            --><!-- Visible Text Column --><!--
+                            <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod"/>
+                            <Grid Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                            </Grid>
+                        </StackPanel>
+                    </DataTemplate>
+                </ui:ListView.ItemTemplate>
+            </ui:ListView>-->
+
+            <!--<ListView Name="MainListView"
+                      Grid.Row="1" 
+                      ItemsSource="{Binding FilteredItems, Mode=OneWay}"
+                      DisplayMemberPath="Id"
+                      SelectedItem="{Binding SelectedElement, Mode=TwoWay}"
+                      SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                --><!--<ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0" Height="20">
+                            --><!-- Hidden ID Column --><!--
+                            <TextBlock Text="{Binding Id}" Visibility="Visible" Margin="0"/>
+                            --><!-- Visible Text Column -->
+                            <!--<c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod"/>
+                            <Grid Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
+                                <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                            </Grid>--><!--
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>--><!--
+            </ListView>-->
         </Grid>
 
         <!-- Right: Split Horizontally -->
@@ -358,15 +431,15 @@
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
-                                <Grid Grid.Row="0" Margin="0" Height="20" Background="{StaticResource SystemBaseMediumLowColor}">
+                                <Grid Grid.Row="0" Margin="0" Height="20" Background="{StaticResource SystemControlBackgroundBaseMediumLowBrush}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="1*"/>
                                         <ColumnDefinition Width="2*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{StaticResource SystemBaseHighColor}" Margin="0" Grid.Column="0"/>
-                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{StaticResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
-                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{StaticResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
+                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="0"/>
+                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="1"/>
+                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="2"/>
                                 </Grid>
                                 <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
                                   ItemsSource="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EnumToSortedEnumConverter}}"
@@ -427,7 +500,7 @@
                     <Grid Grid.Row="13" Visibility="{Binding SelectedConstantDetails, Converter={StaticResource SIStringToVisibilityConverter}}">
                         <StackPanel>
                             <TextBlock Text="string value" FontWeight="Bold" FontSize="26" Margin="10"/>
-                            <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{StaticResource AccentAAFillColorDefaultBrush}" Margin="10" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding SelectedConstantDetails.StringValue}" Foreground="{StaticResource ToggleSwitchKnobFillOnPointerOver}" Margin="10" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

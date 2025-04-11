@@ -1,8 +1,34 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <!--<XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />-->
+        <!-- Other merged dictionaries here -->
+        <!-- Moderm WPF UI -->
+        <ui:ThemeResources />
+    </ResourceDictionary.MergedDictionaries>
 
-    <!--<SolidColorBrush x:Key="SystemBaseHighColor" Color="White"/>
+
+    <Color x:Key="BaseGreen">#b4d012</Color>
+    <Color x:Key="BaseBrand">#5f59ff</Color>
+    <Color x:Key="BaseBrandHighlight">#363391</Color>
+    <Color x:Key="LightBrand">#b6b3fc</Color>
+    <Color x:Key="LightBrandHighlight">#8f8dc9</Color>
+
+    <SolidColorBrush x:Key="BaseBorderColourBrush" Color="{StaticResource BaseBorderColour}"/>
+    <SolidColorBrush x:Key="BaseGreenBrush" Color="{StaticResource BaseGreen}"/>
+    <SolidColorBrush x:Key="BaseBrandBrush" Color="{StaticResource BaseBrand}"/>
+    <SolidColorBrush x:Key="BaseSecondaryHighlightBrush" Color="{StaticResource BaseSecondaryHighlight}"/>
+    <SolidColorBrush x:Key="BaseRedBrush" Color="{StaticResource BaseRed}"/>
+    <SolidColorBrush x:Key="BaseBlueBrush" Color="{StaticResource BaseBlue}"/>
+    <SolidColorBrush x:Key="BaseBackgroundBrush" Color="{StaticResource BaseBackgroundColour}"/>
+    <SolidColorBrush x:Key="BaseBackgroundBrushLight" Color="{StaticResource BaseBackgroundColourLight}" Opacity="0.15"/>
+    <SolidColorBrush x:Key="BaseBackgroundBrushLightSolid" Color="{StaticResource BaseBackgroundColourLight}"/>
+    <SolidColorBrush x:Key="BaseForegroundBrush" Color="{StaticResource BaseForegroundColour}"/>
+    
+
+    <!--<SolidColorBrush x:Key="SystemControlBackgroundBaseHighBrush" Color="White"/>
     <SolidColorBrush x:Key="SystemBaseMediumLowColor" Color="#6E6E6E"/>
     <SolidColorBrush x:Key="AccentAAFillColorDefaultBrush" Color="#0078D7"/>
     <SolidColorBrush x:Key="SystemColorActiveCaptionColor" Color="#99B4D1"/>
@@ -22,11 +48,6 @@
     <Color x:Key="BaseTextBodyBackgroundColour">#404040</Color>
     <Color x:Key="BaseElementBackgroundColour">#FFFFFF</Color>
     <Color x:Key="BaseElementForegroundColour">#404040</Color>
-    <Color x:Key="BaseGreen">#b4d012</Color>
-    <Color x:Key="BaseBrand">#5f59ff</Color>
-    <Color x:Key="BaseBrandHighlight">#363391</Color>
-    <Color x:Key="LightBrand">#b6b3fc</Color>
-    <Color x:Key="LightBrandHighlight">#8f8dc9</Color>
     <Color x:Key="BaseSecondaryHighlight">#fef5f0</Color>
     <Color x:Key="BaseRed">#e51400</Color>
     <Color x:Key="BaseBlue">#00aff0</Color>
@@ -43,25 +64,15 @@
     <SolidColorBrush x:Key="ESOHoverBackgroundLight" Color="{StaticResource LightBrandHighlight}"/>
     <SolidColorBrush x:Key="ESOHoverForeground" Color="{StaticResource BaseWhite}"/>
     <SolidColorBrush x:Key="ESOStripedListForeground">LightGray</SolidColorBrush>
-
-    <SolidColorBrush x:Key="BaseBorderColourBrush" Color="{StaticResource BaseBorderColour}"/>
-    <SolidColorBrush x:Key="BaseGreenBrush" Color="{StaticResource BaseGreen}"/>
-    <SolidColorBrush x:Key="BaseBrandBrush" Color="{StaticResource BaseBrand}"/>
-    <SolidColorBrush x:Key="BaseSecondaryHighlightBrush" Color="{StaticResource BaseSecondaryHighlight}"/>
-    <SolidColorBrush x:Key="BaseRedBrush" Color="{StaticResource BaseRed}"/>
-    <SolidColorBrush x:Key="BaseBlueBrush" Color="{StaticResource BaseBlue}"/>
-    <SolidColorBrush x:Key="BaseBackgroundBrush" Color="{StaticResource BaseBackgroundColour}"/>
-    <SolidColorBrush x:Key="BaseBackgroundBrushLight" Color="{StaticResource BaseBackgroundColourLight}" Opacity="0.15"/>
-    <SolidColorBrush x:Key="BaseBackgroundBrushLightSolid" Color="{StaticResource BaseBackgroundColourLight}"/>
-    <SolidColorBrush x:Key="BaseForegroundBrush" Color="{StaticResource BaseForegroundColour}"/>-->
+-->
 
     <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
 
     <!-- Default Styles -->
     <Style x:Key="DefaultButtonStyle" TargetType="Button">
         <Setter Property="IsTabStop" Value="False" />
-        <Setter Property="Background" Value="{StaticResource SystemChromeBlackMediumLowColor}" />
-        <Setter Property="Foreground" Value="{StaticResource SystemBaseHighColor}"/>
+        <Setter Property="Background" Value="{StaticResource SystemControlBackgroundChromeBlackMediumLowBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource SystemControlForegroundTransparentBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource ButtonBorderThemeThickness}" />
         <Setter Property="Padding" Value="12" />
@@ -98,12 +109,12 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlBackgroundBaseLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlDisabledBaseLowBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                        </ObjectAnimationUsingKeyFrames>-->
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlDisabledTransparentBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        </ObjectAnimationUsingKeyFrames>-->
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -132,9 +143,9 @@
                                 </VisualState>
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource BaseBrand}" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        </ObjectAnimationUsingKeyFrames>-->
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
@@ -149,12 +160,12 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlBackgroundBaseLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlDisabledBaseLowBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                        </ObjectAnimationUsingKeyFrames>-->
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlDisabledTransparentBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        </ObjectAnimationUsingKeyFrames>-->
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -202,12 +213,12 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlBackgroundBaseLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlDisabledBaseLowBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                        </ObjectAnimationUsingKeyFrames>-->
+                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SystemControlDisabledTransparentBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        </ObjectAnimationUsingKeyFrames>-->
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -228,7 +239,7 @@
     <!--<Style x:Key="HyperlinkButtonStyle" TargetType="Button">
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource SystemBaseHighColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0,0,0,2" />
         <Setter Property="Padding" Value="0" />

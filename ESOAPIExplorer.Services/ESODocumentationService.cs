@@ -62,7 +62,7 @@ public class ESODocumentationService : IESODocumentationService
         string path = Path.Combine(appDataFolder, "cache.br");
 
 #if DEBUG
-        // UseCache = false;
+        UseCache = true;
 #endif
         try
         {

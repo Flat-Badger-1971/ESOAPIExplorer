@@ -1,3 +1,5 @@
+using ESOAPIExplorer.ViewModels;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,5 +19,15 @@ public sealed partial class MainWindow : Window
 
         MainContainer = MainGrid;
         NavigationFrame = NavFrame;
+
+        this.Loaded += (s, a) =>
+        {
+            IServiceProvider services = Application.Current.GetType().GetProperty("Container").GetValue(Application.Current) as IServiceProvider;
+            MainViewModel vm = (MainViewModel)services.GetService(typeof(MainViewModel));
+            HomeView home = (HomeView)services.GetService(typeof(HomeView));
+            this.DataContext = vm;
+
+            NavFrame.Navigate(home);
+        };
     }
 }
