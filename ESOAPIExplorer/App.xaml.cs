@@ -11,18 +11,20 @@ namespace ESOAPIExplorer;
 /// <summary>
 /// Provides application-specific behaviour to supplement the default Application class.
 /// </summary>
-#pragma warning disable CA1416
 public partial class App : Application
 {
+    private IConfigurationRoot _configurationRoot;
+    private IConfigurationBuilder _configurationManager;
+
     public static Window MasterWindow { get; private set; }
     public IServiceProvider Container { get; private set; }
-    private IConfigurationRoot _ConfigurationRoot;
-    private IConfigurationBuilder _ConfigurationManager;
     public INavigationService Navigation {private set; get;}
+
     /// <summary>
     /// Initialises the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
     /// </summary>
+    /// 
     public App()
     {
         InitializeComponent();
@@ -49,7 +51,7 @@ public partial class App : Application
         {
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            services.AddSingleton<IConfiguration>(_ConfigurationRoot);
+            services.AddSingleton<IConfiguration>(_configurationRoot);
             RegisterServices(services);
             RegisterViews(services);
             RegisterViewModels(services);
@@ -75,7 +77,7 @@ public partial class App : Application
         services.AddSingleton<HomeView>();
     }
 
-    private void RegisterServices(ServiceCollection services)
+    private static void RegisterServices(ServiceCollection services)
     {
         //App Services
         services.AddSingleton(MasterWindow.Dispatcher);
@@ -93,10 +95,10 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
-        _ConfigurationManager = new ConfigurationBuilder()
+        _configurationManager = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-        _ConfigurationRoot = _ConfigurationManager.Build();
+        _configurationRoot = _configurationManager.Build();
     }
 }

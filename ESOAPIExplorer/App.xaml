@@ -74,10 +74,10 @@
             </converters:SIStringToVisibilityConverter>
             <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
                 <converters:OddEvenToValueConverter.EvenValue>
-                    <SolidColorBrush Color="{StaticResource SystemControlBackgroundListMediumBrush}"/>
+                    <SolidColorBrush Color="{ui:ThemeResource SystemListMediumColor}"/>
                 </converters:OddEvenToValueConverter.EvenValue>
                 <converters:OddEvenToValueConverter.OddValue>
-                    <SolidColorBrush Color="{StaticResource SystemControlBackgroundListLowBrush}"/>
+                    <SolidColorBrush Color="{ui:ThemeResource SystemListLowColor}"/>
                 </converters:OddEvenToValueConverter.OddValue>
             </converters:OddEvenToValueConverter>
             <converters:LowercaseConverter x:Key="LowercaseConverter" />
@@ -116,19 +116,19 @@
 
             <!-- Templates -->
             <DataTemplate x:Key="ValueHeaderTemplate">
-                <Grid Margin="0" Height="20" Background="{StaticResource SystemControlBackgroundBaseMediumLowBrush}">
+                <Grid Margin="0" Height="20" Background="{ui:ThemeResource SystemControlBackgroundBaseMediumLowBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Name" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                    <TextBlock Text="Value" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Name" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Value" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="ValueItemTemplate">
-                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
+                <Grid Height="20" Background="{ui:ThemeResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -144,7 +144,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="GlobalItemTemplate">
-                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
+                <Grid Height="20" Background="{ui:ThemeResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -168,10 +168,10 @@
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
                         <Viewbox Height="20" Margin="0,0,5,0" HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                            <TextBlock Text="{Binding Name}" Height="20" Padding="0" Margin="0" Grid.Column="0" Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
                         </Viewbox>
-                        <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                        <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                        <TextBlock Text="{Binding Type}"  Margin="0" Grid.Column="1"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                        <TextBlock Text="{Binding Value}"  Margin="0" Grid.Column="2" Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
                     </Grid>
                 </Grid>
             </DataTemplate>
@@ -181,12 +181,12 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding}"  Margin="0" Padding="0" Grid.Column="0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                        <TextBlock Text="{Binding}"  Margin="0" Padding="0" Grid.Column="0" Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
                     </Grid>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="GlobalConstantTemplate">
-                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
+                <Grid Height="20" Background="{ui:ThemeResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -202,7 +202,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="SIGlobalConstantTemplate">
-                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
+                <Grid Height="20" Background="{ui:ThemeResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>

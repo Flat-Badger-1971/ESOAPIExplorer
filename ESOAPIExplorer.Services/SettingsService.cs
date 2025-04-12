@@ -9,9 +9,10 @@ namespace ESOAPIExplorer.Services;
 public class SettingsService : ISettingsService
 {
     private readonly string _settingsFilePath;
-    private readonly Dictionary<string, object> _settings = new();
+    private readonly Dictionary<string, object> _settings = [];
     private bool _isDirty = false;
-    private JsonSerializerOptions _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    private readonly JsonSerializerOptions _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    private readonly JsonSerializerOptions _saveOptions = new JsonSerializerOptions { WriteIndented = true };
 
     public SettingsService()
     {
@@ -107,8 +108,7 @@ public class SettingsService : ISettingsService
 
         try
         {
-            string json = JsonSerializer.Serialize(_settings,
-                new JsonSerializerOptions { WriteIndented = true });
+            string json = JsonSerializer.Serialize(_settings, _saveOptions);
 
             await File.WriteAllTextAsync(_settingsFilePath, json);
             _isDirty = false;

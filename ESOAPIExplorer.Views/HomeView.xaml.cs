@@ -1,7 +1,7 @@
 using ESOAPIExplorer.Services;
 using ESOAPIExplorer.ViewModels;
+using ModernWpf;
 using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,8 +16,16 @@ namespace ESOAPIExplorer.Views;
 #pragma warning disable CsWinRT1029 // Class not trimming / AOT compatible
 public sealed partial class HomeView : Page
 {
-    public HomeView()
+    public HomeView(ISettingsService settingsService)
     {
+        string themeName = settingsService.GetSetting("ThemeName", "Dark");
+
+        // change theme
+        if (Enum.TryParse(themeName, out ApplicationTheme theme))
+        {
+            ThemeManager.Current.ApplicationTheme = theme;
+        }
+
         InitializeComponent();
 
         INavigationService navigation = Application.Current.GetType().GetProperty("Navigation").GetValue(Application.Current) as INavigationService;

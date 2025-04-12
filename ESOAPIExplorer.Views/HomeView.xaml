@@ -16,7 +16,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="ArgTextBlockTemplate">
-                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" />
+                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToNameConverter}}" Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}" />
             </DataTemplate>
             <DataTemplate x:Key="ArgButtonTemplate">
                 <Button Content="{Binding Type, Converter={StaticResource TypeToNameConverter}}"
@@ -26,15 +26,15 @@
             </DataTemplate>
             <!--<converters:TypeTemplateSelector x:Key="TypeTemplateSelector" TextBlockTemplate="{StaticResource ArgTextBlockTemplate}" ButtonTemplate="{StaticResource ArgButtonTemplate}" />-->
             <DataTemplate x:Key="ArgumentHeaderTemplate">
-                <Grid Margin="0" Height="20" Background="{StaticResource SystemControlBackgroundBaseMediumLowBrush}">
+                <Grid Margin="0" Height="20" Background="{ui:ThemeResource SystemControlBackgroundBaseMediumLowBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="6*"/>
                         <ColumnDefinition Width="4*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                    <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="#" FontWeight="Bold" Margin="0" Grid.Column="0"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Name" FontWeight="Bold"  Margin="0" Grid.Column="1"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                    <TextBlock Text="Type" FontWeight="Bold"  Margin="0" Grid.Column="2"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
                 </Grid>
             </DataTemplate>
 
@@ -46,9 +46,9 @@
                             <ColumnDefinition Width="6*"/>
                             <ColumnDefinition Width="4*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
-                        <ContentControl Content="{Binding Type}" ContentTemplateSelector="{StaticResource TypeTemplateSelector}" Margin="0" Grid.Column="2" />
+                        <TextBlock Text="{Binding Id}"  Margin="0" Grid.Column="0"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                        <TextBlock Text="{Binding Name}"  Margin="0" Grid.Column="1"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
+                        <!--<ContentControl Content="{Binding Type}" ContentTemplateSelector="{StaticResource TypeTemplateSelector}" Margin="0" Grid.Column="2" />-->
                     </Grid>
                 </Grid>
             </DataTemplate>
@@ -98,23 +98,18 @@
                       SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ui:ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <!--<StackPanel/>
-                    If StackPanel was used, the memory consumed was over 2GB and dead slow.
-                    -->
-                            <VirtualizingStackPanel>
-                                <!--Memory footprint is only 200 mb-->
-                            </VirtualizingStackPanel>
+                            <VirtualizingStackPanel />
                         </ItemsPanelTemplate>
                     </ui:ListView.ItemsPanel>
                     <ui:ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0" Height="20">
                                 <!-- Hidden ID Column -->
-                                <TextBlock Text="{Binding Id}" Visibility="Visible" Margin="0"/>
+                                <TextBlock Text="{Binding Id}" Visibility="Hidden" Margin="0" Width="0"/>
                                 <!-- Visible Text Column -->
                                 <c:HighlightedTextBlock Text="{Binding Name, Mode=TwoWay}" FontSize="14" Filter="{Binding Path=DataContext.FilterText, ElementName=_this}" HighlightForeground="Goldenrod"/>
                                 <Grid Background="{Binding ElementType, Converter={StaticResource APITypeToColourConverter}}" Margin="5,0,0,0" Height="15">
-                                    <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}"/>
+                                    <TextBlock Text="{Binding ElementType}" FontSize="10" Margin="5,0,5,0" Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}"/>
                                 </Grid>
                             </StackPanel>
                         </DataTemplate>
@@ -303,7 +298,7 @@
                     ItemTemplate="{StaticResource ValueItemTemplate}"
                     Visibility="{Binding SelectedEventDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                             </ListView.Resources>
                         </ListView>
 
@@ -314,7 +309,7 @@
                     ItemTemplate="{StaticResource GlobalItemTemplate}" 
                     Visibility="{Binding SelectedGlobalDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                             </ListView.Resources>
                         </ListView>
 
@@ -325,7 +320,7 @@
                     ItemTemplate="{StaticResource GlobalConstantTemplate}" 
                     Visibility="{Binding SelectedConstantDetails, Converter={StaticResource NotNullToVisibilityConverter}}">
                             <ListView.Resources>
-                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                             </ListView.Resources>
                         </ListView>
                     </StackPanel>
@@ -340,7 +335,7 @@
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                 <ListView.Resources>
-                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                                 </ListView.Resources>
                             </ListView>
                             <TextBlock Text="none" Visibility="{Binding SelectedFunctionDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
@@ -354,7 +349,7 @@
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource NotNullToVisibilityConverter}}">
                                 <ListView.Resources>
-                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                                 </ListView.Resources>
                             </ListView>
                             <TextBlock Text="none" Visibility="{Binding SelectedEventDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
@@ -368,7 +363,7 @@
                           ItemTemplate="{StaticResource ArgumentItemTemplate}"
                           Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                 <ListView.Resources>
-                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                                 </ListView.Resources>
                             </ListView>
                             <TextBlock Text="none" Visibility="{Binding SelectedMethodDetails.Args, Converter={StaticResource EmptyListToTextConverter}}" Margin="10"/>
@@ -388,7 +383,7 @@
                                                 MaxHeight="300"
                                                 ItemTemplate="{StaticResource ArgumentItemTemplate}">
                                                 <ListView.Resources>
-                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                                                 </ListView.Resources>
                                             </ListView>
                                         </StackPanel>
@@ -409,7 +404,7 @@
                                                 MaxHeight="300"
                                                 ItemTemplate="{StaticResource ArgumentItemTemplate}">
                                                 <ListView.Resources>
-                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                                    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                                                 </ListView.Resources>
                                             </ListView>
                                         </StackPanel>
@@ -431,15 +426,15 @@
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
-                                <Grid Grid.Row="0" Margin="0" Height="20" Background="{StaticResource SystemControlBackgroundBaseMediumLowBrush}">
+                                <Grid Grid.Row="0" Margin="0" Height="20" Background="{ui:ThemeResource SystemControlBackgroundBaseMediumLowBrush}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="1*"/>
                                         <ColumnDefinition Width="2*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="0"/>
-                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="1"/>
-                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{StaticResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="2"/>
+                                    <TextBlock Text="Name" FontWeight="Bold" Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="0"/>
+                                    <TextBlock Text="Type" FontWeight="Bold"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="1"/>
+                                    <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}" Margin="0" Grid.Column="2"/>
                                 </Grid>
                                 <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
                                   ItemsSource="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EnumToSortedEnumConverter}}"
@@ -448,7 +443,7 @@
                                   SelectedIndex="{Binding SelectedEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Visibility="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                     <ListView.Resources>
-                                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{StaticResource SystemChromeHighColor}" />
+                                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ui:ThemeResource SystemChromeHighColor}" />
                                     </ListView.Resources>
                                 </ListView>
                             </Grid>

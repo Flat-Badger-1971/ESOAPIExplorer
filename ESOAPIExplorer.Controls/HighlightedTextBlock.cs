@@ -7,13 +7,17 @@ using System.Windows.Media;
 
 namespace ESOAPIExplorer.Controls;
 
-public partial class HighlightedTextBlock : Grid
+public partial class HighlightedTextBlock : UserControl
 {
-    private List<char> _charactersToMatch = null;
+    private readonly TextBlock _innerTextBlock;
+    private List<char> _charactersToMatch;
 
     public HighlightedTextBlock()
     {
+        _innerTextBlock = new TextBlock();
+        Content = _innerTextBlock;
         DataContextChanged += (sender, e) => UpdateTextBlock();
+        Loaded += (sender, e) => UpdateTextBlock();
     }
 
     public void UpdateTextBlock()
@@ -23,20 +27,21 @@ public partial class HighlightedTextBlock : Grid
             return;
         }
 
-        TextBlock textBlock = new TextBlock
-        {
-            TextAlignment = TextAlignment
-        };
+        _innerTextBlock.TextAlignment = TextAlignment;
+        _innerTextBlock.Inlines.Clear();
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
+            // Initialize characters to match once for the entire text
+            _charactersToMatch = Filter?.Select(f => char.ToLower(f))?.ToList() ?? [];
+
             for (int i = 0; i < Text.Length; i++)
             {
                 Run run = new Run();
 
                 while (i < Text.Length)
                 {
-                    bool isHighlighted = IsMatched(Filter, Text[i]);
+                    bool isHighlighted = IsMatched(Text[i]);
                     run.Text += Text[i].ToString();
 
                     if (isHighlighted)
@@ -46,13 +51,13 @@ public partial class HighlightedTextBlock : Grid
                     }
                     else
                     {
-                        run.Foreground = Foreground;
+                        run.Foreground = TextForeground;
                         run.FontWeight = FontWeight;
                     }
 
                     run.FontSize = FontSize;
 
-                    if (i + 1 < Text.Length && isHighlighted == IsMatched(Filter, Text[i + 1], true))
+                    if (i + 1 < Text.Length && isHighlighted == IsMatched(Text[i + 1], true))
                     {
                         i++;
                     }
@@ -62,7 +67,7 @@ public partial class HighlightedTextBlock : Grid
                     }
                 }
 
-                textBlock.Inlines.Add(run);
+                _innerTextBlock.Inlines.Add(run);
             }
         }
         else
@@ -70,82 +75,87 @@ public partial class HighlightedTextBlock : Grid
             Run run = new Run
             {
                 Text = Text,
-                Foreground = Foreground,
+                Foreground = TextForeground,
                 FontWeight = FontWeight,
                 FontSize = FontSize
-            }; 
+            };
 
-            textBlock.FontSize = FontSize;
-            textBlock.Inlines.Add(run);
+            _innerTextBlock.FontSize = FontSize;
+            _innerTextBlock.Inlines.Add(run);
         }
-
-        Children.Clear();
-        Children.Add(textBlock);
     }
 
-    public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(HighlightedTextBlock), new PropertyMetadata(string.Empty));
+    private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is HighlightedTextBlock control)
+        {
+            control.UpdateTextBlock();
+        }
+    }
+
+    public static readonly DependencyProperty TextProperty =
+        DependencyProperty.Register(nameof(Text), typeof(string), typeof(HighlightedTextBlock),
+        new PropertyMetadata(string.Empty, OnPropertyChanged));
 
     public string Text
     {
         get => (string)GetValue(TextProperty);
-        set
-        {
-            SetValue(TextProperty, value);
-            UpdateTextBlock();
-        }
+        set => SetValue(TextProperty, value);
     }
 
     public static readonly DependencyProperty FilterProperty =
-    DependencyProperty.Register(nameof(Filter), typeof(string), typeof(HighlightedTextBlock), new PropertyMetadata(string.Empty));
+        DependencyProperty.Register(nameof(Filter), typeof(string), typeof(HighlightedTextBlock),
+        new PropertyMetadata(string.Empty, OnPropertyChanged));
 
     public string Filter
     {
         get => (string)GetValue(FilterProperty);
-        set
-        {
-            SetValue(FilterProperty, value);
-            UpdateTextBlock();
-        }
+        set => SetValue(FilterProperty, value);
     }
 
     public static readonly DependencyProperty HighlightForegroundProperty =
-    DependencyProperty.Register(nameof(HighlightForeground), typeof(SolidColorBrush), typeof(HighlightedTextBlock), new PropertyMetadata(new SolidColorBrush(Colors.Black)));
+        DependencyProperty.Register(nameof(HighlightForeground), typeof(Brush),
+        typeof(HighlightedTextBlock), new PropertyMetadata(Brushes.Yellow, OnPropertyChanged));
 
-    public SolidColorBrush HighlightForeground
+    public Brush HighlightForeground
     {
-        get => (SolidColorBrush)GetValue(HighlightForegroundProperty);
+        get => (Brush)GetValue(HighlightForegroundProperty);
         set => SetValue(HighlightForegroundProperty, value);
     }
 
-    public static readonly DependencyProperty ForegroundProperty =
-    DependencyProperty.Register(nameof(Foreground), typeof(SolidColorBrush), typeof(HighlightedTextBlock), new PropertyMetadata(new SolidColorBrush(Colors.White)));
+    public static readonly DependencyProperty TextForegroundProperty =
+        DependencyProperty.Register(nameof(TextForeground), typeof(Brush),
+        typeof(HighlightedTextBlock), new PropertyMetadata(Brushes.Black, OnPropertyChanged));
 
-    public SolidColorBrush Foreground
+    public Brush TextForeground
     {
-        get => (SolidColorBrush)GetValue(ForegroundProperty);
-        set => SetValue(ForegroundProperty, value);
+        get => (Brush)GetValue(TextForegroundProperty);
+        set => SetValue(TextForegroundProperty, value);
     }
 
     public static readonly DependencyProperty FontSizeProperty =
-    DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(HighlightedTextBlock), new PropertyMetadata((double)11));
+        DependencyProperty.Register(nameof(FontSize), typeof(double),
+        typeof(HighlightedTextBlock), new PropertyMetadata(12.0, OnPropertyChanged));
 
-    public double FontSize
+    public new double FontSize
     {
         get => (double)GetValue(FontSizeProperty);
         set => SetValue(FontSizeProperty, value);
     }
 
-    public static readonly DependencyProperty FontWeightProperty =
-    DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight), typeof(HighlightedTextBlock), new PropertyMetadata(default(FontWeight)));
+    public new static readonly DependencyProperty FontWeightProperty =
+        DependencyProperty.Register(nameof(FontWeight), typeof(FontWeight),
+        typeof(HighlightedTextBlock), new PropertyMetadata(FontWeights.Normal, OnPropertyChanged));
 
-    public FontWeight FontWeight
+    public new FontWeight FontWeight
     {
         get => (FontWeight)GetValue(FontWeightProperty);
         set => SetValue(FontWeightProperty, value);
     }
 
     public static readonly DependencyProperty HighlightFontWeightProperty =
-    DependencyProperty.Register(nameof(HighlightFontWeight), typeof(FontWeight), typeof(HighlightedTextBlock), new PropertyMetadata(default(FontWeight)));
+        DependencyProperty.Register(nameof(HighlightFontWeight), typeof(FontWeight),
+        typeof(HighlightedTextBlock), new PropertyMetadata(FontWeights.Bold, OnPropertyChanged));
 
     public FontWeight HighlightFontWeight
     {
@@ -154,7 +164,8 @@ public partial class HighlightedTextBlock : Grid
     }
 
     public static readonly DependencyProperty TextAlignmentProperty =
-    DependencyProperty.Register(nameof(TextAlignment), typeof(TextAlignment), typeof(HighlightedTextBlock), new PropertyMetadata(TextAlignment.Left));
+        DependencyProperty.Register(nameof(TextAlignment), typeof(TextAlignment),
+        typeof(HighlightedTextBlock), new PropertyMetadata(TextAlignment.Left, OnPropertyChanged));
 
     public TextAlignment TextAlignment
     {
@@ -162,12 +173,15 @@ public partial class HighlightedTextBlock : Grid
         set => SetValue(TextAlignmentProperty, value);
     }
 
-    private bool IsMatched(string filter, char character, bool doNotRemove = false)
+    private bool IsMatched(char character, bool doNotRemove = false)
     {
+        if (_charactersToMatch == null || _charactersToMatch.Count == 0)
+        {
+            return false;
+        }
+
         bool isMatched = false;
         char charToFind = char.ToLower(character);
-
-        _charactersToMatch = filter?.Select(f => char.ToLower(f))?.ToList()?? [];
 
         if (_charactersToMatch.Contains(charToFind))
         {
