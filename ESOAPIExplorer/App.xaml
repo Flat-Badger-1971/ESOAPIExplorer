@@ -74,10 +74,10 @@
             </converters:SIStringToVisibilityConverter>
             <converters:OddEvenToValueConverter x:Key="OddEvenToColourConverter" ReturnType="SolidColorBrush">
                 <converters:OddEvenToValueConverter.EvenValue>
-                    <SolidColorBrush Color="{StaticResource SystemListMediumColor}"/>
+                    <SolidColorBrush Color="{StaticResource SystemControlBackgroundListMediumBrush}"/>
                 </converters:OddEvenToValueConverter.EvenValue>
                 <converters:OddEvenToValueConverter.OddValue>
-                    <SolidColorBrush Color="{StaticResource SystemListLowColor}"/>
+                    <SolidColorBrush Color="{StaticResource SystemControlBackgroundListLowBrush}"/>
                 </converters:OddEvenToValueConverter.OddValue>
             </converters:OddEvenToValueConverter>
             <converters:LowercaseConverter x:Key="LowercaseConverter" />
@@ -116,7 +116,7 @@
 
             <!-- Templates -->
             <DataTemplate x:Key="ValueHeaderTemplate">
-                <Grid Margin="0" Height="20" Background="{StaticResource SystemBaseMediumLowColor}">
+                <Grid Margin="0" Height="20" Background="{StaticResource SystemControlBackgroundBaseMediumLowBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="1*"/>
@@ -128,7 +128,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="ValueItemTemplate">
-                <Grid Height="20" Background="{StaticResource SystemListMediumColor}">
+                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -144,7 +144,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="GlobalItemTemplate">
-                <Grid Height="20" Background="{StaticResource SystemListMediumColor}">
+                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -186,7 +186,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="GlobalConstantTemplate">
-                <Grid Height="20" Background="{StaticResource SystemListMediumColor}">
+                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
@@ -202,7 +202,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="SIGlobalConstantTemplate">
-                <Grid Height="20" Background="{StaticResource SystemListMediumColor}">
+                <Grid Height="20" Background="{StaticResource SystemControlBackgroundListMediumBrush}">
                     <Grid Margin="10,0,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>

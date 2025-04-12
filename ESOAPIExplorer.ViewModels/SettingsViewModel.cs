@@ -9,47 +9,49 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ESOAPIExplorer.Models;
+using ModernWpf;
 namespace ESOAPIExplorer.ViewModels;
 
 #pragma warning disable CA1416, CsWinRT1028
-public class SettingsViewModel(ILuaParserService luaParserService, IThemeService themeService) : ViewModelBase
+public class SettingsViewModel(ILuaParserService luaParserService, ISettingsService settingsService) : ViewModelBase
 {
     private readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-    //private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
+    private ISettingsService _settingsService = settingsService;
     //private FileOpenPicker _FileOpenPicker;
     //private FileSavePicker _FileSavePicker;
-    private ComboBoxItem _SelectedThemeName;
-    private int _SelectedAlgorithmIndex;
-    private DateTime _LastScanDateTime;
-    private ObservableCollection<string> _Themes;
+    private ComboBoxItem _selectedThemeName;
+    private int _selectedAlgorithmIndex;
+    private DateTime _lastScanDateTime;
+    private ObservableCollection<string> _themes;
 
     public int SelectedAlgorithmIndex
     {
-        get => _SelectedAlgorithmIndex;
+        get => _selectedAlgorithmIndex;
         set
         {
             if (value > -1)
             {
-                // _Settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
-                SetProperty(ref _SelectedAlgorithmIndex, value);
+                _settingsService.SaveSetting("SearchAlgorithm", SearchAlgorithmItemSource[value]);
+                SetProperty(ref _selectedAlgorithmIndex, value);
             }
         }
     }
 
     public string SelectedThemeName
     {
-        get => _SelectedThemeName?.Content.ToString();
+        get => _selectedThemeName?.Content.ToString();
         set
         {
             if (value != null)
             {
-                // _Settings.Values["ThemeName"] = value;
-                SetProperty(ref _SelectedThemeName, new ComboBoxItem { Content = value });
+                _settingsService.SaveSetting("ThemeName", value);
+                SetProperty(ref _selectedThemeName, new ComboBoxItem { Content = value });
 
                 // change theme
-                if (Enum.TryParse(value, out ElementTheme theme))
+                if (Enum.TryParse(value, out ApplicationTheme theme))
                 {
-                    themeService.SetTheme(theme);
+                    // themeService.SetTheme(theme);
+                    ThemeManager.Current.ApplicationTheme = theme;
                 }
             }
         }
@@ -57,11 +59,11 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
 
     public DateTime LastScanDateTime
     {
-        get => _LastScanDateTime;
+        get => _lastScanDateTime;
         set
         {
-            // _Settings.Values["LastScanDateTime"] = value;
-            SetProperty(ref _LastScanDateTime, value);
+            _settingsService.SaveSetting("LastScanDateTime", value);
+            SetProperty(ref _lastScanDateTime, value);
         }
     }
 
@@ -74,9 +76,9 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
 
     public ObservableCollection<string> Themes
     {
-        get => _Themes;
+        get => _themes;
         set {
-            SetProperty(ref _Themes, value);
+            SetProperty(ref _themes, value);
         }
     }
 
@@ -107,38 +109,37 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
         //WinRT.Interop.InitializeWithWindow.Initialize(_FileOpenPicker, hwnd);
         //WinRT.Interop.InitializeWithWindow.Initialize(_FileSavePicker, hwnd);
 
-        //await base.InitializeAsync(data);
+        await base.InitializeAsync(data);
 
-        //if (_Settings.Values["SearchAlgorithm"] == null)
-        //{
-        //    _Settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
-        //}
+        if (_settingsService.GetSetting<string>("SearchAlgorithm") == null)
+        {
+            _settingsService.SaveSetting("SearchAlgorithm", "Fast Fuzzy");
+        }
 
-        //List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
+        List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
 
-        //SearchAlgorithmItemSource = new ObservableCollection<string>(
-        //    searchAlgorithms
-        //        .Select(a => a.GetPropertyValue("Name"))
-        //        .OrderBy(a => a)
-        //    );
+        SearchAlgorithmItemSource = new ObservableCollection<string>(
+            searchAlgorithms
+                .Select(a => a.GetPropertyValue("Name"))
+                .OrderBy(a => a)
+            );
 
-        // SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values["SearchAlgorithm"].ToString());
+        SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_settingsService.GetSetting<string>("SearchAlgorithm"));
 
-        //Themes =
-        //[
-        //    "Light",
-        //    "Dark",
-        //    "SystemDefault"
-        //];
+        Themes =
+        [
+            "Light",
+            "Dark"
+            // "SystemDefault"
+        ];
 
-        // string defaultTheme = _Settings.Values["ThemeName"] as string ?? "Dark";
+        string defaultTheme = _settingsService.GetSetting("ThemeName", "Dark");
+        SelectedThemeName = Themes.FirstOrDefault(t => t == defaultTheme) ?? Themes.First();
 
-        //SelectedThemeName = Themes.FirstOrDefault(t => t == defaultTheme) ?? Themes.First();
-
-        //if (Enum.TryParse(defaultTheme, out ElementTheme theme))
-        //{
-        //    themeService.SetTheme(theme);
-        //}
+        if (Enum.TryParse(defaultTheme, out ApplicationTheme theme))
+        {
+            ThemeManager.Current.ApplicationTheme = theme;
+        }
     }
 
     public ICommand Generate => new RelayCommand(async () =>

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ESOAPIExplorer.DisplayModels\ESOAPIExplorer.DisplayModels.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.Interfaces\ESOAPIExplorer.Interfaces.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.Models\ESOAPIExplorer.Models.csproj" />

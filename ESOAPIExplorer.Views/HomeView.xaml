@@ -26,7 +26,7 @@
             </DataTemplate>
             <!--<converters:TypeTemplateSelector x:Key="TypeTemplateSelector" TextBlockTemplate="{StaticResource ArgTextBlockTemplate}" ButtonTemplate="{StaticResource ArgButtonTemplate}" />-->
             <DataTemplate x:Key="ArgumentHeaderTemplate">
-                <Grid Margin="0" Height="20" Background="{StaticResource SystemBaseMediumLowColor}">
+                <Grid Margin="0" Height="20" Background="{StaticResource SystemControlBackgroundBaseMediumLowBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="6*"/>

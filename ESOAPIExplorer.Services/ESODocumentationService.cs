@@ -62,7 +62,7 @@ public class ESODocumentationService : IESODocumentationService
         string path = Path.Combine(appDataFolder, "cache.br");
 
 #if DEBUG
-        UseCache = true;
+        // UseCache = false;
 #endif
         try
         {
@@ -192,6 +192,12 @@ public class ESODocumentationService : IESODocumentationService
     private async Task<EsoUIDocumentation> GetDocumentationAsync()
     {
         string path = await GetPathAsync();
+
+        if (string.IsNullOrEmpty(path))
+        {
+            return null;
+        }
+
         string directoryPath = Path.GetDirectoryName(path);
         string ingamePath = $"{directoryPath}\\esoui\\ingamelocalization\\LocalizeGeneratedStrings.lua";
         string localePath = $"{directoryPath}\\esoui\\lang\\en_client.lua";
