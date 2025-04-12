@@ -87,7 +87,7 @@
                         ToolTipService.ToolTip="Back"
                         Grid.Column="0" />
                 <!-- Filter TextBox -->
-                <ComboBox IsEditable="True" x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" Margin="5,0,5,0" Grid.Column="1" />
+                <ui:AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" Margin="5,0,5,0" Grid.Column="1" />
             </Grid>
             <!-- Full Height ListBox -->
             <Grid Grid.Row="1" Name="ListViewGrid">

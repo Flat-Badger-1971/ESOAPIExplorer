@@ -22,7 +22,7 @@ namespace ESOAPIExplorer.ViewModels;
 // TODO: add proper export screen with options to control export content
 // TODO: replace copyright and tm with icons
 // TODO: constant value search
-public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService) : ViewModelBase
+public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService, ISettingsService _settingsService) : ViewModelBase
 {
     #region Properties
     private APIElement _selectedElement;
@@ -558,14 +558,14 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private void SetSearchAlgorithm()
     {
-        //string selectedAlgorithmName = _settings.Values["SearchAlgorithm"].ToString();
+        string selectedAlgorithmName = _settingsService.GetSetting("SearchAlgorithm", "Fast Fuzzy");
 
-        //if (selectedAlgorithmName != _currentAlgorithmName)
-        //{
-        //    Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
-        //    _searchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
-        //    _currentAlgorithmName = selectedAlgorithmName;
-        //}
+        if (selectedAlgorithmName != _currentAlgorithmName)
+        {
+            Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
+            _searchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
+            _currentAlgorithmName = selectedAlgorithmName;
+        }
     }
 
     private bool HasMatchingArgument(APIElement element, string value)
