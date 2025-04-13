@@ -23,7 +23,6 @@
     <ProjectReference Include="..\ESOAPIExplorer.ViewModels\ESOAPIExplorer.ViewModels.csproj" />
     <ProjectReference Include="..\ESOAPIExplorer.Views\ESOAPIExplorer.Views.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

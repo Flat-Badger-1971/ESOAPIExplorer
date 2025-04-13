@@ -8,19 +8,39 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d" Title="ESO API Explorer" Height="800" Width="1400">
-
-    <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
+    <Grid x:Name="MainGrid">
         <DockPanel>
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="Home" Command="{Binding NavigateHomeCommand}" CommandParameter="HomeViewModel"/>
-                <MenuItem Header="Export" Command="{Binding NavigateCommand}" CommandParameter="ExportViewModel"/>
-                <MenuItem Header="About" Command="{Binding NavigateCommand}" CommandParameter="InfoViewModel"/>
-                <MenuItem Header="Settings" Command="{Binding NavigateCommand}" CommandParameter="SettingsViewModel"/>
-            </Menu>
-            <Frame x:Name="NavFrame" NavigationUIVisibility="Hidden">
-                
-            </Frame>
+            <ui:NavigationView
+            x:Name="NavigationViewControl"
+            AlwaysShowHeader="False"
+            IsSettingsVisible="False"
+            IsBackButtonVisible="Collapsed"
+            IsTabStop="False"
+            IsTitleBarAutoPaddingEnabled="False"
+            SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsPaneOpen="False">
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem Tag="HomeViewModel" Content="Home" Icon="Home" />
+                    <ui:NavigationViewItem Tag="ExportViewModel" Content="Export">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:FontIcon Glyph="{StaticResource segoe-export}" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Tag="InfoViewModel" Content="About">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:FontIcon Glyph="{StaticResource segoe-info}" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.MenuItems>
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem Tag="SettingsViewModel" Content="Settings" Icon="Setting"/>
+                </ui:NavigationView.FooterMenuItems>
+                <Frame Grid.Column="1" x:Name="NavFrame"/>
+            </ui:NavigationView>
         </DockPanel>
     </Grid>
 </Window>

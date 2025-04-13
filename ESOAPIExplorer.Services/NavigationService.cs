@@ -26,26 +26,27 @@ public class NavigationService : INavigationService
         _EventService = eventService;
         _DialogService = dialogService;
 
-        CurrentApplication = (Views.MainWindow)Application.Current.GetType().GetProperty("MasterWindow").GetValue(Application.Current);
+        CurrentApplication = (MainWindow)Application.Current.GetType().GetProperty("MasterWindow").GetValue(Application.Current);
         MainFrame = (CurrentApplication).NavigationFrame;
 
         MainFrame.Navigated += async (sender, e) =>
         {
             NavigationModel nav = (NavigationModel)e.ExtraData;
+
             if (nav != null)
             {
-                //Type viewModelType = nav?.ViewModel?.GetType();
-                //MainFrame.DataContext = nav?.ViewModel;
-                //OnNavigationPerformed(viewModelType);
-                //await (nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
-                //Page page = GetPage(viewModelType);
-                //page.DataContext = nav.ViewModel;
-                //MainFrame.Content = page;
+                Type viewModelType = nav?.ViewModel?.GetType();
+                OnNavigationPerformed(viewModelType);
+                Page page = GetPage(viewModelType);
+                page.DataContext = nav.ViewModel;
+                await (nav.ViewModel as ViewModelBase).InitializeAsync(nav.Parameter);
+                MainFrame.DataContext = nav?.ViewModel;
+                MainFrame.Content = page;
             }
         };
 
     }
-    
+
 
     public async Task InitializeAsync()
     {
@@ -145,32 +146,39 @@ public class NavigationService : INavigationService
     {
         object vm = _Container.GetService(viewModelType);
         object nav = new NavigationModel { ViewModel = vm, Parameter = parameter };
+
         Type pageType = GetPageTypeForViewModel(viewModelType);
+        // pageType.DataContext = vm;
+
+        MainFrame.Navigate(pageType, nav);
+
+        if (vm is ViewModelBase viewModelBase)
+        {
+            await viewModelBase.InitializeAsync(parameter);
+        }
+
 
         // Do not repeat app initialisation when the Window already has content,
         // just ensure that the window is active
-        if (Application.Current.MainWindow.Content == null)
-        {
+        //if (Application.Current.MainWindow.Content == null)
+        //{
             // Create a Frame to act as the navigation context and navigate to the first page
             //MainFrame = new Frame();
-            MainFrame.NavigationFailed += CurrentApplication_NavigationFailed;
+            //MainFrame.NavigationFailed += CurrentApplication_NavigationFailed;
 
             // Place the frame in the current Window
-            Application.Current.MainWindow.Content = MainFrame;
-        }
+            //Application.Current.MainWindow.Content = MainFrame;
+        //}
 
         //if (vm is MainViewModel)
         //{
-        //    MainFrame.Navigate(pageType,nav);
         //   // ((Page)MainFrame.Content).DataContext = vm;
         //}
 
-        Page page = GetPage(viewModelType);
-        //page.DataContext = vm;
 
         //MainFrame.Content = page;
 
-        MainFrame.Navigate(page,nav);
+        //MainFrame.Navigate(page, nav);
     }
 
     private void CurrentApplication_NavigationFailed(object sender, NavigationFailedEventArgs e)

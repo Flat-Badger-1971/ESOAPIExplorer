@@ -75,6 +75,9 @@ public partial class App : Application
     private static void RegisterViews(ServiceCollection services)
     {
         services.AddSingleton<HomeView>();
+        services.AddSingleton<ExportView>();
+        services.AddSingleton<InfoView>();
+        services.AddSingleton<SettingsView>();
     }
 
     private static void RegisterServices(ServiceCollection services)
