@@ -24,12 +24,8 @@ public class FastFuzzy : ISearchAlgorithm
             }
         });
 
-        //double maxScore = results.Max(r => r.Score);
-        //double limit = maxScore - (maxScore / 3);
-
         return
             results
-            // .Where(r => r.Score <= limit)
             .OrderByDescending(result => result.Score)
             .Select((result, index) =>
             {
@@ -59,6 +55,7 @@ public class FastFuzzy : ISearchAlgorithm
                 matchesSimple.Add(targetIndex);
                 searchIndex++;
             }
+
             targetIndex++;
         }
 

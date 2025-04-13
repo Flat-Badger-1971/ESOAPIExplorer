@@ -1,19 +1,11 @@
 using ESOAPIExplorer.Services;
 using ModernWpf.Controls;
-using System.Windows.Input;
 
 namespace ESOAPIExplorer.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class MainViewModel(INavigationService navigationService) : ViewModelBase
 {
-    private readonly INavigationService _navigationService;
     private NavigationViewItem _selectedNavigationItem;
-
-    public MainViewModel(INavigationService navigationService)
-    {
-        _navigationService = navigationService;
-        // SelectionChangedCommand = new RelayCommand<NavigationViewSelectionChangedEventArgs>(OnSelectionChanged);
-    }
 
     public NavigationViewItem SelectedNavigationItem
     {
@@ -28,53 +20,19 @@ public class MainViewModel : ViewModelBase
                 {
                     default:
                     case nameof(HomeViewModel):
-                        _ = _navigationService.GoToAsync<HomeViewModel>();
+                        _ = navigationService.GoToAsync<HomeViewModel>();
                         break;
                     case nameof(SettingsViewModel):
-                        _ = _navigationService.GoToAsync<SettingsViewModel>();
+                        _ = navigationService.GoToAsync<SettingsViewModel>();
                         break;
                     case nameof(InfoViewModel):
-                        _ = _navigationService.GoToAsync<InfoViewModel>();
+                        _ = navigationService.GoToAsync<InfoViewModel>();
                         break;
                     case nameof(ExportViewModel):
-                        _ = _navigationService.GoToAsync<ExportViewModel>();
+                        _ = navigationService.GoToAsync<ExportViewModel>();
                         break;
                 }
             }
         }
     }
-
-    //public ICommand SelectionChangedCommand { get; }
-
-    //private void OnSelectionChanged(NavigationViewSelectionChangedEventArgs e)
-    //{
-    //    if (e.SelectedItem is NavigationViewItem selectedItem)
-    //    {
-    //        SelectedNavigationItem = selectedItem;
-    //    }
-    //}
-
-    //public ICommand NavigateCommand => new RelayCommand<string>((string destination) =>
-    //{
-    //    switch (destination)
-    //    {
-    //        default:
-    //        case nameof(HomeViewModel):
-    //            _ = navigationService.GoToAsync<HomeViewModel>();
-    //            break;
-    //        case nameof(SettingsViewModel):
-    //            _ = navigationService.GoToAsync<SettingsViewModel>();
-    //            break;
-    //        case nameof(InfoViewModel):
-    //            _ = navigationService.GoToAsync<InfoViewModel>();
-    //            break;
-    //        case nameof(ExportViewModel):
-    //            _ = navigationService.GoToAsync<ExportViewModel>();
-    //            break;
-    //    }
-    //});
-    //public ICommand NavigateHomeCommand => new RelayCommand(() =>
-    //{
-    //    navigationService.GoToAsync<HomeViewModel>();
-    //});
 }

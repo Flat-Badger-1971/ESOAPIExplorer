@@ -32,7 +32,7 @@ public partial class HighlightedTextBlock : UserControl
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
-            // Initialize characters to match once for the entire text
+            // Initialise characters to match once for the entire text
             _charactersToMatch = Filter?.Select(f => char.ToLower(f))?.ToList() ?? [];
 
             for (int i = 0; i < Text.Length; i++)
@@ -133,7 +133,7 @@ public partial class HighlightedTextBlock : UserControl
         set => SetValue(TextForegroundProperty, value);
     }
 
-    public static readonly DependencyProperty FontSizeProperty =
+    public new static readonly DependencyProperty FontSizeProperty =
         DependencyProperty.Register(nameof(FontSize), typeof(double),
         typeof(HighlightedTextBlock), new PropertyMetadata(12.0, OnPropertyChanged));
 

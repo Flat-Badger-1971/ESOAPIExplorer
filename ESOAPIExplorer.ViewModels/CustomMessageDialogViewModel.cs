@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ESOAPIExplorer.ViewModels;
@@ -8,57 +7,57 @@ public partial class CustomMessageDialogViewModel : ViewModelBase
 {
     public CustomMessageDialogViewModel() => ActionMessage = "";
 
-    private string _Title;
+    private string _title;
     public string Title
     {
-        get => _Title;
-        set => SetProperty(ref _Title, value);
+        get => _title;
+        set => SetProperty(ref _title, value);
     }
 
-    private string _Message;
+    private string _message;
     public string Message
     {
-        get => _Message;
-        set => SetProperty(ref _Message, value);
+        get => _message;
+        set => SetProperty(ref _message, value);
     }
 
-    private string _ActionMessage;
+    private string _actionMessage;
     public string ActionMessage
     {
-        get => _ActionMessage;
-        set => SetProperty(ref _ActionMessage, value);
+        get => _actionMessage;
+        set => SetProperty(ref _actionMessage, value);
     }
 
-    private bool _IsSelectable = false;
+    private bool _isSelectable = false;
     public bool IsSelectable
     {
-        get => _IsSelectable;
-        set => SetProperty(ref _IsSelectable, value);
+        get => _isSelectable;
+        set => SetProperty(ref _isSelectable, value);
     }
 
-    private string _PositiveText;
+    private string _positiveText;
     public string PositiveText
     {
-        get => _PositiveText;
-        set => SetProperty(ref _PositiveText, value);
+        get => _positiveText;
+        set => SetProperty(ref _positiveText, value);
     }
 
-    private string _NegativeText;
+    private string _negativeText;
     public string NegativeText
     {
-        get => _NegativeText;
+        get => _negativeText;
         set
         {
             IsNegativeButtonVisible = !string.IsNullOrEmpty(value);
-            SetProperty(ref _NegativeText, value);
+            SetProperty(ref _negativeText, value);
         }
     }
 
-    private bool _IsNegativeButtonVisible;
+    private bool _isNegativeButtonVisible;
     public bool IsNegativeButtonVisible
     {
-        get => _IsNegativeButtonVisible;
-        set => SetProperty(ref _IsNegativeButtonVisible, value);
+        get => _isNegativeButtonVisible;
+        set => SetProperty(ref _isNegativeButtonVisible, value);
     }
 
     protected virtual void OnResponseEntered(bool response)
@@ -67,7 +66,7 @@ public partial class CustomMessageDialogViewModel : ViewModelBase
         ResponseEntered?.Invoke(this, args);
     }
 
-    DateTime _LastCopied = DateTime.Now;
+    private DateTime _lastCopied = DateTime.Now;
 
     public ICommand CopyToClipboardCommand => new RelayCommand(async () =>
     {

@@ -1,22 +1,21 @@
 ﻿using ESOAPIExplorer.Services;
+using ModernWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ESOAPIExplorer.Models;
-using ModernWpf;
+
 namespace ESOAPIExplorer.ViewModels;
 
 #pragma warning disable CA1416, CsWinRT1028
 public class SettingsViewModel(ILuaParserService luaParserService, ISettingsService settingsService) : ViewModelBase
 {
-    private readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-    private ISettingsService _settingsService = settingsService;
+    private readonly Window _mainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+    private readonly ISettingsService _settingsService = settingsService;
     //private FileOpenPicker _FileOpenPicker;
     //private FileSavePicker _FileSavePicker;
     private ComboBoxItem _selectedThemeName;

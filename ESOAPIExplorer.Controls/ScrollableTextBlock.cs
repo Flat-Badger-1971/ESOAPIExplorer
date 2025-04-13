@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -65,7 +64,9 @@ public partial class ScrollableTextBlock : UserControl
     private void UpdateTextBlockPadding()
     {
         if (_scrollViewer == null || _textBlock == null)
+        {
             return;
+        }
 
         bool horizontalVisible = _scrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
         bool verticalVisible = _scrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
@@ -104,7 +105,7 @@ public partial class ScrollableTextBlock : UserControl
     }
 
     // Add this to inherit background correctly
-    public static readonly DependencyProperty BackgroundProperty =
+    public new static readonly DependencyProperty BackgroundProperty =
         DependencyProperty.Register(nameof(Background), typeof(Brush),
         typeof(ScrollableTextBlock),
         new PropertyMetadata(null, OnBackgroundChanged));
@@ -118,7 +119,7 @@ public partial class ScrollableTextBlock : UserControl
     }
 
     // Add this for TextBlock foreground
-    public static readonly DependencyProperty ForegroundProperty =
+    public new static readonly DependencyProperty ForegroundProperty =
         DependencyProperty.Register(nameof(Foreground), typeof(Brush),
         typeof(ScrollableTextBlock),
         new PropertyMetadata(Brushes.White, OnForegroundChanged));

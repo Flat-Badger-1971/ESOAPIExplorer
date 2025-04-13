@@ -30,11 +30,9 @@ public sealed partial class HomeView : Page
 
         INavigationService navigation = Application.Current.GetType().GetProperty("Navigation").GetValue(Application.Current) as INavigationService;
         ViewModelBase vm = (ViewModelBase)navigation.GetDataContextForPage(this);
-        this.DataContext = vm;
+        DataContext = vm;
         vm.InitializeAsync(null);
-        this.Loaded += (s, a) =>
-        {
-        };
+
         ListViewGrid.SizeChanged += ListViewGridSizeChanged;
     }
 

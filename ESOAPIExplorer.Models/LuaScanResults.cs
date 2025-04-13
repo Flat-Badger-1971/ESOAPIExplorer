@@ -1,12 +1,11 @@
 ﻿using System.Collections.Concurrent;
 
-namespace ESOAPIExplorer.Models
+namespace ESOAPIExplorer.Models;
+
+public class LuaScanResults
 {
-    public class LuaScanResults
-    {
-        public ConcurrentBag<EsoUIFunction> Functions { get; set; } = [];
-        public ConcurrentBag<EsoUIInstance> InstanceNames { get; set; } = [];
-        public ConcurrentBag<EsoUIObject> Objects { get; set; } = [];
-        public ConcurrentDictionary<string, bool> Fragments { get; set; } = [];
-    }
+    public ConcurrentBag<EsoUIFunction> Functions { get; set; } = [];
+    public ConcurrentBag<EsoUIInstance> InstanceNames { get; set; } = [];
+    public ConcurrentBag<EsoUIObject> Objects { get; set; } = [];
+    public ConcurrentDictionary<string, bool> Fragments { get; set; } = [];
 }

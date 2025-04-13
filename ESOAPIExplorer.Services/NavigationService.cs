@@ -2,9 +2,7 @@ using ESOAPIExplorer.Models;
 using ESOAPIExplorer.ViewModels;
 using ESOAPIExplorer.Views;
 using System;
-using System.Data.Common;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,17 +12,17 @@ namespace ESOAPIExplorer.Services;
 
 public class NavigationService : INavigationService
 {
-    private readonly IServiceProvider _Container;
-    private readonly IEventService _EventService;
-    private readonly IDialogService _DialogService;
-    protected Views.MainWindow CurrentApplication;
+    private readonly IServiceProvider _container;
+    private readonly IEventService _eventService;
+    private readonly IDialogService _dialogService;
+    protected MainWindow CurrentApplication;
     protected Frame MainFrame;
 
     public NavigationService(IServiceProvider container, IEventService eventService, IDialogService dialogService)
     {
-        _Container = container;
-        _EventService = eventService;
-        _DialogService = dialogService;
+        _container = container;
+        _eventService = eventService;
+        _dialogService = dialogService;
 
         CurrentApplication = (MainWindow)Application.Current.GetType().GetProperty("MasterWindow").GetValue(Application.Current);
         MainFrame = (CurrentApplication).NavigationFrame;
@@ -47,10 +45,9 @@ public class NavigationService : INavigationService
 
     }
 
-
     public async Task InitializeAsync()
     {
-        CurrentApplication.MainContainer.DataContext = _Container.GetService(typeof(MainViewModel));
+        CurrentApplication.MainContainer.DataContext = _container.GetService(typeof(MainViewModel));
         await GoToAsync<HomeViewModel>();
     }
 
@@ -144,7 +141,7 @@ public class NavigationService : INavigationService
 
     protected virtual async Task InternalNavigateToAsync(Type viewModelType, object parameter)
     {
-        object vm = _Container.GetService(viewModelType);
+        object vm = _container.GetService(viewModelType);
         object nav = new NavigationModel { ViewModel = vm, Parameter = parameter };
 
         Type pageType = GetPageTypeForViewModel(viewModelType);
@@ -212,7 +209,7 @@ public class NavigationService : INavigationService
         string typeFullName = $"{ns}.{pageType.Name.Replace("View", "ViewModel")}";
         Type type = GetType(typeFullName);
 
-        ViewModelBase vm = (ViewModelBase)_Container.GetService(type);
+        ViewModelBase vm = (ViewModelBase)_container.GetService(type);
         vm.InitializeAsync(null);
         return vm;
     }
@@ -261,7 +258,7 @@ public class NavigationService : INavigationService
 
         try
         {
-            Page page = _Container.GetService(pageType) as Page;
+            Page page = _container.GetService(pageType) as Page;
 
             return page;
         }

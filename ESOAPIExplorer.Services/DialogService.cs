@@ -53,7 +53,7 @@ public class DialogService(Dispatcher mainDispatcherQueue, CustomMessageDialogVi
             _mainDispatcher.Invoke(action);
             return true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return false;
         }

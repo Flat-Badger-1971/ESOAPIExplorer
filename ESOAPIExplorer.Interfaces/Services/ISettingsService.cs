@@ -1,11 +1,10 @@
 using System.Threading.Tasks;
 
-namespace ESOAPIExplorer.Services
+namespace ESOAPIExplorer.Services;
+
+public interface ISettingsService
 {
-    public interface ISettingsService
-    {
-        T GetSetting<T>(string key, T defaultValue = default);
-        void SaveSetting<T>(string key, T value);
-        Task SaveSettingsAsync();
-    }
+    T GetSetting<T>(string key, T defaultValue = default);
+    void SaveSetting<T>(string key, T value);
+    Task SaveSettingsAsync();
 }

@@ -1,8 +1,7 @@
-﻿namespace ESOAPIExplorer.Models
+﻿namespace ESOAPIExplorer.Models;
+
+public class ExportOption
 {
-    public class ExportOption
-    {
-        public int Id { get; set; }
-        public string DisplayName { get; set; }
-    }
+    public int Id { get; set; }
+    public string DisplayName { get; set; }
 }

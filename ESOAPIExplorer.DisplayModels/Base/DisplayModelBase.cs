@@ -6,22 +6,22 @@ namespace ESOAPIExplorer.DisplayModels;
 
 public partial class DisplayModelBase<T> : INotifyPropertyChanged
 {
-    private T _Value;
-    public T Value { get => _Value; set { SetProperty(ref _Value, value); } }
+    private T _value;
+    public T Value { get => _value; set { SetProperty(ref _value, value); } }
     public DisplayModelBase() { }
 
-    private bool _IsVisible = false;
+    private bool _isVisible = false;
     public bool IsVisible
     {
-        get => _IsVisible;
-        set => SetProperty(ref _IsVisible, value);
+        get => _isVisible;
+        set => SetProperty(ref _isVisible, value);
     }
 
-    private bool _IsSelected = false;
+    private bool _isSelected = false;
     public bool IsSelected
     {
-        get => _IsSelected;
-        set => SetProperty(ref _IsSelected, value);
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
     }
 
     protected bool SetProperty<U>(ref U backingStore, U value, [CallerMemberName] string propertyName = "", Action onChanged = null)
@@ -33,7 +33,6 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
         return true;
     }
 
-    #region INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
     {
@@ -50,5 +49,4 @@ public partial class DisplayModelBase<T> : INotifyPropertyChanged
         }
         finally { }
     }
-    #endregion
 }

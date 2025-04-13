@@ -6,14 +6,23 @@ public static class Common
 {
     public static int LevenshteinDistance(string source, string target)
     {
-        if (string.IsNullOrEmpty(source)) return string.IsNullOrEmpty(target) ? 0 : target.Length;
-        if (string.IsNullOrEmpty(target)) return source.Length;
+        if (string.IsNullOrEmpty(source))
+        {
+            return string.IsNullOrEmpty(target) ? 0 : target.Length;
+        }
+
+        if (string.IsNullOrEmpty(target))
+        {
+            return source.Length;
+        }
 
         int[] previousRow = new int[target.Length + 1];
         int[] currentRow = new int[target.Length + 1];
 
         for (int i = 0; i <= target.Length; i++)
+        {
             previousRow[i] = i;
+        }
 
         for (int i = 0; i < source.Length; i++)
         {
