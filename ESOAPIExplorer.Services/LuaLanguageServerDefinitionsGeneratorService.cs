@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -16,43 +17,132 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
     private readonly StringBuilder returns = new StringBuilder();
     private readonly StringBuilder param = new StringBuilder();
     private readonly StringBuilder func = new StringBuilder();
-    private readonly EsoUIDocumentation docs = _esoDocumentationService.Documentation;
+    private EsoUIDocumentation docs => _esoDocumentationService.Documentation ?? throw new InvalidOperationException("ESO API documentation has not been loaded.");
     private bool _added = false;
 
-    public async Task Generate(StorageFolder esofolder)
+    public async Task Generate(StorageFolder esofolder, bool generateDefinitionFiles = true, bool mergeDiagnosticsGlobals = false)
     {
-        StorageFile esoapiFile;
+        if (generateDefinitionFiles)
+        {
+            StorageFile esoapiFile;
 
-        // create definition files
-        esoapiFile = await esofolder.CreateFileAsync("aliases.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddAliases());
+            esoapiFile = await esofolder.CreateFileAsync("aliases.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddAliases());
 
-        esoapiFile = await esofolder.CreateFileAsync("api.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddAPI());
+            esoapiFile = await esofolder.CreateFileAsync("api.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddAPI());
 
-        esoapiFile = await esofolder.CreateFileAsync("classes.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddClasses(false));
+            esoapiFile = await esofolder.CreateFileAsync("classes.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddClasses(false));
 
-        esoapiFile = await esofolder.CreateFileAsync("zoclasses.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddClasses(true));
+            esoapiFile = await esofolder.CreateFileAsync("zoclasses.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddClasses(true));
 
-        esoapiFile = await esofolder.CreateFileAsync("events.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddEvents());
+            esoapiFile = await esofolder.CreateFileAsync("events.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddEvents());
 
-        esoapiFile = await esofolder.CreateFileAsync("functions.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddFunctions());
+            esoapiFile = await esofolder.CreateFileAsync("functions.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddFunctions());
 
-        esoapiFile = await esofolder.CreateFileAsync("globals.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddGlobals());
+            esoapiFile = await esofolder.CreateFileAsync("globals.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddGlobals());
 
-        esoapiFile = await esofolder.CreateFileAsync("sounds.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddSounds());
+            esoapiFile = await esofolder.CreateFileAsync("sounds.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddSounds());
 
-        esoapiFile = await esofolder.CreateFileAsync("zoclasses.min", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddClasses(true, true));
+            esoapiFile = await esofolder.CreateFileAsync("zoclasses.min", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddClasses(true, true));
 
-        esoapiFile = await esofolder.CreateFileAsync("fragments.lua", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(esoapiFile, AddFragments());
+            esoapiFile = await esofolder.CreateFileAsync("fragments.lua", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(esoapiFile, AddFragments());
+        }
+
+        if (mergeDiagnosticsGlobals)
+        {
+            await MergeDiagnosticsGlobalsAsync(esofolder);
+        }
+    }
+
+    private async Task MergeDiagnosticsGlobalsAsync(StorageFolder esofolder)
+    {
+        StorageFile luarcFile = await esofolder.CreateFileAsync(".luarc.json", CreationCollisionOption.OpenIfExists);
+        JsonObject root = new JsonObject();
+
+        string existingContent = await FileIO.ReadTextAsync(luarcFile);
+
+        if (!string.IsNullOrWhiteSpace(existingContent)
+            && JsonNode.Parse(existingContent) is JsonObject existingRoot)
+        {
+            root = existingRoot;
+        }
+
+        JsonObject diagnostics = root["diagnostics"] as JsonObject ?? new JsonObject();
+        root["diagnostics"] = diagnostics;
+
+        JsonArray globals = diagnostics["globals"] as JsonArray ?? new JsonArray();
+        diagnostics["globals"] = globals;
+
+        HashSet<string> existingGlobals = globals
+            .Select(node => node?.GetValue<string>())
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (string globalName in GetLuaDiagnosticsGlobals())
+        {
+            if (existingGlobals.Add(globalName))
+            {
+                globals.Add(globalName);
+            }
+        }
+
+        await FileIO.WriteTextAsync(luarcFile, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    private IEnumerable<string> GetLuaDiagnosticsGlobals()
+    {
+        HashSet<string> globals = ["SLASH_COMMANDS"];
+
+        foreach (KeyValuePair<string, EsoUIObject> obj in docs.Objects)
+        {
+            globals.Add(obj.Key);
+
+            if (!string.IsNullOrWhiteSpace(obj.Value.InstanceName))
+            {
+                globals.Add(obj.Value.InstanceName);
+            }
+        }
+
+        foreach (string global in docs.Globals.Keys.Where(key => key != "Globals"))
+        {
+            globals.Add(global);
+        }
+
+        foreach (string global in docs.Globals.SelectMany(item => item.Value.Select(value => value.Name)))
+        {
+            globals.Add(global);
+        }
+
+        foreach (string global in docs.Constants.Keys)
+        {
+            globals.Add(global);
+        }
+
+        foreach (string global in docs.Functions.Keys)
+        {
+            globals.Add(global);
+        }
+
+        foreach (string global in docs.Events.Keys)
+        {
+            globals.Add(global);
+        }
+
+        foreach (string global in docs.Fragments.Keys)
+        {
+            globals.Add(global);
+        }
+
+        return globals.OrderBy(value => value, StringComparer.Ordinal);
     }
 
     private string AddFragments()
@@ -114,11 +204,11 @@ public class LuaLanguageServerDefinitionsGeneratorService(IESODocumentationServi
 
                 if (i == func.Value.Args.Count - 1)
                 {
-                    param.Append($"--- @param {arg.Name} {Utility.InferType(arg.Name, _regexService)}");
+                    param.Append($"--- @param {arg.Name} {LuaTypeInference.InferType(arg.Name, _regexService)}");
                 }
                 else
                 {
-                    param.AppendLine($"--- @param {arg.Name} {Utility.InferType(arg.Name, _regexService)}");
+                    param.AppendLine($"--- @param {arg.Name} {LuaTypeInference.InferType(arg.Name, _regexService)}");
                 }
 
                 rawparamlist.Add(arg.Name);

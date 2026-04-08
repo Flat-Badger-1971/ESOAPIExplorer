@@ -5,7 +5,8 @@
     xmlns:local="using:ESOAPIExplorer.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:ESOAPIExplorer.ViewModels"    
+    xmlns:vm="using:ESOAPIExplorer.ViewModels"
+    xmlns:c="using:ESOAPIExplorer.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="_this"
@@ -13,27 +14,46 @@
 
     <Grid x:Name="RootGrid" Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <c:BusyOverlay Grid.RowSpan="4" IsActive="{Binding IsBusy}" Message="{Binding BusyMessage}" />
+
         <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center">
-            <TextBlock Text="ESO API Explorer" FontSize="32" Margin="0,10,0,20" Foreground="Goldenrod" FontWeight="Bold"/>
+        <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="8">
+            <TextBlock Text="Export" FontSize="32" Margin="0,10,0,0" Foreground="{StaticResource ESOAccentBrush}" FontWeight="Bold"/>
+            <TextBlock Text="Build the files your Lua tooling needs from the currently loaded ESO API data." Foreground="{StaticResource ESOSecondaryTextBrush}" TextWrapping="WrapWholeWords"/>
         </StackPanel>
 
         <!-- Export Options -->
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,20,0,0" HorizontalAlignment="Left" Width="400">
-            <TextBlock Text="Export Options" FontSize="24" Margin="0,0,0,10" Foreground="DarkGray" FontWeight="SemiBold"/>
-            <!--<RadioButtons ItemsSource="{Binding ExportOptions}" SelectedItem="{Binding SelectedExportOption, Mode=TwoWay}" SelectedIndex="0">
-                <RadioButtons.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Value.DisplayName}" FontSize="18"/>
-                    </DataTemplate>
-                </RadioButtons.ItemTemplate>
-            </RadioButtons>-->
-            <Button Content="Export" Margin="0,20,0,0" FontSize="18" Command="{Binding ExportCommand}"/>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,24,0,0" Spacing="12">
+            <TextBlock Text="Export options" FontSize="24" Foreground="{StaticResource ESOSectionHeaderBrush}" FontWeight="SemiBold"/>
+            <TextBlock Text="All selected outputs are written to the same folder." Foreground="{StaticResource ESOSecondaryTextBrush}" />
+        </StackPanel>
+
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding ExportOptions}" Margin="0,20,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,0,12" Padding="16" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="8">
+                        <StackPanel Spacing="8">
+                            <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected, Mode=TwoWay}" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Description}" TextWrapping="WrapWholeWords" Foreground="{StaticResource ESOSecondaryTextBrush}" />
+                            <TextBlock Text="{Binding OutputTarget}" Foreground="{StaticResource ESOAccentBrush}" TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel Grid.Row="3" Margin="0,20,0,0" Spacing="12">
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="WrapWholeWords" Foreground="{StaticResource ESOSecondaryTextBrush}" />
+            <Button Content="Export selected files" FontSize="18" Command="{Binding ExportCommand}" />
         </StackPanel>
     </Grid>
 </Page>

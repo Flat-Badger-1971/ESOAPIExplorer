@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -16,10 +17,25 @@ public partial class ViewModelBase : INotifyPropertyChanged
         set { SetProperty(ref _IsBusy, value); }
     }
 
+    private string _BusyMessage;
+    public string BusyMessage
+    {
+        get => _BusyMessage;
+        set => SetProperty(ref _BusyMessage, value);
+    }
+
+    protected void SetBusyState(bool isBusy, string message = null)
+    {
+        IsBusy = isBusy;
+        BusyMessage = isBusy ? message : null;
+    }
+
     protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "", Action onChanged = null)
     {
-        //if (EqualityComparer<T>.Default.Equals(backingStore, value))
-        //return false;
+        if (EqualityComparer<T>.Default.Equals(backingStore, value))
+        {
+            return false;
+        }
 
         backingStore = value;
         onChanged?.Invoke();

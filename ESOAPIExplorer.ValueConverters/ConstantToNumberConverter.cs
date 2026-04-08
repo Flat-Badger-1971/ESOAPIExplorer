@@ -12,6 +12,11 @@ public class ConstantToNumberConverter : IValueConverter
         {
             EsoUIGlobalValue globalvalue = ConstantValues.GetConstantValue(constant);
 
+            if (globalvalue == null)
+            {
+                return constant;
+            }
+
             if (globalvalue.IntValue.HasValue)
             {
                 return globalvalue.IntValue.ToString();

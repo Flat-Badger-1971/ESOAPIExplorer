@@ -5,7 +5,6 @@ using ESOAPIExplorer.Services;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,17 +14,10 @@ using System.Windows.Input;
 using Windows.Storage;
 
 namespace ESOAPIExplorer.ViewModels;
-// TODO: IDE formatters
-// TODO: fix settings bindings
-// TODO: diagnose enum list delay
-// TODO: fix scrollable text block padding
-// TODO: implement decent theme colours
-// TODO: add busy indicator
-// TODO: add proper export screen with options to control export content
-// TODO: replace copyright and tm with icons
-// TODO: constant value search
-public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService) : ViewModelBase
+public partial class HomeViewModel(IDialogService _dialogService, IESODocumentationService _esoDocumentationService, IRegexService _regexService, IEventService eventService) : ViewModelBase
 {
+    private static readonly TimeSpan FilterDebounceDelay = TimeSpan.FromMilliseconds(300);
+
     #region Properties
     private APIElement _selectedElement;
     public APIElement SelectedElement
@@ -43,7 +35,21 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         }
     }
 
-    CancellationTokenSource _selectedElementTokenSource;
+    private string _loadingMessage;
+    public string LoadingMessage
+    {
+        get => _loadingMessage;
+        set => SetProperty(ref _loadingMessage, value);
+    }
+
+    private Visibility _loadingVisibility = Visibility.Collapsed;
+    public Visibility LoadingVisibility
+    {
+        get => _loadingVisibility;
+        set => SetProperty(ref _loadingVisibility, value);
+    }
+
+    private CancellationTokenSource _selectedElementTokenSource;
 
     private StatusInformation _status;
     public StatusInformation Status
@@ -142,19 +148,22 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         }
     }
 
-    private int _selectedEnum;
-    public int SelectedEnum
+    private EsoUIEnumValue _selectedEnumValue;
+    public EsoUIEnumValue SelectedEnumValue
     {
-        get => _selectedEnum;
+        get => _selectedEnumValue;
         set
         {
-            SetProperty(ref _selectedEnum, value);
-
-            Task.Run(async () =>
+            if (!SetProperty(ref _selectedEnumValue, value))
             {
-                await Task.Delay(10);
-                _dialogService.RunOnMainThread(() => SelectedEnum = -1);
-            });
+                return;
+            }
+
+            if (value != null)
+            {
+                SelectElement(value.Name);
+                SetProperty(ref _selectedEnumValue, null, nameof(SelectedEnumValue));
+            }
         }
     }
 
@@ -211,7 +220,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         set
         {
             SetProperty(ref _filterText, value);
-            FilterItemsAsync().Wait();
+            _ = FilterItemsAsync();
         }
     }
 
@@ -235,7 +244,10 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private readonly ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
     private readonly Stack<string> _historyStack = new Stack<string>();
+    private readonly IEventService _eventService = eventService;
+    private CancellationTokenSource _filterItemsTokenSource;
     private string _currentAlgorithmName;
+    private bool _isSubscribedToDocumentationChanges;
     private IEnumerable<Type> _searchAlgorithms;
     private ISearchAlgorithm _searchAlgorithm;
 
@@ -248,37 +260,100 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         // intialise the constants dictionary
         ConstantValues.InitialiseConstants();
 
+        if (!_isSubscribedToDocumentationChanges)
+        {
+            _eventService.DocumentationChanged += HandleDocumentationChanged;
+            _isSubscribedToDocumentationChanges = true;
+        }
+
         if (_allItems == null || _allItems?.Count == 0)
         {
+            await LoadItemsAsync();
+        }
+    }
+
+    private async Task LoadItemsAsync(string loadingMessage = "Loading ESO API documentation...")
+    {
+        SetLoadingState(true, loadingMessage);
+
+        try
+        {
             await _esoDocumentationService.InitialiseAsync();
+            EsoUIDocumentation documentation = _esoDocumentationService.Documentation ?? throw new InvalidOperationException("ESO API documentation could not be loaded.");
 
-            _searchAlgorithms = Utility.ListSearchAlgorithms();
+            SetLoadingState(true, "Building API index...");
+            BuildItems(documentation);
+            await FilterItemsAsync();
+        }
+        finally
+        {
+            SetLoadingState(false);
+        }
+    }
 
-            // Events
-            ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Events
-                .Select(item =>
+    private void BuildItems(EsoUIDocumentation documentation)
+    {
+        _searchAlgorithms = SearchAlgorithmDiscovery.ListSearchAlgorithms();
+
+        ObservableCollection<APIElement> events = new ObservableCollection<APIElement>(documentation.Events
+            .Select(item =>
+                new APIElement
+                {
+                    Id = item.Key,
+                    Name = item.Value.Name,
+                    ElementType = APIElementType.EVENT,
+                    Code = item.Value.Code
+                }));
+
+        ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(documentation.Functions
+            .Select(item =>
+                new APIElement
+                {
+                    Id = item.Key,
+                    Name = item.Value.Name,
+                    ElementType = item.Value.ElementType,
+                    Code = item.Value.Code
+                }));
+
+        ObservableCollection<APIElement> enums = new ObservableCollection<APIElement>(documentation.Globals
+            .Where(g => g.Key != "Globals")
+            .SelectMany(item =>
+                item.Value
+                .Select(detail =>
+                    new APIElement
+                    {
+                        Id = detail.Name,
+                        Name = detail.Name,
+                        ElementType = APIElementType.ENUM_CONSTANT,
+                        Parent = item.Key,
+                        Code = [$"* {detail.Name}"]
+                    }))
+            .Concat(documentation.Globals
+            .Where(g => g.Key != "Global")
+            .SelectMany(item =>
+                item.Value
+                .Select(detail =>
                     new APIElement
                     {
                         Id = item.Key,
-                        Name = item.Value.Name,
-                        ElementType = APIElementType.EVENT,
-                        Code = item.Value.Code
-                    }));
+                        Name = item.Key,
+                        ElementType = APIElementType.ENUM_TYPE,
+                        Code = [$"* {item.Key}"]
+                    }))
+            .GroupBy(e => e.Id)
+            .Select(e => e.First())));
 
-            // Functions
-            ObservableCollection<APIElement> functions = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Functions
-                .Select(item =>
-                    new APIElement
-                    {
-                        Id = item.Key,
-                        Name = item.Value.Name,
-                        ElementType = item.Value.ElementType,
-                        Code = item.Value.Code
-                    }));
-
-            // Enums
-            ObservableCollection<APIElement> enums = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Globals
-                .Where(g => g.Key != "Globals")
+        ObservableCollection<APIElement> constants = new ObservableCollection<APIElement>(documentation.Constants
+            .Select(item =>
+                new APIElement
+                {
+                    Id = item.Key,
+                    Name = item.Value.Name,
+                    ElementType = item.Value.Name.StartsWith("SI_") ? APIElementType.SI_GLOBAL : APIElementType.CONSTANT,
+                    Code = [$"{item.Value.Name} = {item.Value.Value}"]
+                })
+            .Concat(documentation.Globals
+                .Where(g => g.Key == "Globals")
                 .SelectMany(item =>
                     item.Value
                     .Select(detail =>
@@ -286,65 +361,24 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                         {
                             Id = detail.Name,
                             Name = detail.Name,
-                            ElementType = APIElementType.ENUM_CONSTANT,
-                            Parent = item.Key,
+                            ElementType = APIElementType.CONSTANT,
                             Code = [$"* {detail.Name}"]
-                        }))
-                .Concat(_esoDocumentationService.Documentation.Globals
-                .Where(g => g.Key != "Global")
-                .SelectMany(item =>
-                    item.Value
-                    .Select(detail =>
-                        new APIElement
-                        {
-                            Id = item.Key,
-                            Name = item.Key,
-                            ElementType = APIElementType.ENUM_TYPE,
-                            Code = [$"* {item.Key}"]
-                        }))
-                .GroupBy(e => e.Id)
-                .Select(e => e.First())));
+                        }))));
 
-            // Constants
-            ObservableCollection<APIElement> constants = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Constants
-                .Select(item =>
-                    new APIElement
-                    {
-                        Id = item.Key,
-                        Name = item.Value.Name,
-                        ElementType = item.Value.Name.StartsWith("SI_") ? APIElementType.SI_GLOBAL : APIElementType.CONSTANT,
-                        Code = [$"{item.Value.Name} = {item.Value.Value}"]
-                    })
-                .Concat(_esoDocumentationService.Documentation.Globals
-                    .Where(g => g.Key == "Globals")
-                    .SelectMany(item =>
-                        item.Value
-                        .Select(detail =>
-                            new APIElement
-                            {
-                                Id = detail.Name,
-                                Name = detail.Name,
-                                ElementType = APIElementType.CONSTANT,
-                                Code = [$"* {detail.Name}"]
-                            }))));
+        ObservableCollection<APIElement> objects = new ObservableCollection<APIElement>(documentation.Objects
+            .Select(item =>
+                new APIElement
+                {
+                    Id = item.Key,
+                    Name = item.Value.Name,
+                    ElementType = item.Value.ElementType,
+                    Code = item.Value.Code
+                }));
 
-            // Objects
-            ObservableCollection<APIElement> objects = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Objects
-                .Select(item =>
-                    new APIElement
-                    {
-                        Id = item.Key,
-                        Name = item.Value.Name,
-                        ElementType = item.Value.ElementType,
-                        Code = item.Value.Code
-                    }
-                ));
-
-            // Object methods
-            ObservableCollection<APIElement> methods = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.Objects
-                .SelectMany(item =>
-                    item.Value.Functions
-                    .Select(func =>
+        ObservableCollection<APIElement> methods = new ObservableCollection<APIElement>(documentation.Objects
+            .SelectMany(item =>
+                item.Value.Functions
+                .Select(func =>
                     new APIElement
                     {
                         Id = func.Key,
@@ -352,30 +386,70 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                         ElementType = func.Value.ElementType,
                         Code = func.Value.Code,
                         Parent = item.Value.Name
-                    }
-                )));
+                    })));
 
-            // InstanceNames
-            ObservableCollection<APIElement> instanceNames = new ObservableCollection<APIElement>(_esoDocumentationService.Documentation.InstanceNames
-                .Select(n => new APIElement
-                {
-                    Id = n.Key,
-                    Name = n.Value.Name,
-                    ElementType = APIElementType.INSTANCE_NAME,
-                    Code = [n.Value.Code]
-                }));
+        ObservableCollection<APIElement> instanceNames = new ObservableCollection<APIElement>(documentation.InstanceNames
+            .Select(n => new APIElement
+            {
+                Id = n.Key,
+                Name = n.Value.Name,
+                ElementType = APIElementType.INSTANCE_NAME,
+                Code = [n.Value.Code]
+            }));
 
-            AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
-                events.Select(e => new DisplayModelBase<APIElement> { Value = e })
-                .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
-                .Concat(enums.Select(c => new DisplayModelBase<APIElement> { Value = c }))
-                .Concat(constants.Select(c => new DisplayModelBase<APIElement> { Value = c }))
-                .Concat(objects.Select(o => new DisplayModelBase<APIElement> { Value = o }))
-                .Concat(methods.Select(m => new DisplayModelBase<APIElement> { Value = m }))
-                .Concat(instanceNames.Select(n => new DisplayModelBase<APIElement> { Value = n })));
+        AllItems = new ObservableCollection<DisplayModelBase<APIElement>>(
+            events.Select(e => new DisplayModelBase<APIElement> { Value = e })
+            .Concat(functions.Select(f => new DisplayModelBase<APIElement> { Value = f }))
+            .Concat(enums.Select(c => new DisplayModelBase<APIElement> { Value = c }))
+            .Concat(constants.Select(c => new DisplayModelBase<APIElement> { Value = c }))
+            .Concat(objects.Select(o => new DisplayModelBase<APIElement> { Value = o }))
+            .Concat(methods.Select(m => new DisplayModelBase<APIElement> { Value = m }))
+            .Concat(instanceNames.Select(n => new DisplayModelBase<APIElement> { Value = n })));
+    }
 
+    private async void HandleDocumentationChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            await RefreshItemsAsync();
+        }
+        catch (Exception ex)
+        {
+            SetLoadingState(false);
+            await _dialogService.ShowAsync(ex.Message, "Rescan failed");
+        }
+    }
+
+    private async Task RefreshItemsAsync()
+    {
+        EsoUIDocumentation documentation = _esoDocumentationService.Documentation ?? throw new InvalidOperationException("ESO API documentation could not be refreshed.");
+
+        SetLoadingState(true, "Refreshing API index...");
+
+        try
+        {
+            _historyStack.Clear();
+            CanGoBack = false;
+            SelectedFilterIndex = -1;
+            SelectedUsedByItem = null;
+            SetProperty(ref _selectedElement, null, nameof(SelectedElement));
+            SetProperty(ref _selectedEnumValue, null, nameof(SelectedEnumValue));
+            UpdateProperties(string.Empty, null);
+
+            BuildItems(documentation);
             await FilterItemsAsync();
         }
+        finally
+        {
+            SetLoadingState(false);
+        }
+    }
+
+    private void SetLoadingState(bool isLoading, string message = null)
+    {
+        SetBusyState(isLoading, message);
+        LoadingVisibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
+        LoadingMessage = BusyMessage;
     }
 
     private void UpdateProperties(string propertyName, object value)
@@ -423,129 +497,133 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
     private void UpdateSelectedElementDetails()
     {
-        if (_selectedElementTokenSource != null && !_selectedElementTokenSource.IsCancellationRequested)
+        CancellationToken token = ResetCancellationTokenSource(ref _selectedElementTokenSource);
+        APIElement element = _selectedElement;
+        List<Action> actions = [];
+        EsoUIDocumentation doc = _esoDocumentationService.Documentation;
+
+        if (element == null || doc == null || token.IsCancellationRequested)
         {
-            _selectedElementTokenSource.Cancel();
+            return;
         }
 
-        _selectedElementTokenSource = new CancellationTokenSource();
-
-        Task.Run(() =>
+        switch (element.ElementType)
         {
-            APIElement element = _selectedElement;
-            List<Action> actions = [];
-            EsoUIDocumentation doc = _esoDocumentationService.Documentation;
-
-            if (element != null)
-            {
-                switch (element.ElementType)
+            case APIElementType.EVENT:
+                if (doc.Events.TryGetValue(element.Id, out EsoUIEvent eventInfo))
                 {
-                    case APIElementType.EVENT:
-                        if (doc.Events.TryGetValue(element.Id, out EsoUIEvent eventInfo))
-                        {
-                            actions.Add(() =>
-                            {
-                                SelectedEventDetails = eventInfo;
-                                UpdateObjects(eventInfo.Args);
-                            });
-                        }
-                        break;
-                    case APIElementType.FUNCTION:
-                    case APIElementType.C_FUNCTION:
-                        if (doc.Functions.TryGetValue(element.Id, out EsoUIFunction func))
-                        {
-                            actions.Add(() =>
-                            {
-                                SelectedFunctionDetails = func;
-                                UpdateObjects(func.Args);
-                                UpdateObjects(func.Returns);
-                            });
-                        }
-                        break;
-                    case APIElementType.ENUM_CONSTANT:
-                        actions.Add(() => SelectedGlobalDetails = new EsoUIGlobal { Name = element.Name, ParentName = element.Parent });
+                    actions.Add(() =>
+                    {
+                        SelectedEventDetails = eventInfo;
+                        UpdateObjects(eventInfo.Args);
+                    });
+                }
+                break;
+            case APIElementType.FUNCTION:
+            case APIElementType.C_FUNCTION:
+                if (doc.Functions.TryGetValue(element.Id, out EsoUIFunction func))
+                {
+                    actions.Add(() =>
+                    {
+                        SelectedFunctionDetails = func;
+                        UpdateObjects(func.Args);
+                        UpdateObjects(func.Returns);
+                    });
+                }
+                break;
+            case APIElementType.ENUM_CONSTANT:
+                actions.Add(() => SelectedGlobalDetails = new EsoUIGlobal { Name = element.Name, ParentName = element.Parent });
 
-                        IEnumerable<string> usedBy = GetUsedByParallel(element.Parent);
+                IEnumerable<string> usedBy = GetUsedBy(element.Parent);
 
-                        if (doc.Globals.TryGetValue(element.Parent, out ICollection<EsoUIEnumValue> enumValues))
-                        {
-                            actions.Add(() => SelectedGlobalEnum = new EsoUIEnum { Values = enumValues, Name = element.Name, UsedBy = usedBy });
-                        }
-
-                        break;
-                    case APIElementType.ENUM_TYPE:
-                        actions.Add(() => SelectedEnumName = new EsoUIGlobal { Name = element.Name });
-
-                        IEnumerable<string> eusedBy = GetUsedByParallel(element.Id);
-
-                        if (doc.Globals.TryGetValue(element.Id, out ICollection<EsoUIEnumValue> enumTypes))
-                        {
-                            actions.Add(() => { SelectedGlobalEnum = new EsoUIEnum { Values = enumTypes, Name = element.Name, UsedBy = eusedBy }; });
-                        }
-
-                        break;
-                    case APIElementType.CONSTANT:
-                        if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue constantValue))
-                        {
-                            actions.Add(() => SelectedConstantDetails = constantValue);
-                        }
-                        else if (doc.Globals.TryGetValue("Globals", out ICollection<EsoUIEnumValue> globalList))
-                        {
-                            EsoUIEnumValue constant = globalList.SingleOrDefault(g => g.Name == element.Id);
-
-                            if (constant != null)
-                            {
-                                EsoUIConstantValue cvalue = new EsoUIConstantValue(constant.Name, new EsoUIGlobalValue { DisplayValue = constant.Value, Name = constant.Name });
-                                actions.Add(() => SelectedConstantDetails = cvalue);
-                            }
-                        }
-                        break;
-                    case APIElementType.SI_GLOBAL:
-                    case APIElementType.GLOBAL:
-                        if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue globalValue))
-                        {
-                            if (element.ElementType == APIElementType.SI_GLOBAL && doc.SI_Lookup.TryGetValue(element.Id, out string stringValue))
-                            {
-                                globalValue.StringValue = stringValue;
-                            }
-
-                            actions.Add(() => SelectedConstantDetails = globalValue);
-                        }
-                        break;
-                    case APIElementType.C_OBJECT_TYPE:
-                    case APIElementType.OBJECT_TYPE:
-                        if (doc.Objects.TryGetValue(element.Id, out EsoUIObject esoUIObject))
-                        {
-                            actions.Add(() => SelectedObjectDetails = esoUIObject);
-                        }
-                        break;
-                    case APIElementType.C_OBJECT_METHOD:
-                    case APIElementType.OBJECT_METHOD:
-                        if (doc.Objects.TryGetValue(element.Parent, out EsoUIObject parent))
-                        {
-                            if (parent.Functions.TryGetValue(element.Id, out EsoUIFunction function))
-                            {
-                                actions.Add(() => SelectedMethodDetails = function);
-                            }
-                        }
-                        break;
-                    case APIElementType.INSTANCE_NAME:
-                        if (doc.InstanceNames.TryGetValue(element.Id, out EsoUIInstance instanceName))
-                        {
-                            actions.Add(() => SelectedInstanceDetails = instanceName);
-                        }
-                        break;
+                if (doc.Globals.TryGetValue(element.Parent, out ICollection<EsoUIEnumValue> enumValues))
+                {
+                    actions.Add(() => SelectedGlobalEnum = new EsoUIEnum { Values = enumValues, Name = element.Name, UsedBy = usedBy });
                 }
 
-                if (actions.Count > 0)
+                break;
+            case APIElementType.ENUM_TYPE:
+                actions.Add(() => SelectedEnumName = new EsoUIGlobal { Name = element.Name });
+
+                IEnumerable<string> enumTypeUsedBy = GetUsedBy(element.Id);
+
+                if (doc.Globals.TryGetValue(element.Id, out ICollection<EsoUIEnumValue> enumTypes))
                 {
-                    foreach (Action action in actions)
+                    actions.Add(() => SelectedGlobalEnum = new EsoUIEnum { Values = enumTypes, Name = element.Name, UsedBy = enumTypeUsedBy });
+                }
+
+                break;
+            case APIElementType.CONSTANT:
+                if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue constantValue))
+                {
+                    actions.Add(() => SelectedConstantDetails = constantValue);
+                }
+                else if (doc.Globals.TryGetValue("Globals", out ICollection<EsoUIEnumValue> globalList))
+                {
+                    EsoUIEnumValue constant = globalList.SingleOrDefault(g => g.Name == element.Id);
+
+                    if (constant != null)
                     {
-                        _dialogService.RunOnMainThread(action);
+                        EsoUIConstantValue cvalue = new EsoUIConstantValue(constant.Name, new EsoUIGlobalValue { DisplayValue = constant.Value, Name = constant.Name });
+                        actions.Add(() => SelectedConstantDetails = cvalue);
                     }
                 }
+                break;
+            case APIElementType.SI_GLOBAL:
+            case APIElementType.GLOBAL:
+                if (doc.Constants.TryGetValue(element.Id, out EsoUIConstantValue globalValue))
+                {
+                    if (element.ElementType == APIElementType.SI_GLOBAL && doc.SI_Lookup.TryGetValue(element.Id, out string stringValue))
+                    {
+                        globalValue.StringValue = stringValue;
+                    }
+
+                    actions.Add(() => SelectedConstantDetails = globalValue);
+                }
+                break;
+            case APIElementType.C_OBJECT_TYPE:
+            case APIElementType.OBJECT_TYPE:
+                if (doc.Objects.TryGetValue(element.Id, out EsoUIObject esoUIObject))
+                {
+                    actions.Add(() => SelectedObjectDetails = esoUIObject);
+                }
+                break;
+            case APIElementType.C_OBJECT_METHOD:
+            case APIElementType.OBJECT_METHOD:
+                if (doc.Objects.TryGetValue(element.Parent, out EsoUIObject parent)
+                    && parent.Functions.TryGetValue(element.Id, out EsoUIFunction function))
+                {
+                    actions.Add(() => SelectedMethodDetails = function);
+                }
+                break;
+            case APIElementType.INSTANCE_NAME:
+                if (doc.InstanceNames.TryGetValue(element.Id, out EsoUIInstance instanceName))
+                {
+                    actions.Add(() => SelectedInstanceDetails = instanceName);
+                }
+                break;
+        }
+
+        if (!token.IsCancellationRequested)
+        {
+            foreach (Action action in actions)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                _dialogService.RunOnMainThread(action);
             }
-        }, _selectedElementTokenSource.Token);
+        }
+    }
+
+    private static CancellationToken ResetCancellationTokenSource(ref CancellationTokenSource cancellationTokenSource)
+    {
+        cancellationTokenSource?.Cancel();
+        cancellationTokenSource?.Dispose();
+        cancellationTokenSource = new CancellationTokenSource();
+        return cancellationTokenSource.Token;
     }
 
     private void SetSearchAlgorithm()
@@ -554,7 +632,7 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
 
         if (selectedAlgorithmName != _currentAlgorithmName)
         {
-            Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetPropertyValue("Name") == selectedAlgorithmName);
+            Type algorithm = _searchAlgorithms.FirstOrDefault(a => a.GetStaticPropertyValue("Name") == selectedAlgorithmName);
             _searchAlgorithm = Activator.CreateInstance(algorithm) as ISearchAlgorithm;
             _currentAlgorithmName = selectedAlgorithmName;
         }
@@ -563,6 +641,11 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
     private bool HasMatchingArgument(APIElement element, string value)
     {
         EsoUIDocumentation docs = _esoDocumentationService.Documentation;
+
+        if (docs == null)
+        {
+            return false;
+        }
 
         switch (element.ElementType)
         {
@@ -594,19 +677,104 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         return false;
     }
 
+    private bool HasMatchingValue(APIElement element, string value)
+    {
+        EsoUIDocumentation docs = _esoDocumentationService.Documentation;
+
+        if (docs == null || string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        switch (element.ElementType)
+        {
+            case APIElementType.CONSTANT:
+            case APIElementType.GLOBAL:
+            case APIElementType.SI_GLOBAL:
+                if (docs.Constants.TryGetValue(element.Id, out EsoUIConstantValue constantValue))
+                {
+                    return (constantValue.Value?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false)
+                        || (constantValue.StringValue?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false);
+                }
+
+                if (docs.Globals.TryGetValue("Globals", out ICollection<EsoUIEnumValue> globals))
+                {
+                    return globals.Any(global => global.Name == element.Id && (global.Value?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+                }
+
+                break;
+            case APIElementType.ENUM_CONSTANT:
+                if (docs.Globals.TryGetValue(element.Parent, out ICollection<EsoUIEnumValue> enumValues))
+                {
+                    return enumValues.Any(global => global.Name == element.Id && (global.Value?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+                }
+
+                break;
+            case APIElementType.ENUM_TYPE:
+                if (docs.Globals.TryGetValue(element.Id, out ICollection<EsoUIEnumValue> enumTypeValues))
+                {
+                    return enumTypeValues.Any(global => global.Value?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false);
+                }
+
+                break;
+        }
+
+        return false;
+    }
+
+    private void UpdateStatus(IReadOnlyCollection<APIElement> filteredItems)
+    {
+        Status = new StatusInformation
+        {
+            APIItems = filteredItems.Count,
+            APIVersion = _esoDocumentationService.Documentation?.ApiVersion ?? 0,
+            CFunctionItems = filteredItems.Count(f => f.ElementType == APIElementType.C_FUNCTION),
+            CMethodItems = filteredItems.Count(f => f.ElementType == APIElementType.C_OBJECT_METHOD),
+            CObjectItems = filteredItems.Count(f => f.ElementType == APIElementType.C_OBJECT_TYPE),
+            ConstantItems = filteredItems.Count(f => f.ElementType == APIElementType.CONSTANT),
+            EnumConstants = filteredItems.Count(g => g.ElementType == APIElementType.ENUM_CONSTANT),
+            EnumTypes = filteredItems.Count(g => g.ElementType == APIElementType.ENUM_TYPE),
+            EventItems = filteredItems.Count(e => e.ElementType == APIElementType.EVENT),
+            FunctionItems = filteredItems.Count(f => f.ElementType == APIElementType.FUNCTION),
+            GlobalInstanceItems = filteredItems.Count(f => f.ElementType == APIElementType.INSTANCE_NAME),
+            MethodItems = filteredItems.Count(f => f.ElementType == APIElementType.OBJECT_METHOD),
+            ObjectItems = filteredItems.Count(f => f.ElementType == APIElementType.OBJECT_TYPE),
+            SIGlobalItems = filteredItems.Count(f => f.ElementType == APIElementType.SI_GLOBAL),
+        };
+    }
+
+    private void ClearFilteredItems()
+    {
+        FilteredItems = [];
+        UpdateStatus(FilteredItems);
+    }
+
+    private void ApplyFilteredItems(IReadOnlyList<APIElement> filteredItems)
+    {
+        FilteredItems = new ObservableCollection<APIElement>(filteredItems);
+        UpdateStatus(FilteredItems);
+    }
+
+    private async Task<List<APIElement>> FilterKeywordsAsync(IEnumerable<APIElement> keywordList, string filter, CancellationToken cancellationToken)
+    {
+        return await Task.Run(() => FilterKeywords(keywordList, filter).ToList(), cancellationToken);
+    }
+
     private IOrderedEnumerable<APIElement> FilterKeywords(IEnumerable<APIElement> keywordList, string filter)
     {
+        IEnumerable<APIElement> keywords = keywordList ?? [];
+        EsoUIDocumentation documentation = _esoDocumentationService.Documentation;
+
         if (string.IsNullOrWhiteSpace(filter))
         {
-            return keywordList.Order();
+            return keywords.Order();
         }
 
         SetSearchAlgorithm();
 
         if (filter.StartsWith('@'))
         {
-            // look for any functions/events that accept the filter as an argument
-            return AllItems
+            return (AllItems ?? [])
                 .Where(d =>
                     d.Value.ElementType == APIElementType.C_FUNCTION ||
                     d.Value.ElementType == APIElementType.C_OBJECT_METHOD ||
@@ -617,72 +785,61 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
                 .Where(v => HasMatchingArgument(v, filter.Substring(1)))
                 .OrderBy(v => v.Name);
         }
-        else if (filter.StartsWith('$'))
+
+        if (filter.StartsWith('$'))
         {
-            // look for any SI global value that contains the text following $
-            return AllItems
+            return (AllItems ?? [])
                 .Where(d =>
                     d.Value.ElementType == APIElementType.SI_GLOBAL &&
-                        _esoDocumentationService.Documentation.SI_Lookup.TryGetValue(d.Value.Name, out string value) &&
-                        value.Contains(filter.Substring(1), StringComparison.OrdinalIgnoreCase)
-                )
+                    documentation?.SI_Lookup != null &&
+                    documentation.SI_Lookup.TryGetValue(d.Value.Name, out string value) &&
+                    value.Contains(filter.Substring(1), StringComparison.OrdinalIgnoreCase))
                 .Select(s => s.Value)
                 .OrderBy(v => v.Name);
         }
 
-        // normal search
-        return _searchAlgorithm.Search(filter, keywordList);
+        if (filter.StartsWith('='))
+        {
+            return (AllItems ?? [])
+                .Select(d => d.Value)
+                .Where(v => HasMatchingValue(v, filter.Substring(1)))
+                .OrderBy(v => v.Name);
+        }
+
+        return _searchAlgorithm.Search(filter, keywords);
     }
 
-    CancellationTokenSource token;
-
-    private Task FilterItemsAsync()
+    private async Task FilterItemsAsync()
     {
-        if (token != null && !token.IsCancellationRequested)
+        CancellationToken cancellationToken = ResetCancellationTokenSource(ref _filterItemsTokenSource);
+
+        try
         {
-            token.Cancel();
-        }
+            await Task.Delay(FilterDebounceDelay, cancellationToken);
 
-        token = new CancellationTokenSource();
+            IReadOnlyList<APIElement> allItems = AllItems?.Select(i => i.Value).ToList();
 
-        _ = Task.Run(() =>
-        {
-            string searchQuery = _filterText;
-            Thread.Sleep(300);
-
-            if (!token.IsCancellationRequested)
+            if (allItems == null || allItems.Count == 0)
             {
-                if (searchQuery == _filterText)
-                {
-                    IOrderedEnumerable<APIElement> filtered = FilterKeywords(AllItems.Select(i => i.Value), FilterText);
-                    _dialogService.RunOnMainThread(() =>
-                    {
-                        FilteredItems = new ObservableCollection<APIElement>(filtered);
-                        Status = new StatusInformation
-                        {
-                            APIItems = _filteredItems.Count,
-                            APIVersion = _esoDocumentationService.Documentation.ApiVersion,
-                            CFunctionItems = _filteredItems.Where(f => f.ElementType == APIElementType.C_FUNCTION).Count(),
-                            CMethodItems = _filteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_METHOD).Count(),
-                            CObjectItems = _filteredItems.Where(f => f.ElementType == APIElementType.C_OBJECT_TYPE).Count(),
-                            ConstantItems = _filteredItems.Where(f => f.ElementType == APIElementType.CONSTANT).Count(),
-                            EnumConstants = _filteredItems.Where(g => g.ElementType == APIElementType.ENUM_CONSTANT).Count(),
-                            EnumTypes = _filteredItems.Where(g => g.ElementType == APIElementType.ENUM_TYPE).Count(),
-                            EventItems = _filteredItems.Where(e => e.ElementType == APIElementType.EVENT).Count(),
-                            FunctionItems = _filteredItems.Where(f => f.ElementType == APIElementType.FUNCTION).Count(),
-                            GlobalInstanceItems = _filteredItems.Where(f => f.ElementType == APIElementType.INSTANCE_NAME).Count(),
-                            MethodItems = _filteredItems.Where(f => f.ElementType == APIElementType.OBJECT_METHOD).Count(),
-                            ObjectItems = _filteredItems.Where(f => f.ElementType == APIElementType.OBJECT_TYPE).Count(),
-                            SIGlobalItems = _filteredItems.Where(f => f.ElementType == APIElementType.SI_GLOBAL).Count(),
-                        };
-                    });
-                }
+                _dialogService.RunOnMainThread(ClearFilteredItems);
+                return;
             }
-        }
-        , token.Token);
 
-        return Task.CompletedTask;
+            string filterText = FilterText ?? string.Empty;
+            List<APIElement> filtered = await FilterKeywordsAsync(allItems, filterText, cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _dialogService.RunOnMainThread(() => ApplyFilteredItems(filtered));
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
+
 
     public ICommand SearchGithubCommand => new RelayCommand(() => _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://github.com/esoui/esoui/search?q={_selectedElement.Name}&type=code")));
     public ICommand SearchWikiCommand => new RelayCommand(() =>
@@ -713,42 +870,33 @@ public partial class HomeViewModel(IDialogService _dialogService, IESODocumentat
         _ = Windows.System.Launcher.LaunchUriAsync(new Uri($"https://wiki.esoui.com/{subpath}{_selectedElement.Name}"));
     });
 
-    private IEnumerable<string> GetUsedByParallel(string enumName)
+    private IEnumerable<string> GetUsedBy(string enumName)
     {
-        ConcurrentBag<string> usedBy = [];
+        EsoUIDocumentation documentation = _esoDocumentationService.Documentation;
 
-        Parallel.ForEach(_esoDocumentationService.Documentation.Events, item =>
+        if (documentation == null)
         {
-            Parallel.ForEach(item.Value.Args, arg =>
-            {
-                if (arg.Type.Name == enumName)
-                {
-                    usedBy.Add(item.Key);
-                }
-            });
-        });
+            return [];
+        }
 
-        Parallel.ForEach(_esoDocumentationService.Documentation.Functions, item =>
+        HashSet<string> usedBy = [];
+
+        foreach (KeyValuePair<string, EsoUIEvent> item in documentation.Events)
         {
-            Parallel.ForEach(item.Value.Args, arg =>
+            if (item.Value.Args.Any(arg => arg.Type.Name == enumName))
             {
-                if (arg.Type.Name == enumName)
-                {
-                    usedBy.Add(item.Key);
-                }
-            });
+                usedBy.Add(item.Key);
+            }
+        }
 
-            Parallel.ForEach(item.Value.Returns, retval =>
+        foreach (KeyValuePair<string, EsoUIFunction> item in documentation.Functions)
+        {
+            if (item.Value.Args.Any(arg => arg.Type.Name == enumName)
+                || item.Value.Returns.Any(retval => retval.Values.Any(ret => ret.Type.Name == enumName)))
             {
-                Parallel.ForEach(retval.Values, ret =>
-                {
-                    if (ret.Type.Name == enumName && !usedBy.Contains(item.Key))
-                    {
-                        usedBy.Add(item.Key);
-                    }
-                });
-            });
-        });
+                usedBy.Add(item.Key);
+            }
+        }
 
         return usedBy.Order();
     }

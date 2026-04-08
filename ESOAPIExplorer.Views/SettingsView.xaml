@@ -24,9 +24,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <c:BusyOverlay Grid.RowSpan="2" Grid.ColumnSpan="2" IsActive="{Binding IsBusy}" Message="{Binding BusyMessage}" />
+
         <!-- Header -->
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-            <TextBlock Text="Settings" FontSize="32" Margin="0,10,0,20" />
+            <TextBlock Text="Settings" FontSize="32" Margin="0,10,0,20" Foreground="{StaticResource ESOAccentBrush}" />
         </StackPanel>
 
         <Image Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
@@ -53,6 +55,7 @@
 
             <!-- Rescan API -->
             <TextBlock Text="Rescan API" Margin="0,0,0,10" />
+            <TextBlock Text="Reload the selected documentation source, rebuild the cache, and refresh the home index." Margin="0,0,0,10" TextWrapping="WrapWholeWords" Foreground="{StaticResource ESOSecondaryTextBrush}" />
             <Button Content="Rescan"
                     Command="{Binding Rescan}"
                     Margin="0,0,0,20"
@@ -64,6 +67,9 @@
             <!-- Last Scan -->
             <TextBlock Text="Last Scan" Margin="0,0,0,10" />
             <TextBlock Text="{Binding LastScanDateTime}" Margin="0,0,0,20" />
+
+            <TextBlock Text="Status" Margin="0,0,0,10" />
+            <TextBlock Text="{Binding StatusMessage}" Margin="0,0,0,20" TextWrapping="WrapWholeWords" Foreground="{StaticResource ESOSecondaryTextBrush}" />
 
             <!-- Theme -->
             <TextBlock Text="Theme" Margin="0,0,0,10" />

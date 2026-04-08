@@ -63,6 +63,8 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <c:BusyOverlay Grid.Row="0" Grid.ColumnSpan="2" IsActive="{Binding IsBusy}" Message="{Binding BusyMessage}" />
+
         <!-- Left: TextBox and ListBox -->
         <Grid Grid.Column="0" Grid.Row="0" MinWidth="500" >
             <Grid.RowDefinitions>
@@ -85,7 +87,7 @@
                         ToolTipService.ToolTip="Back"
                         Grid.Column="0" />
                 <!-- Filter TextBox -->
-                <AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" PlaceholderText="Filter items..." Margin="5,0,5,0" Grid.Column="1" />
+                <AutoSuggestBox x:Name="FilterTextBox" Text="{Binding FilterText, Mode=TwoWay}" PlaceholderText="Filter items, @arguments, $strings, =values..." Margin="5,0,5,0" Grid.Column="1" />
             </Grid>
             <!-- Full Height ListBox -->
             <ListView Name="MainListView"
@@ -110,7 +112,7 @@
         </Grid>
 
         <!-- Right: Split Horizontally -->
-        <Grid Grid.Column="1" Grid.Row="0" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
+        <Grid Grid.Column="1" Grid.Row="0" Margin="16,0,0,0" Visibility="{Binding SelectedElement, Converter={StaticResource NotNullToVisibilityConverter}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -133,7 +135,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Grid.Row="0" 
                            Text="{Binding SelectedElement.Name}"
-                           Foreground ="Goldenrod"
+                           Foreground="{StaticResource ESOAccentBrush}"
                            Margin="5" 
                            FontSize="32" 
                            FontWeight="Bold" 
@@ -375,11 +377,11 @@
                                     <TextBlock Text="Type" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="1"/>
                                     <TextBlock Text="Value" FontWeight="Bold"  Foreground="{ThemeResource SystemBaseHighColor}" Margin="0" Grid.Column="2"/>
                                 </Grid>
-                                <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
+                                 <ListView Grid.Row="1" MaxHeight="300" x:Name="EnumListView"
                                   ItemsSource="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EnumToSortedEnumConverter}}"
                                   ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                                   ItemTemplate="{StaticResource EnumItemTemplate}"
-                                  SelectedIndex="{Binding SelectedEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                   SelectedItem="{Binding SelectedEnumValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Visibility="{Binding SelectedGlobalEnum.Values, Converter={StaticResource EmptyListToVisibilityConverter}}">
                                     <ListView.Resources>
                                         <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{ThemeResource SystemChromeHighColor}" />

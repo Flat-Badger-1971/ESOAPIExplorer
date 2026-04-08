@@ -88,6 +88,11 @@
             <converters:EmptyListToTextConverter x:Key="EmptyListToTextConverter"/>
             <converters:SingleValueToListConverter x:Key="SingleValueToListConverter"/>
             <converters:ConstantToNumberConverter x:Key="ConstantToValueConverter"/>
+            <SolidColorBrush x:Key="ESOAccentBrush" Color="{ThemeResource BaseGreen}" />
+            <SolidColorBrush x:Key="ESOSectionHeaderBrush" Color="{ThemeResource BaseBrand}" />
+            <SolidColorBrush x:Key="ESOSecondaryTextBrush" Color="{ThemeResource SystemBaseMediumColor}" />
+            <SolidColorBrush x:Key="ESOOverlayBackgroundBrush" Color="#AA111827" />
+            <SolidColorBrush x:Key="ESOOverlayForegroundBrush" Color="{ThemeResource BaseWhite}" />
             <converters:StringToValueConverter x:Key="APITypeToColourConverter" ReturnType="SolidColorBrush">
                 <converters:StringToValueConverter.Values>
                     <SolidColorBrush Color="#FFB86D0B" x:Key="C_FUNCTION"/>

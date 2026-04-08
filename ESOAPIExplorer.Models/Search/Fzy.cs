@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 // Fzy search algorithm converted from a lua implementation of the original C code.
 // Original code: https://github.com/swarn/fzy-lua/blob/main/docs/fzy.md
@@ -37,16 +35,16 @@ namespace ESOAPIExplorer.Models.Search
         /// <returns>An ordered enumerable of API elements that match the search term.</returns>
         public IOrderedEnumerable<APIElement> Search(string searchTerm, IEnumerable<APIElement> targets)
         {
-            ConcurrentBag<FuzzySearchResult> results = [];
+            List<FuzzySearchResult> results = [];
 
-            Parallel.ForEach(targets, target =>
+            foreach (APIElement target in targets)
             {
                 if (HasMatch(searchTerm, target.Name))
                 {
                     double score = Score(searchTerm, target.Name);
                     results.Add(new FuzzySearchResult { Target = target, Score = score });
                 }
-            });
+            }
 
             return results
                 .OrderByDescending(result => result.Score)
@@ -284,7 +282,7 @@ namespace ESOAPIExplorer.Models.Search
         {
             List<FilterResult> result = [];
 
-            Parallel.For(0, haystacks.Count, i =>
+            for (int i = 0; i < haystacks.Count; i++)
             {
                 string line = haystacks[i];
 
@@ -293,7 +291,7 @@ namespace ESOAPIExplorer.Models.Search
                     PositionResult positionsResult = Positions(needle, line, caseSensitive);
                     result.Add(new FilterResult(i, positionsResult.Positions, positionsResult.Score));
                 }
-            });
+            }
 
             return result;
         }

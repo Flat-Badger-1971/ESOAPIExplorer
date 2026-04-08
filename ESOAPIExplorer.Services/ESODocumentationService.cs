@@ -1,5 +1,4 @@
 using ESOAPIExplorer.Models;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,12 +9,13 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace ESOAPIExplorer.Services;
 
 public class ESODocumentationService : IESODocumentationService
 {
+    private const string CacheFileName = "apiCache.br";
+
     private string FileName { get; set; }
     private string CurrentLine { get; set; }
     private ICollection<EsoUIEnumValue> CurrentEnum { get; set; }
@@ -25,160 +25,183 @@ public class ESODocumentationService : IESODocumentationService
     public bool UseCache { get; set; } = true;
 
     private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
-    private readonly FileOpenPicker _FilePicker;
+    private readonly IFilePickerService _FilePickerService;
     private readonly ILuaObjectScanner _LuaObjectScanner;
     private readonly IRegexService _RegexService;
 
     public EsoUIDocumentation Documentation { get; set; }
 
-    public ESODocumentationService(ILuaObjectScanner luaObjectScanner, IRegexService regexService)
+    public ESODocumentationService(ILuaObjectScanner luaObjectScanner, IRegexService regexService, IFilePickerService filePickerService)
     {
-        _FilePicker = new FileOpenPicker
-        {
-            ViewMode = PickerViewMode.List,
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-        };
-
-        // Get the current window's HWND by passing in the Window object
-        Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
-        nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
-
-        // Associate the HWND with the file picker
-        WinRT.Interop.InitializeWithWindow.Initialize(_FilePicker, hwnd);
-
-        _FilePicker.FileTypeFilter.Add(".txt");
+        _FilePickerService = filePickerService;
         _LuaObjectScanner = luaObjectScanner;
         _RegexService = regexService;
     }
 
     public async Task InitialiseAsync()
     {
-        string path = $"{ApplicationData.Current.LocalCacheFolder.Path}\\apiCache.br";
+        await LoadDocumentationAsync(forceRefresh: false, clearCache: false);
+    }
+
+    public async Task ReloadAsync(bool clearCache = false)
+    {
+        await LoadDocumentationAsync(forceRefresh: true, clearCache: clearCache);
+    }
+
+    private async Task LoadDocumentationAsync(bool forceRefresh, bool clearCache)
+    {
+        string cachePath = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, CacheFileName);
 
 #if DEBUG
-         UseCache = false;
+        UseCache = false;
 #endif
-        try
+        Documentation = null;
+
+        if (clearCache)
         {
-            // do we have cached data
-            if (UseCache && File.Exists(path))
-            {
-                using (FileStream cacheFile = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    using (MemoryStream data = new MemoryStream())
-                    {
-                        using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
-                        {
-                            decompressor.CopyTo(data);
-                        }
+            DeleteCacheFile(cachePath);
+        }
 
-                        byte[] byteData = data.ToArray();
-                        Documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
-                    };
-                };
+        if (!forceRefresh && UseCache && File.Exists(cachePath))
+        {
+            try
+            {
+                Documentation = LoadCachedDocumentation(cachePath);
+                ValidateDocumentation(Documentation, "cached documentation");
+                return;
             }
-            else
+            catch (Exception ex) when (IsRecoverableCacheException(ex))
             {
-                Documentation = await GetDocumentationAsync();
-
-                if (Documentation != null)
-                {
-                    // cache the documentation
-                    if (UseCache)
-                    {
-                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(Documentation);
-
-                        using (FileStream cacheFile = new FileStream(path, FileMode.Create))
-                        {
-                            using (BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest))
-                            {
-                                compressor.Write(data, 0, data.Length);
-                            }
-                        }
-                    }
-                }
+                DeleteCacheFile(cachePath);
             }
         }
-        catch (Exception e)
+
+        try
         {
-            Console.WriteLine(e.ToString());
+            EsoUIDocumentation documentation = await GetDocumentationAsync();
+            ValidateDocumentation(documentation, "parsed documentation");
+            Documentation = documentation;
+
+            if (UseCache)
+            {
+                SaveCachedDocumentation(cachePath, documentation);
+            }
+        }
+        catch (Exception ex)
+        {
+            Documentation = null;
+            throw new InvalidOperationException("Failed to load ESO API documentation. Select a valid documentation text file and ensure the ESO UI source files are available.", ex);
+        }
+    }
+
+    private static EsoUIDocumentation LoadCachedDocumentation(string cachePath)
+    {
+        using FileStream cacheFile = new FileStream(cachePath, FileMode.Open, FileAccess.Read);
+        using MemoryStream data = new MemoryStream();
+        using (BrotliStream decompressor = new BrotliStream(cacheFile, CompressionMode.Decompress))
+        {
+            decompressor.CopyTo(data);
+        }
+
+        byte[] byteData = data.ToArray();
+        EsoUIDocumentation documentation = JsonSerializer.Deserialize<EsoUIDocumentation>(byteData);
+
+        return documentation;
+    }
+
+    private static void SaveCachedDocumentation(string cachePath, EsoUIDocumentation documentation)
+    {
+        ValidateDocumentation(documentation, "parsed documentation");
+
+        byte[] data = JsonSerializer.SerializeToUtf8Bytes(documentation);
+
+        using FileStream cacheFile = new FileStream(cachePath, FileMode.Create, FileAccess.Write);
+        using BrotliStream compressor = new BrotliStream(cacheFile, CompressionLevel.Fastest);
+        compressor.Write(data, 0, data.Length);
+    }
+
+    private static void DeleteCacheFile(string cachePath)
+    {
+        try
+        {
+            if (File.Exists(cachePath))
+            {
+                File.Delete(cachePath);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private static bool IsRecoverableCacheException(Exception exception)
+    {
+        return exception is InvalidDataException
+            or IOException
+            or JsonException
+            or NotSupportedException
+            or UnauthorizedAccessException
+            or InvalidOperationException;
+    }
+
+    private static void ValidateDocumentation(EsoUIDocumentation documentation, string source)
+    {
+        if (documentation == null)
+        {
+            throw new InvalidOperationException($"The {source} is empty.");
+        }
+
+        if (documentation.Events == null
+            || documentation.Functions == null
+            || documentation.Globals == null
+            || documentation.Objects == null
+            || documentation.Constants == null
+            || documentation.InstanceNames == null)
+        {
+            throw new InvalidOperationException($"The {source} is missing one or more required collections.");
+        }
+
+        if (documentation.ApiVersion <= 0)
+        {
+            throw new InvalidOperationException($"The {source} does not contain a valid API version.");
+        }
+
+        if (!documentation.Objects.ContainsKey("ZO_CallbackObject"))
+        {
+            throw new InvalidOperationException($"The {source} does not contain the required 'ZO_CallbackObject' entry.");
         }
     }
 
     private ConcurrentDictionary<string, string> GetEsoStrings(string path)
     {
         ConcurrentDictionary<string, string> lookup = [];
-        BlockingCollection<string> lines = [];
 
-        Task readLines = Task.Run(() =>
+        foreach (string line in File.ReadLines(path))
         {
-            using (StreamReader reader = new StreamReader(path))
-            {
-                string line;
+            Match matches = _RegexService.EsoStringMatcher().Match(line);
 
-                while ((line = reader.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
+            if (matches.Success)
+            {
+                lookup.TryAdd(matches.Groups[2].Value, matches.Groups[1].Value);
             }
-
-            lines.CompleteAdding();
-        });
-
-
-        Task processLines = Task.Run(() =>
-        {
-            Parallel.ForEach(lines.GetConsumingEnumerable(), line =>
-            {
-                Match matches = _RegexService.EsoStringMatcher().Match(line);
-
-                if (matches.Success)
-                {
-                    lookup.TryAdd(matches.Groups[2].Value, matches.Groups[1].Value);
-                }
-            });
-        });
-
-        Task.WaitAll(readLines, processLines);
+        }
 
         return lookup;
     }
 
     private ConcurrentDictionary<string, string> GetLocaleStrings(string path)
     {
-        BlockingCollection<string> lines = [];
         ConcurrentDictionary<string, string> lookup = [];
 
-        Task readLines = Task.Run(() =>
+        foreach (string line in File.ReadLines(path))
         {
-            using (StreamReader reader = new StreamReader(path))
-            {
-                string line;
+            Match matches = _RegexService.LocaleStringMatcher().Match(line);
 
-                while ((line = reader.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
+            if (matches.Success)
+            {
+                lookup.TryAdd(matches.Groups[1].Value, matches.Groups[2].Value);
             }
-
-            lines.CompleteAdding();
-        });
-
-
-        Task processLines = Task.Run(() =>
-        {
-            Parallel.ForEach(lines.GetConsumingEnumerable(), line =>
-            {
-                Match matches = _RegexService.LocaleStringMatcher().Match(line);
-
-                if (matches.Success)
-                {
-                    lookup.TryAdd(matches.Groups[1].Value, matches.Groups[2].Value);
-                }
-            });
-        });
-
-        Task.WaitAll(readLines, processLines);
+        }
 
         return lookup;
     }
@@ -187,18 +210,46 @@ public class ESODocumentationService : IESODocumentationService
     {
         string path = await GetPathAsync();
         string directoryPath = Path.GetDirectoryName(path);
+
+        if (string.IsNullOrWhiteSpace(directoryPath))
+        {
+            throw new InvalidOperationException("The selected documentation file path is invalid.");
+        }
+
         string ingamePath = $"{directoryPath}\\esoui\\ingamelocalization\\LocalizeGeneratedStrings.lua";
         string localePath = $"{directoryPath}\\esoui\\lang\\en_client.lua";
 
         EsoUIDocumentation documentation = await ParseAsync(path);
+        ValidateDocumentation(documentation, "parsed documentation");
         _LuaObjectScanner.FolderPath = directoryPath;
-        _LuaObjectScanner.ScanFolderForLuaFunctions(documentation.Objects.First(o => o.Value.Name == "ZO_CallbackObject").Value);
+
+        if (!documentation.Objects.TryGetValue("ZO_CallbackObject", out EsoUIObject callbackObject))
+        {
+            throw new InvalidOperationException("The parsed documentation does not contain 'ZO_CallbackObject'.");
+        }
+
+        _LuaObjectScanner.ScanFolderForLuaFunctions(callbackObject);
         LuaScanResults luaobjects = _LuaObjectScanner.Results;
 
-        Parallel.ForEach(luaobjects.Functions, func => documentation.Functions.TryAdd(func.Name, func));
-        Parallel.ForEach(luaobjects.InstanceNames, name => documentation.InstanceNames.TryAdd(name.Name, name));
-        Parallel.ForEach(luaobjects.Objects, obj => documentation.Objects.TryAdd(obj.Name, obj));
-        Parallel.ForEach(luaobjects.Fragments, fragment => documentation.Fragments.TryAdd(fragment.Key, true));
+        foreach (EsoUIFunction func in luaobjects.Functions)
+        {
+            documentation.Functions.TryAdd(func.Name, func);
+        }
+
+        foreach (EsoUIInstance name in luaobjects.InstanceNames)
+        {
+            documentation.InstanceNames.TryAdd(name.Name, name);
+        }
+
+        foreach (EsoUIObject obj in luaobjects.Objects)
+        {
+            documentation.Objects.TryAdd(obj.Name, obj);
+        }
+
+        foreach (KeyValuePair<string, bool> fragment in luaobjects.Fragments)
+        {
+            documentation.Fragments.TryAdd(fragment.Key, true);
+        }
 
         documentation.SoundsPath = _LuaObjectScanner.SoundsPath;
 
@@ -214,67 +265,75 @@ public class ESODocumentationService : IESODocumentationService
         esoStrings.Clear();
         localeStrings.Clear();
 
-        // find constants
-        ConcurrentDictionary<string, EsoUIEnumValue> otherGlobals = [];
+        HashSet<string> globalKeys =
+        [
+            .. documentation.Globals.Keys,
+            .. documentation.Globals.SelectMany(item => item.Value.Select(detail => detail.Name))
+        ];
 
-        List<string> globalKeys = documentation.Globals
-            .SelectMany(item => item.Value.Select(detail => detail.Name))
-            .Concat(documentation.Globals.SelectMany(item => item.Value.Select(detail => item.Key)))
-            .ToList();
-
-        Parallel.ForEach(ConstantValues.Values, kvp =>
+        foreach (KeyValuePair<string, EsoUIGlobalValue> kvp in ConstantValues.Values)
         {
-            if (!globalKeys.Contains(kvp.Key))
+            if (globalKeys.Contains(kvp.Key))
             {
-                EsoUIEnumValue global = new EsoUIEnumValue(kvp.Key, kvp.Value);
-                EsoUIGlobalValue value = new EsoUIGlobalValue
-                {
-                    Code = $"{global.Name} = {global.Value}",
-                    DisplayValue = global.Value
-                };
-
-                switch (global.Type)
-                {
-                    case "number":
-                        if (double.TryParse(global.Value, out double doubleValue)) { value.DoubleValue = doubleValue; }
-                        break;
-                    case "integer":
-                        if (int.TryParse(global.Value, out int intValue)) { value.IntValue = intValue; }
-                        break;
-                    default:
-
-                        value.StringValue = global.Value;
-                        break;
-                }
-
-                documentation.Constants.TryAdd(global.Name, new EsoUIConstantValue(global.Name, value));
+                continue;
             }
-        });
+
+            EsoUIEnumValue global = new EsoUIEnumValue(kvp.Key, kvp.Value);
+            EsoUIGlobalValue value = new EsoUIGlobalValue
+            {
+                Code = $"{global.Name} = {global.Value}",
+                DisplayValue = global.Value
+            };
+
+            switch (global.Type)
+            {
+                case "number":
+                    if (double.TryParse(global.Value, out double doubleValue)) { value.DoubleValue = doubleValue; }
+                    break;
+                case "integer":
+                    if (int.TryParse(global.Value, out int intValue)) { value.IntValue = intValue; }
+                    break;
+                default:
+                    value.StringValue = global.Value;
+                    break;
+            }
+
+            documentation.Constants.TryAdd(global.Name, new EsoUIConstantValue(global.Name, value));
+        }
 
         return documentation;
     }
 
     private async Task<string> GetPathAsync()
     {
-        string path = _Settings.Values["last path"] as string;
-
-        if (string.IsNullOrEmpty(path))
+        while (true)
         {
-            StorageFile file = await _FilePicker.PickSingleFileAsync();
+            string path = _Settings.Values["last path"] as string;
 
-            if (file != null)
+            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
             {
-                _Settings.Values["last path"] = file.Path;
-                path = file.Path;
+                return path;
             }
-        }
-        else if (!File.Exists(path))
-        {
-            _Settings.Values["last path"] = null;
-            path = await GetPathAsync();
-        }
 
-        return path;
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                _Settings.Values["last path"] = null;
+            }
+
+            StorageFile file = await _FilePickerService.PickSingleFileAsync(new FileOpenPickerOptions
+            {
+                SuggestedStartLocation = PickerStartLocation.DocumentsLibrary,
+                CommitButtonText = "Select ESO API documentation",
+                FileTypeFilter = [".txt"]
+            });
+
+            if (file == null)
+            {
+                throw new InvalidOperationException("A valid ESO API documentation file must be selected to continue.");
+            }
+
+            _Settings.Values["last path"] = file.Path;
+        }
     }
 
     private bool LineStartsWith(string prefix) => CurrentLine.StartsWith(prefix);

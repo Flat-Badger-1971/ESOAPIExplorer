@@ -233,7 +233,7 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
                 foreach (string p in parameters.Split(','))
                 {
                     string pt = p.Replace(" : ", "_").Trim();
-                    func.AddArgument(pt, Utility.InferType(pt, _regexService));
+                    func.AddArgument(pt, LuaTypeInference.InferType(pt, _regexService));
                 }
             }
 
@@ -312,7 +312,7 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
         {
             foreach (string p in objectParameters)
             {
-                func.AddArgument(p.Trim(), Utility.InferType(p.Trim(), _regexService));
+                    func.AddArgument(p.Trim(), LuaTypeInference.InferType(p.Trim(), _regexService));
             }
         }
 
@@ -460,7 +460,7 @@ public class LuaObjectScannerService(IRegexService _regexService) : ILuaObjectSc
                         {
                             Index = returnIndex++,
                             Values = SplitReturnValues(returnBlock.ToString())
-                                .Select((split, index) => new EsoUIArgument(split, new EsoUIType(Utility.InferType(split, _regexService)), index + 1))
+                        .Select((split, index) => new EsoUIArgument(split, new EsoUIType(LuaTypeInference.InferType(split, _regexService)), index + 1))
                                 .ToList()
                         };
                         returns.Add(ret);

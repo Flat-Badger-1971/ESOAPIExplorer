@@ -1,16 +1,16 @@
 using ESOAPIExplorer.ViewModels;
+using ESOAPIExplorer.Views;
 using ESOAPIExplorer.Views.Dialogs;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using Window = Microsoft.UI.Xaml.Window;
 
 namespace ESOAPIExplorer.Services;
 
-public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDialogViewModel viewModel) : IDialogService
+public class DialogService(DispatcherQueue mainDispatcherQueue, MainWindow mainWindow, CustomMessageDialogViewModel viewModel) : IDialogService
 {
-    readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+    private readonly MainWindow _MainWindow = mainWindow;
     private readonly DispatcherQueue _MainDispatcherQueue = mainDispatcherQueue;
     private readonly CustomMessageDialogViewModel _ViewModel = viewModel;
 
@@ -34,7 +34,7 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
         positiveCallback ??= () => messageDialog.Hide();
         negativeCallback ??= () => messageDialog.Hide();
 
-        _ViewModel.ResponseEntered += (source, args) =>
+        EventHandler<bool> responseEnteredHandler = (source, args) =>
         {
             if (args)
             {
@@ -46,7 +46,16 @@ public class DialogService(DispatcherQueue mainDispatcherQueue, CustomMessageDia
             }
         };
 
-        await messageDialog.ShowAsync();
+        _ViewModel.ResponseEntered += responseEnteredHandler;
+
+        try
+        {
+            await messageDialog.ShowAsync();
+        }
+        finally
+        {
+            _ViewModel.ResponseEntered -= responseEnteredHandler;
+        }
     }
 
     public bool RunOnMainThread(Action action)

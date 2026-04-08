@@ -69,7 +69,7 @@ public static class CodeGenerator
         sb.AppendLine("    {");
         sb.AppendLine("        if (_Values == null)");
         sb.AppendLine("        {");
-        sb.AppendLine("            int initialCapacity = Utility.NextPrime(_NumEntries);");
+        sb.AppendLine("            int initialCapacity = PrimeNumberUtility.NextPrime(_NumEntries);");
         sb.AppendLine("            int concurrencyLevel = Environment.ProcessorCount * 2;");
         sb.AppendLine("            _Values = new ConcurrentDictionary<string, EsoUIGlobalValue>(concurrencyLevel, initialCapacity);");
         sb.AppendLine("            PopulateDictionary();");

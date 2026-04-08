@@ -4,6 +4,7 @@ using ESOAPIExplorer.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using Windows.ApplicationModel;
 
@@ -32,30 +33,36 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainWindow = new MainWindow();
-        MainWindow.AppWindow.SetIcon("Assets/Images/win32Icon.ico");
-        Container = RegisterDependencyInjection;
-
-        INavigationService navigation = Container.GetRequiredService<INavigationService>();
-        navigation.InitializeAsync();
         MainWindow.Activate();
+
+        try
+        {
+            MainWindow.AppWindow.SetIcon("Assets/Images/win32Icon.ico");
+            Container = BuildServiceProvider();
+
+            INavigationService navigation = Container.GetRequiredService<INavigationService>();
+            await navigation.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowStartupFailure(ex);
+        }
     }
 
-    private IServiceProvider RegisterDependencyInjection
+    private IServiceProvider BuildServiceProvider()
     {
-        get
-        {
-            ServiceCollection services = new ServiceCollection();
-            ConfigureServices(services);
-            services.AddSingleton<IConfiguration>(_ConfigurationRoot);
-            RegisterServices(services);
-            RegisterViews(services);
-            RegisterViewModels(services);
+        ServiceCollection services = new ServiceCollection();
+        ConfigureServices(services);
+        services.AddSingleton<IConfiguration>(_ConfigurationRoot);
+        services.AddSingleton((MainWindow)MainWindow);
+        services.AddSingleton<Window>(MainWindow);
+        RegisterServices(services);
+        RegisterViewModels(services);
 
-            return services.BuildServiceProvider();
-        }
+        return services.BuildServiceProvider();
     }
 
     private static void RegisterViewModels(ServiceCollection services)
@@ -70,17 +77,14 @@ public partial class App : Application
         services.AddTransient<ExportViewModel>();
     }
 
-    private static void RegisterViews(ServiceCollection services)
-    {
-        services.AddTransient<HomeView>();
-    }
-
     private void RegisterServices(ServiceCollection services)
     {
         //App Services
         services.AddSingleton(MainWindow.DispatcherQueue);
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IEventService, EventService>();
+        services.AddSingleton<IFilePickerService, PickerService>();
+        services.AddSingleton<IFolderPickerService, PickerService>();
         services.AddTransient<IDialogService, DialogService>();
         services.AddSingleton<IESODocumentationService, ESODocumentationService>();
         services.AddTransient<ILuaObjectScanner, LuaObjectScannerService>();
@@ -98,5 +102,38 @@ public partial class App : Application
             .AddJsonFile("appsettings.json", optional: false);
 
         _ConfigurationRoot = _ConfigurationManager.Build();
+    }
+
+    private static void ShowStartupFailure(Exception exception)
+    {
+        MainWindow.Content = new ScrollViewer
+        {
+            Content = new StackPanel
+            {
+                Spacing = 12,
+                Margin = new Thickness(24),
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = "Application startup failed",
+                        FontSize = 24,
+                    },
+                    new TextBlock
+                    {
+                        Text = exception.Message,
+                        TextWrapping = TextWrapping.Wrap,
+                    },
+                    new TextBox
+                    {
+                        Text = exception.ToString(),
+                        IsReadOnly = true,
+                        TextWrapping = TextWrapping.Wrap,
+                        AcceptsReturn = true,
+                        MinHeight = 240,
+                    }
+                }
+            }
+        };
     }
 }

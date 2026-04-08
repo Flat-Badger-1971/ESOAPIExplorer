@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using System.Threading;
 
 namespace ESOAPIExplorer.Controls;
 
@@ -31,9 +30,9 @@ public partial class ScrollableTextBlock : UserControl
     {
         _RootGrid = new Grid
         {
-            Background = new SolidColorBrush(Colors.Black),
-            Margin = new Thickness(10, 0, 10, 0),
-            Padding = new Thickness(10)
+            Background = Application.Current.Resources["SystemControlBackgroundChromeMediumLowBrush"] as Brush ?? new SolidColorBrush(Colors.Black),
+            Margin = new Thickness(12, 0, 12, 0),
+            Padding = new Thickness(12)
         };
 
         _ScrollViewer = new ScrollViewer
@@ -82,8 +81,7 @@ public partial class ScrollableTextBlock : UserControl
         if (d is ScrollableTextBlock control && control._TextBlock != null)
         {
             control._TextBlock.Text = e.NewValue as string;
-            Thread.Sleep(100);
-            control.UpdateTextBlockPadding();
+            control.DispatcherQueue.TryEnqueue(control.UpdateTextBlockPadding);
         }
     }
 }

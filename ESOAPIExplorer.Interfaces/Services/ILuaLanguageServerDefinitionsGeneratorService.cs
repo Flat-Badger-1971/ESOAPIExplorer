@@ -5,6 +5,6 @@ namespace ESOAPIExplorer.Services
 {
     public interface ILuaLanguageServerDefinitionsGeneratorService
     {
-        public Task Generate(StorageFolder folder);
+        public Task Generate(StorageFolder folder, bool generateDefinitionFiles = true, bool mergeDiagnosticsGlobals = false);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ESOAPIExplorer.Services;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,20 +8,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace ESOAPIExplorer.ViewModels;
 
 #pragma warning disable CA1416, CsWinRT1028
-public class SettingsViewModel(ILuaParserService luaParserService, IThemeService themeService) : ViewModelBase
+public class SettingsViewModel(ILuaParserService luaParserService, IThemeService themeService, IFilePickerService filePickerService, IESODocumentationService esoDocumentationService, IEventService eventService) : ViewModelBase
 {
-    private readonly Window _MainWindow = (Window)Application.Current.GetType().GetProperty("MainWindow").GetValue(Application.Current);
+    private const string SearchAlgorithmSettingKey = "SearchAlgorithm";
+    private const string ThemeNameSettingKey = "ThemeName";
+    private const string LastScanDateTimeSettingKey = "LastScanDateTime";
+
     private readonly ApplicationDataContainer _Settings = ApplicationData.Current.LocalSettings;
-    private FileOpenPicker _FileOpenPicker;
-    private FileSavePicker _FileSavePicker;
-    private ComboBoxItem _SelectedThemeName;
+    private string _SelectedThemeName;
     private int _SelectedAlgorithmIndex;
     private DateTime _LastScanDateTime;
+    private string _StatusMessage;
     private ObservableCollection<string> _Themes;
 
     public int SelectedAlgorithmIndex
@@ -32,7 +32,7 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
         {
             if (value > -1)
             {
-                _Settings.Values["SearchAlgorithm"] = SearchAlgorithmItemSource[value];
+                _Settings.Values[SearchAlgorithmSettingKey] = SearchAlgorithmItemSource[value];
                 SetProperty(ref _SelectedAlgorithmIndex, value);
             }
         }
@@ -40,13 +40,13 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
 
     public string SelectedThemeName
     {
-        get => _SelectedThemeName?.Content.ToString();
+        get => _SelectedThemeName;
         set
         {
             if (value != null)
             {
-                _Settings.Values["ThemeName"] = value;
-                SetProperty(ref _SelectedThemeName, new ComboBoxItem { Content = value });
+                _Settings.Values[ThemeNameSettingKey] = value;
+                SetProperty(ref _SelectedThemeName, value);
 
                 // change theme
                 if (Enum.TryParse(value, out ElementTheme theme))
@@ -62,9 +62,15 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
         get => _LastScanDateTime;
         set
         {
-            _Settings.Values["LastScanDateTime"] = value;
+            _Settings.Values[LastScanDateTimeSettingKey] = value.ToString("O");
             SetProperty(ref _LastScanDateTime, value);
         }
+    }
+
+    public string StatusMessage
+    {
+        get => _StatusMessage;
+        set => SetProperty(ref _StatusMessage, value);
     }
 
     private ObservableCollection<string> _SearchAlgorithmItemSource;
@@ -84,47 +90,22 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
 
     public override async Task InitializeAsync(object data)
     {
-        // Get the current window's HWND by passing in the Window object        
-        nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_MainWindow);
-
-        _FileOpenPicker = new FileOpenPicker
-        {
-            ViewMode = PickerViewMode.List,
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-            CommitButtonText = "Open merTorchbug.lua"
-        };
-
-        _FileOpenPicker.FileTypeFilter.Add(".lua");
-
-        _FileSavePicker = new FileSavePicker
-        {
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-            SuggestedFileName = "ConstantValues",
-            CommitButtonText = "Save ConstantValues.cs"
-        };
-
-        _FileSavePicker.FileTypeChoices.Add("C Sharp Class", [".cs"]);
-
-        // Associate the HWND with the file pickers
-        WinRT.Interop.InitializeWithWindow.Initialize(_FileOpenPicker, hwnd);
-        WinRT.Interop.InitializeWithWindow.Initialize(_FileSavePicker, hwnd);
-
         await base.InitializeAsync(data);
 
-        if (_Settings.Values["SearchAlgorithm"] == null)
+        if (_Settings.Values[SearchAlgorithmSettingKey] == null)
         {
-            _Settings.Values["SearchAlgorithm"] = "Fast Fuzzy";
+            _Settings.Values[SearchAlgorithmSettingKey] = "Fast Fuzzy";
         }
 
-        List<Type> searchAlgorithms = Utility.ListSearchAlgorithms();
+        List<Type> searchAlgorithms = SearchAlgorithmDiscovery.ListSearchAlgorithms();
 
         SearchAlgorithmItemSource = new ObservableCollection<string>(
             searchAlgorithms
-                .Select(a => a.GetPropertyValue("Name"))
+                .Select(a => a.GetStaticPropertyValue("Name"))
                 .OrderBy(a => a)
             );
 
-        SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values["SearchAlgorithm"].ToString());
+        SelectedAlgorithmIndex = SearchAlgorithmItemSource.IndexOf(_Settings.Values[SearchAlgorithmSettingKey].ToString());
 
         Themes =
         [
@@ -133,7 +114,7 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
             "SystemDefault"
         ];
 
-        string defaultTheme = _Settings.Values["ThemeName"] as string ?? "Dark";
+        string defaultTheme = _Settings.Values[ThemeNameSettingKey] as string ?? "Dark";
 
         SelectedThemeName = Themes.FirstOrDefault(t => t == defaultTheme) ?? Themes.First();
 
@@ -141,25 +122,90 @@ public class SettingsViewModel(ILuaParserService luaParserService, IThemeService
         {
             themeService.SetTheme(theme);
         }
+
+        if (_Settings.Values[LastScanDateTimeSettingKey] is string lastScanValue
+            && DateTime.TryParse(lastScanValue, out DateTime lastScanDateTime))
+        {
+            SetProperty(ref _LastScanDateTime, lastScanDateTime, nameof(LastScanDateTime));
+        }
+
+        StatusMessage = LastScanDateTime == default ? "No API rescan has been run yet." : $"Last API rescan completed on {LastScanDateTime:G}.";
     }
 
-    public ICommand Generate => new RelayCommand(async () =>
+    public ICommand Generate => new RelayCommand(() => _ = GenerateAsync());
+
+    private async Task GenerateAsync()
     {
-        // Select merTorchbug saved vars file
-        StorageFile merFilePath = await _FileOpenPicker.PickSingleFileAsync();
+        SetBusyState(true, "Generating ConstantValues class...");
 
-        // Parse the file
-        string content = File.ReadAllText(merFilePath.Path).Replace("\r", "");
-        Dictionary<string, Models.EsoUIGlobalValue> parsedData = luaParserService.ParseLuaContent(content);
+        try
+        {
+            StorageFile merFilePath = await filePickerService.PickSingleFileAsync(new FileOpenPickerOptions
+            {
+                SuggestedStartLocation = PickerStartLocation.DocumentsLibrary,
+                CommitButtonText = "Open merTorchbug.lua",
+                FileTypeFilter = [".lua"]
+            });
 
-        // Generate and save the file
-        StorageFile saveLocation = await _FileSavePicker.PickSaveFileAsync();
-        CodeGenerator.GenerateClassFile(parsedData, saveLocation.Path);
-    });
+            if (merFilePath == null)
+            {
+                StatusMessage = "Constant generation cancelled.";
+                return;
+            }
 
-    public ICommand Rescan => new RelayCommand(() =>
+            string content = File.ReadAllText(merFilePath.Path).Replace("\r", "");
+            Dictionary<string, Models.EsoUIGlobalValue> parsedData = luaParserService.ParseLuaContent(content);
+
+            StorageFile saveLocation = await filePickerService.PickSaveFileAsync(new FileSavePickerOptions
+            {
+                SuggestedStartLocation = PickerStartLocation.DocumentsLibrary,
+                SuggestedFileName = "ConstantValues",
+                CommitButtonText = "Save ConstantValues.cs",
+                FileTypeChoices = new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["C Sharp Class"] = [".cs"]
+                }
+            });
+
+            if (saveLocation == null)
+            {
+                StatusMessage = "Constant generation cancelled.";
+                return;
+            }
+
+            CodeGenerator.GenerateClassFile(parsedData, saveLocation.Path);
+            StatusMessage = $"Generated ConstantValues class at {saveLocation.Path}.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            SetBusyState(false);
+        }
+    }
+
+    public ICommand Rescan => new RelayCommand(() => _ = RescanAsync());
+
+    private async Task RescanAsync()
     {
-        // TODO: initiate rescan
-        LastScanDateTime = DateTime.Now;
-    });
+        SetBusyState(true, "Rescanning ESO API documentation...");
+
+        try
+        {
+            await esoDocumentationService.ReloadAsync(clearCache: true);
+            LastScanDateTime = DateTime.Now;
+            StatusMessage = $"API rescan completed on {LastScanDateTime:G}.";
+            await eventService.RaiseDocumentationChanged();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            SetBusyState(false);
+        }
+    }
 }
